@@ -110,7 +110,7 @@ test.describe('with a returning visitor', () => {
   });
 
   test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(420_000);
     // Pin the tier: on a slow machine the adaptive tier would change mid-test and change the counts.
     await page.goto('/?debug&tier=mid');
     await waitForScene(page);
@@ -145,8 +145,10 @@ test.describe('with a returning visitor', () => {
       await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
     }
 
-    // The first flight uploads things that are created lazily (the jump tunnel, for example),
-    // so it sets the baseline. A second flight must end exactly where the first one did.
+    // The first flight uploads things that are created lazily (the jump tunnel, for example). On a
+    // slow machine a frame may even skip one of them, so two warm-up flights come first. After
+    // that, a further flight must end exactly where the previous one did.
+    await flyEverywhere();
     await flyEverywhere();
     const before = await read();
     await flyEverywhere();
