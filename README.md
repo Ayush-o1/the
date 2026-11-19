@@ -10,14 +10,14 @@ Every project has a small simulation you can use in the page, with no login. Eac
 
 I build backend systems, and most of my projects are about what happens when something goes wrong. A portfolio that scrolls past six screenshots would hide that. So the page shows the failures instead:
 
-| Mission | Project | Failure it deals with | Simulation |
-|---|---|---|---|
-| Argus | Graph analytics on synthetic data | Hidden patterns | A graph where a planted burst gets flagged by a z-score detector |
-| BlackWater | Incident management and a status page | Outages | Declare an incident, walk the lifecycle, see private and public health differ |
-| BeetleJuice | Payment settlement reconciliation | Money that does not match | Reconcile two files, then try to approve your own fix |
-| theRedArmy | Prompt regression testing (team project) | Silent regressions | Shorten a prompt and watch the CI gate fail |
-| deadLetter | An action firewall for AI agents | Prompt injection | Pick an attack and a defence and read each tool call's verdict |
-| Europa | Satellite conjunction screening | Collisions and tampered records | Edit one log line and watch the hash chain break |
+| Mission     | Project                                  | Failure it deals with           | Simulation                                                                    |
+| ----------- | ---------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------- |
+| Argus       | Graph analytics on synthetic data        | Hidden patterns                 | A graph where a planted burst gets flagged by a z-score detector              |
+| BlackWater  | Incident management and a status page    | Outages                         | Declare an incident, walk the lifecycle, see private and public health differ |
+| BeetleJuice | Payment settlement reconciliation        | Money that does not match       | Reconcile two files, then try to approve your own fix                         |
+| theRedArmy  | Prompt regression testing (team project) | Silent regressions              | Shorten a prompt and watch the CI gate fail                                   |
+| deadLetter  | An action firewall for AI agents         | Prompt injection                | Pick an attack and a defence and read each tool call's verdict                |
+| Europa      | Satellite conjunction screening          | Collisions and tampered records | Edit one log line and watch the hash chain break                              |
 
 ## How it is built
 
@@ -34,7 +34,7 @@ More in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - First load (HTML, CSS and boot script): about 26 KB gzip. The 3D scene (Three.js, about 190 KB gzip) loads after the page is readable.
 - Lighthouse on a local build: desktop 99 performance and 100 for accessibility, best practices and SEO. Mobile (flight mode) 82 performance, 100 for the rest.
 - 60 fps on an M-series Mac with the GPU, also under a 4x CPU slowdown. Draw calls stay under 60 and triangles under 35,000 (post-processing passes included).
-- 111 logic tests with the Node test runner, and 133 passing Playwright tests in Chromium and WebKit (the flight tests run in Chromium only), including axe accessibility checks at five viewport sizes.
+- 110 logic tests with the Node test runner, and 133 passing Playwright tests in Chromium and WebKit (the flight tests run in Chromium only), including axe accessibility checks at five viewport sizes.
 
 ## Run it
 
