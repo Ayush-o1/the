@@ -74,3 +74,4 @@ PR #4 merged, CI green.
 
 ## Next
 Phase 5: Argus graph (Canvas 2D) and BlackWater status page and lifecycle (DOM), pure logic modules with `node --test`, keyboard access, text outcomes in aria-live.
+- `?tier=` now pins the tier (no adaptation) so tests are stable on slow machines (found when the leak test failed in CI).

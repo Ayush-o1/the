@@ -5,7 +5,7 @@ import { writeSetting } from './store.js';
 import { setModeToggleLabel, mountHud } from '../ui/hud.js';
 import { readCopy } from '../ui/copy.js';
 
-export function createModeController({ env, startTier }) {
+export function createModeController({ env, startTier, pinTier }) {
   const html = document.documentElement;
   let current = 'lite';
   let scene = null;
@@ -39,6 +39,7 @@ export function createModeController({ env, startTier }) {
       scene = startScene({
         env,
         startTier,
+        pinTier,
         onContextLost: () => enterLite('graphics context lost'),
         onSector: (stop) => hud?.setSector(stop),
         onFrame: (state) => hud?.update(state),

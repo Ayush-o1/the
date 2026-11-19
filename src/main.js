@@ -13,9 +13,10 @@ import { mountDebug } from './ui/debug.js';
 import { setModeToggleLabel } from './ui/hud.js';
 import { $ } from './lib/dom.js';
 
-// ?tier=low, mid or high starts on that tier, for testing. Otherwise it starts on mid and adapts.
+// ?tier=low, mid or high pins that tier, for testing. Otherwise it starts on mid and adapts.
 const requestedTier = new URLSearchParams(window.location.search).get('tier');
-const START_TIER = ['low', 'mid', 'high'].includes(requestedTier) ? requestedTier : 'mid';
+const TIER_PINNED = ['low', 'mid', 'high'].includes(requestedTier);
+const START_TIER = TIER_PINNED ? requestedTier : 'mid';
 
 function afterFirstPaint(callback) {
   requestAnimationFrame(() => requestAnimationFrame(callback));
@@ -30,7 +31,7 @@ async function firstVisit(env, decision) {
 const env = detectEnvironment();
 env.savedLite = readSetting('lite');
 const decision = decideMode(env);
-const modes = createModeController({ env, startTier: START_TIER });
+const modes = createModeController({ env, startTier: START_TIER, pinTier: TIER_PINNED });
 
 initBriefing();
 initContact();

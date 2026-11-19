@@ -111,7 +111,8 @@ test.describe('with a returning visitor', () => {
 
   test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
     test.setTimeout(240_000);
-    await page.goto('/?debug');
+    // Pin the tier: on a slow machine the adaptive tier would change mid-test and change the counts.
+    await page.goto('/?debug&tier=mid');
     await waitForScene(page);
     const read = async () => {
       await page.waitForTimeout(350);

@@ -23,7 +23,7 @@ const FOLLOW_RATE = 6; // docs/PLAN.md 5.2: tune between 4 and 8
 const INTERACTIVE =
   'a, button, input, textarea, select, summary, dialog, form, header, nav, label, details, .panel';
 
-export function startScene({ env, startTier, onContextLost, onSector, onFrame }) {
+export function startScene({ env, startTier, pinTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
   const curve = buildRoute(stops.map((stop) => stop.id));
 
@@ -182,7 +182,8 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     }
 
     fps = damp(fps, 1000 / Math.max(deltaMs, 1), 3, dt);
-    const nextTier = tierMonitor.sample(deltaMs, performance.now() - workStart);
+    // A pinned tier (?tier=) never adapts, so tests see the same scene on fast and slow machines.
+    const nextTier = pinTier ? null : tierMonitor.sample(deltaMs, performance.now() - workStart);
     if (nextTier) applyTier(nextTier);
 
     const nearest = nearestStop(scrolls, window.scrollY);
