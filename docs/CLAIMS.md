@@ -98,3 +98,9 @@ or a line in `docs/RECON.md` that cites one. A claim without evidence is removed
 | 89 | Stack JavaScript, Node.js, Express, PostgreSQL, satellite.js | Europa tags | Europa README 'Technology Stack' |
 | 90 | Status COMPLETE | Europa chip | DECISIONS D10 (last commit 19 Oct 2026) |
 | 91 | No analytics, no cookies | Footer | The site sets none; no analytics script or cookie code exists in src/ or index.html |
+| 92 | The Argus simulation flags an account whose most transactions in any 6 hours is 3 or more standard deviations above the rest; the real detector also needs an Isolation Forest | Argus simulation note | Argus docs/analytics.md 'Transaction Anomaly Detection' (6-hour burst count, z >= 3.0, both methods must agree). D06 |
+| 93 | Simulation: internal health counts all open incidents, the public page counts only published ones; open means not RESOLVED or CLOSED | BlackWater simulation | BlackWater src/services/health.service.js (CLOSED_STATUSES, publicOnly) |
+| 94 | Simulation: error text "Invalid state transition from X to Y" and "Incident is closed and cannot be modified" | BlackWater simulation | BlackWater src/services/incident.service.js validateTransition |
+| 95 | Simulation: audit entry types INCIDENT_CREATED, STATUS_CHANGED, VISIBILITY_CHANGED | BlackWater simulation | BlackWater src/utils/timelineEvents.js |
+| 96 | Hull gauge steps and hazard alert lines are a joke, not a metric | Flight HUD | docs/PLAN.md 5.3. Not a factual claim about the projects |
+| 97 | Conjunction alert shows a miss distance computed by lib/orbit.js from the debris track | Flight HUD | tests/logic/hazards.test.js; DECISIONS D25. Illustration, not Europa's real output |

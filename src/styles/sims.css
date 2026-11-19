@@ -1,0 +1,158 @@
+/* Simulation panels. Shared controls first, then one block per simulation. */
+
+.sim__app {
+  display: grid;
+  gap: var(--s4);
+}
+
+.sim__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s3);
+}
+
+.field select {
+  min-height: 44px;
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--void);
+  color: var(--star);
+  font: inherit;
+}
+
+.field select:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-color: var(--amber);
+}
+
+.sim__outcome {
+  min-height: 3.2em;
+  color: var(--star);
+  font-size: 0.9375rem;
+}
+
+.sim__note {
+  color: var(--dim);
+  font-size: 0.875rem;
+}
+
+/* Health labels: teal is only for "operational", red only for outages. */
+.health {
+  padding: 2px var(--s3);
+  border: 1px solid currentcolor;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.health--OPERATIONAL {
+  color: var(--ok);
+}
+
+.health--DEGRADED {
+  color: var(--amber);
+}
+
+.health--PARTIAL_OUTAGE,
+.health--MAJOR_OUTAGE {
+  color: var(--alert);
+}
+
+/* BlackWater */
+.bw__views {
+  display: grid;
+  gap: var(--s4);
+}
+
+.bw__views section {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+}
+
+.bw__services {
+  display: grid;
+  gap: var(--s2);
+  margin-top: var(--s2);
+}
+
+.bw__services li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.bw__incidents {
+  display: grid;
+  gap: var(--s3);
+}
+
+.bw__incidents > li {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+}
+
+.bw__incidents p {
+  max-width: none;
+}
+
+.bw__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+
+.bw__move[aria-disabled='true'] {
+  opacity: 0.6;
+}
+
+.bw__audit {
+  display: grid;
+  gap: var(--s1);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--dim);
+}
+
+.bw__audit:empty {
+  display: none;
+}
+
+@media (min-width: 700px) {
+  .bw__views {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Argus */
+.argus__canvas {
+  display: block;
+  width: 100%;
+  height: 340px;
+  border: 1px solid var(--line);
+  background: var(--void);
+}
+
+.argus__detail {
+  max-width: none;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--dim);
+  min-height: 2.6em;
+}
+
+.argus__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.argus__list .btn {
+  font-size: 0.6875rem;
+  padding-inline: var(--s3);
+}
