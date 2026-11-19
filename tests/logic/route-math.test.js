@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { stopScrolls, stopParam, nearestStop } from '../../src/core/route-math.js';
+import { stopScrolls, stopParam, nearestStop, jumpIntensity } from '../../src/core/route-math.js';
 
 const rects = [
   { top: 0, bottom: 800 },
@@ -60,4 +60,24 @@ test('nearestStop picks the closest centre', () => {
   assert.equal(nearestStop(scrolls, 400), 0);
   assert.equal(nearestStop(scrolls, 700), 1);
   assert.equal(nearestStop(scrolls, 2500), 2);
+});
+
+test('jumpIntensity is zero outside a jump and at both ends, and peaks half way', () => {
+  const jumps = [[2, 3]];
+  assert.equal(jumpIntensity(1.9, jumps), 0);
+  assert.equal(jumpIntensity(2, jumps), 0);
+  assert.equal(jumpIntensity(3, jumps), 0);
+  assert.equal(jumpIntensity(3.4, jumps), 0);
+  assert.equal(jumpIntensity(2.5, jumps), 1);
+  assert.ok(jumpIntensity(2.25, jumps) > 0 && jumpIntensity(2.25, jumps) < 1);
+});
+
+test('jumpIntensity depends only on progress, so scrubbing back gives the same value', () => {
+  const jumps = [
+    [2, 3],
+    [3, 4],
+  ];
+  const forward = jumpIntensity(3.7, jumps);
+  jumpIntensity(1, jumps);
+  assert.equal(jumpIntensity(3.7, jumps), forward);
 });

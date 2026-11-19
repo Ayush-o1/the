@@ -109,6 +109,77 @@ test.describe('with a returning visitor', () => {
     expect(Number(text.match(/triangles (\d+)/)[1])).toBeLessThanOrEqual(300_000);
   });
 
+  test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
+    test.setTimeout(240_000);
+    await page.goto('/?debug');
+    await waitForScene(page);
+    const read = async () => {
+      await page.waitForTimeout(350);
+      const text = await page.locator('.debug').textContent();
+      return {
+        geometries: Number(text.match(/geometries (\d+)/)[1]),
+        textures: Number(text.match(/textures (\d+)/)[1]),
+        worlds: text.match(/worlds (.*)/)[1],
+      };
+    };
+    const ids = [
+      'belt',
+      'argus',
+      'blackwater',
+      'beetlejuice',
+      'theredarmy',
+      'deadletter',
+      'europa',
+      'crew',
+      'contact',
+    ];
+    const route = [...ids, ...ids.slice(0, -1).reverse(), 'launch'];
+    let peak = 0;
+    async function flyEverywhere() {
+      for (const id of route) {
+        await scrollToSection(page, id);
+        await page.waitForTimeout(500);
+        peak = Math.max(peak, (await read()).geometries);
+      }
+      await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
+    }
+
+    // The first flight uploads things that are created lazily (the jump tunnel, for example),
+    // so it sets the baseline. A second flight must end exactly where the first one did.
+    await flyEverywhere();
+    const before = await read();
+    await flyEverywhere();
+    const after = await read();
+    expect(after.geometries).toBe(before.geometries);
+    expect(after.textures).toBe(before.textures);
+    // No world piles up: even at the busiest moment the count stays well below "everything at once".
+    expect(peak).toBeLessThan(60);
+  });
+
+  for (const tier of ['low', 'high']) {
+    test(`the ${tier} tier flies the whole route without errors`, async ({ page }) => {
+      const errors = [];
+      page.on('pageerror', (err) => errors.push(err.message));
+      page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()));
+      await page.goto(`/?debug&tier=${tier}`);
+      await waitForScene(page);
+      for (const id of [
+        'argus',
+        'blackwater',
+        'beetlejuice',
+        'theredarmy',
+        'deadletter',
+        'europa',
+        'contact',
+      ]) {
+        await scrollToSection(page, id);
+        await page.waitForTimeout(400);
+      }
+      await expect(page.locator('.debug')).toContainText(`tier ${tier}`);
+      expect(errors).toEqual([]);
+    });
+  }
+
   for (const size of [
     { width: 360, height: 740 },
     { width: 768, height: 1024 },

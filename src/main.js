@@ -13,7 +13,9 @@ import { mountDebug } from './ui/debug.js';
 import { setModeToggleLabel } from './ui/hud.js';
 import { $ } from './lib/dom.js';
 
-const START_TIER = 'mid';
+// ?tier=low, mid or high starts on that tier, for testing. Otherwise it starts on mid and adapts.
+const requestedTier = new URLSearchParams(window.location.search).get('tier');
+const START_TIER = ['low', 'mid', 'high'].includes(requestedTier) ? requestedTier : 'mid';
 
 function afterFirstPaint(callback) {
   requestAnimationFrame(() => requestAnimationFrame(callback));

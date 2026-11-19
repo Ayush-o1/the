@@ -16,6 +16,8 @@ export function mountDebug(getStats, getMode) {
         `triangles ${stats.triangles}`,
         `geometries ${stats.geometries}`,
         `textures ${stats.textures}`,
+        `programs ${stats.programs}`,
+        `worlds ${stats.worlds || 'none'}`,
       );
     }
     box.textContent = lines.join('\n');

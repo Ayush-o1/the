@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 2 complete locally, PR pending. Next: Phase 3 (worlds and jumps).
+Current phase: 3 complete locally, PR pending. Next: Phase 4 (hazards).
 
 ## Phase log
 
@@ -37,6 +37,23 @@ PR #2 merged. CI green. Lighthouse on local preview, desktop and mobile: 100 / 1
 - Not verified: Safari/WebKit flight, real phone, VoiceOver. Placeholder spheres stand in for worlds until Phase 3.
 - Misses: flight length vs 1,100 vh (D17).
 
+### Phase 2 (merged, tag phase-2)
+PR #3 merged, CI green.
+
+### Phase 3: Worlds and jumps (done locally)
+- Done: shared noise chunk, 20 GLSL files, `scene/worlds/` with Earth, Argus (banded giant, ring, 14-36 satellites linked into a graph with one red node), BlackWater (black sphere, swirling
+  accretion disk, upright lensing ring, photon ring, glow), BeetleJuice (convective red star, glow shell, flare, 60-160 GPU-animated dots in two streams with glowing mismatches),
+  Mars, relay station (blinking beacon, signal pulses), Europa (cracked ice, Jupiter behind), the blue home dot. Nebula backdrop (off on low tier). Jump tunnel J1 and J2 with wider field of view,
+  intensity a pure function of progress (`jumpIntensity`, tested). World manager creates a world when the probe is within 1.25 stops and disposes it beyond 1.9.
+  Per-world framing: each world sits on the side of the screen opposite its dossier panel. `?tier=low|mid|high` forces a tier for testing. CSS pictures hide in flight mode.
+- Verified (ran it): `npm run check` passes (22 logic tests; JS 177 KB gzip of 350, first load 19 KB, total 294 KB). 43 Playwright tests pass (17 skipped in WebKit by design).
+  New scene tests: second full flight forwards and back ends with identical geometry and texture counts (no leak), low and high tiers fly the route without errors, draw calls under 200 and triangles under 300k.
+  Real GPU numbers with ?debug: draw calls 11-33, triangles 1.4k-31k, 60 fps at 1440x900 and 360x740, no console errors, zero texture downloads (textures count stays 1: the shader-less probe uses none; the 1 is three.js's internal).
+  Screenshots at 360 and 1440 were looked at: all six worlds, the jump tunnel mid-flight, contact with the home dot.
+- Fixes found by looking: CSS pictures covered the 3D worlds, CSS horizon hid the 3D Earth, photon ring too thick, relay too small.
+- Not verified: Safari, a real phone. Mobile portrait hides most of each world behind the dossier (by design: worlds move up and toward the middle).
+- Note: "lens flare" is the glow plane with streaks on the star and black hole. Gravity-well lensing pass and chromatic aberration are Phase 4.
+
 ## Next
-Phase 3: six procedural worlds with GLSL, nebula, jump tunnel, lens flare, per-world framing, lazy init and dispose.
+Phase 4: hazard timeline (pure functions of progress), the Belt (instanced probes, text rocks, steering, click to break, hull hit), gravity-well lensing, signal flicker, conjunction readout, drift and star fix, reduced-motion variants, camera shake.
 Phase 2: capability and tier detection, lazy Three.js, renderer, loop, starfield, camera path, Lenis+GSAP, probe, HUD frame, boot, role chooser, Lite toggle, ?debug.

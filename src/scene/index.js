@@ -4,13 +4,15 @@ import { Scene, PerspectiveCamera, DirectionalLight, AmbientLight } from 'three'
 import { gsap } from 'gsap';
 import { createScroll } from '../core/scroll.js';
 import { collectStops, measureStops } from '../core/sectors.js';
-import { stopScrolls, stopParam, nearestStop } from '../core/route-math.js';
+import { stopScrolls, stopParam, nearestStop, jumpIntensity } from '../core/route-math.js';
 import { damp } from '../core/damp.js';
 import { TIERS, createTierMonitor } from '../core/tier.js';
 import { createRenderer } from './renderer.js';
 import { createStarfield } from './starfield.js';
 import { createProbe } from './probe.js';
-import { createMarkers } from './markers.js';
+import { createWorldManager } from './worlds/index.js';
+import { createNebula } from './nebula.js';
+import { createJump } from './jump.js';
 import { createCameraPath } from './camera-path.js';
 import { buildRoute } from './route.js';
 
@@ -30,9 +32,18 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
   scene.add(sun, new AmbientLight(0x6a6f85, 1.1));
 
   const starfield = createStarfield();
-  const markers = createMarkers();
+  const worlds = createWorldManager({ scene, stops, tier: startTier });
+  const nebula = createNebula();
+  const jump = createJump();
+  // J1 runs from Argus to BlackWater and J2 from BlackWater to BeetleJuice.
+  const jumps = [
+    ['argus', 'blackwater'],
+    ['blackwater', 'beetlejuice'],
+  ]
+    .map(([a, b]) => [a, b].map((id) => stops.findIndex((stop) => stop.id === id)))
+    .filter(([a, b]) => a >= 0 && b >= 0);
   const probe = createProbe();
-  scene.add(starfield.object, markers.object, probe.object);
+  scene.add(nebula.object, starfield.object, jump.object, probe.object);
   const rig = createCameraPath(curve, camera, probe.object);
 
   const scroll = createScroll();
@@ -54,6 +65,8 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     const settings = TIERS[name];
     rendererBundle.setDprCap(settings.dpr);
     starfield.setCount(settings.stars);
+    worlds.setTier(name);
+    nebula.object.visible = name !== 'low';
   }
 
   function measure() {
@@ -97,7 +110,16 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     const speed = Math.abs(param - previous) / dt; // stops per second
     thrust = damp(thrust, Math.min(1, speed / 1.5), 8, dt);
 
+    const jumpAmount = jumpIntensity(param, jumps);
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
+    const fov = jump.fovFor(jumpAmount);
+    if (Math.abs(camera.fov - fov) > 0.05) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
+    worlds.update(param, time, camera);
+    nebula.update(time, camera.position);
+    jump.update(jumpAmount, time, camera);
     const workStart = performance.now();
     probe.update(time, thrust);
     starfield.update(time, rendererBundle.pixelRatio, window.innerHeight);
@@ -134,6 +156,8 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
         triangles: info.render.triangles,
         geometries: info.memory.geometries,
         textures: info.memory.textures,
+        programs: info.programs?.length ?? 0,
+        worlds: worlds.active.join(','),
       };
     },
     dispose() {
@@ -143,7 +167,9 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
       window.removeEventListener('pointermove', onPointerMove);
       scroll.destroy();
       starfield.dispose();
-      markers.dispose();
+      worlds.dispose();
+      nebula.dispose();
+      jump.dispose();
       probe.dispose();
       rendererBundle.dispose();
       document.documentElement.classList.remove('scene');
