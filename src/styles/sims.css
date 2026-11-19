@@ -156,3 +156,315 @@
   font-size: 0.6875rem;
   padding-inline: var(--s3);
 }
+
+/* Verdict labels shared by the deadLetter steps */
+.verdict {
+  padding: 2px var(--s3);
+  border: 1px solid currentcolor;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.verdict--allow,
+.verdict--ran,
+.verdict--approved {
+  color: var(--ok);
+}
+
+.verdict--ask {
+  color: var(--amber);
+}
+
+.verdict--deny,
+.verdict--blocked,
+.verdict--rejected {
+  color: var(--alert);
+}
+
+/* BeetleJuice */
+.bj__table {
+  font-size: 0.875rem;
+}
+
+.bj__ref {
+  min-height: 44px;
+  padding-inline: var(--s3);
+}
+
+.bj__ref[aria-pressed='true'] {
+  --edge: var(--amber);
+  color: var(--amber);
+}
+
+.bj__panel {
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s4);
+  border: 1px solid var(--line);
+}
+
+.bj__panel p {
+  max-width: none;
+}
+
+.bj__switch {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  font-size: 0.875rem;
+  color: var(--dim);
+}
+
+.bj__switch input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--amber);
+}
+
+.bj__panel input[type='text'] {
+  min-width: min(100%, 16rem);
+  min-height: 44px;
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--void);
+  color: var(--star);
+  font: inherit;
+}
+
+/* deadLetter */
+.dl__defences {
+  display: grid;
+  gap: var(--s3);
+  margin: 0;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+}
+
+.dl__defence {
+  display: flex;
+  gap: var(--s3);
+  align-items: flex-start;
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.dl__defence input {
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  accent-color: var(--amber);
+}
+
+.dl__story p {
+  max-width: none;
+}
+
+.dl__story mark {
+  background: transparent;
+  color: var(--alert);
+  text-decoration: underline;
+}
+
+.dl__steps {
+  display: grid;
+  gap: var(--s3);
+}
+
+.dl__step {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+}
+
+.dl__step--maybe {
+  border-style: dashed;
+}
+
+.dl__step p {
+  max-width: none;
+}
+
+.dl__card {
+  padding: 0;
+}
+
+.dl__card:not(:empty) {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--amber);
+}
+
+/* Narrow screens: keep the simulations inside the column. */
+.sim__app > * {
+  min-width: 0;
+}
+
+.bj__panel,
+.sim__outcome {
+  overflow-wrap: anywhere;
+}
+
+.bj__ref {
+  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .bj__ref {
+    padding-inline: var(--s2);
+  }
+
+  .sim__controls .field {
+    flex: 1 1 100%;
+  }
+
+  .sim__controls .field select,
+  .bj__panel input[type='text'] {
+    width: 100%;
+  }
+}
+
+/* On a phone each row of the table becomes a labelled card, as in the real project. */
+@media (max-width: 599px) {
+  .bj__table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .bj__table,
+  .bj__table tbody,
+  .bj__table tr,
+  .bj__table th,
+  .bj__table td {
+    display: block;
+  }
+
+  .bj__table tr {
+    padding: var(--s3) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bj__table th,
+  .bj__table td {
+    padding: var(--s1) 0;
+    border: 0;
+  }
+
+  .bj__table td::before {
+    content: attr(data-label) ': ';
+    font-family: var(--font-mono);
+    font-size: var(--text-hud);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+  }
+}
+
+/* theRedArmy */
+.ra__editor {
+  width: 100%;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--void);
+  color: var(--star);
+  font: 0.875rem/1.5 var(--font-mono);
+  resize: vertical;
+}
+
+.ra__gate {
+  max-width: none;
+  min-height: 1.6em;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ra__gate[data-state='passed'] {
+  color: var(--ok);
+}
+
+.ra__gate[data-state='failed'] {
+  color: var(--alert);
+}
+
+/* Europa */
+.eu__events {
+  display: grid;
+  gap: var(--s2);
+}
+
+.eu__event {
+  border: 1px solid var(--line);
+  padding: 0 var(--s4);
+}
+
+.eu__event summary {
+  min-height: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.eu__event .dossier__list {
+  padding-bottom: var(--s3);
+}
+
+.urgency {
+  padding: 2px var(--s3);
+  border: 1px solid currentcolor;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  letter-spacing: 0.08em;
+}
+
+.urgency--CRITICAL,
+.urgency--HIGH {
+  color: var(--alert);
+}
+
+.urgency--MEDIUM {
+  color: var(--amber);
+}
+
+.urgency--LOW {
+  color: var(--dim);
+}
+
+.eu__log {
+  display: grid;
+  gap: var(--s2);
+}
+
+.eu__entry {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+}
+
+.eu__entry--broken {
+  border-color: var(--alert);
+}
+
+.eu__entry p {
+  max-width: none;
+}
+
+.eu__note,
+#eu-note {
+  width: 100%;
+  min-height: 44px;
+  margin-block: var(--s2);
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--void);
+  color: var(--star);
+  font: inherit;
+}

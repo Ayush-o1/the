@@ -6,6 +6,10 @@ import { $$ } from '../lib/dom.js';
 const LOADERS = {
   argus: () => import('./argus.js').then((module) => module.mountArgus),
   blackwater: () => import('./blackwater.js').then((module) => module.mountBlackWater),
+  beetlejuice: () => import('./beetlejuice.js').then((module) => module.mountBeetleJuice),
+  deadletter: () => import('./deadletter.js').then((module) => module.mountDeadLetter),
+  theredarmy: () => import('./redarmy.js').then((module) => module.mountRedArmy),
+  europa: () => import('./europa.js').then((module) => module.mountEuropa),
 };
 
 export function mountSimulations() {

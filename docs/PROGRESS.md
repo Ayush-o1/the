@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 5 complete locally, PR pending. Next: Phase 6 (simulations B: BeetleJuice and deadLetter).
+Current phase: 6 and 7 complete locally, PR pending. Next: Phase 8 (navigation and interaction layer).
 
 ## Phase log
 
@@ -84,5 +84,16 @@ PR #5 merged after CI went green (first run failed on a tier-dependent leak test
   14 new Playwright tests pass in Chromium and WebKit (incl. axe at 360 and 1440 with both sims in use, keyboard flow). Screenshots at 1440 and 360 looked at; the first Argus layout piled nodes on the border, fixed by normalising the layout.
 - Not done: the sims do not run in the Phase 2 flight HUD (they are page content under the panel, work in both modes).
 
+### Phase 5 (merged, tag phase-5)
+PR #6 merged. Its first CI run failed on the leak test again on the slow CI renderer (a lazily uploaded resource); the test now uses two warm-up flights.
+
+### Phases 6 and 7: Simulations B and C (done locally, one PR, see D32)
+- Done: BeetleJuice (reconcile 6 ledger and 6 settlement lines to one outcome each, then maker-checker with four people, audit log), deadLetter (5 real scenarios x 3 defences, labels and policy, approval card),
+  theRedArmy (edit prompt, save immutable version, run 8 cases, comparison, CI gate), Europa (review-priority scoring, same pair in either order merged, SHA-256 hash-chained log with editable notes, verify, append, restore).
+  Each has a pure logic module with tests, a DOM UI, keyboard access and a text outcome in an aria-live region. On a phone the BeetleJuice table becomes labelled cards.
+- Verified (ran it): 98 logic tests pass (new: 25 for BeetleJuice and deadLetter, 21 for theRedArmy and Europa, including SHA-256 agreeing with Node crypto, tamper at entry 3 fails at exactly 3, rewritten hash moves failure to the next link).
+  Playwright sims.spec.js: 42 tests pass in Chromium and WebKit, including axe at 360 and 1440 with every simulation in use. Screenshots looked at (1440 and 360); fixes: BeetleJuice table overflow on 360 solved with card layout.
+- Not done: real-phone test; no screen reader pass (listed for MANUAL_QA).
+
 ## Next
-Phase 6: BeetleJuice maker-checker (self-approval blocked, second approver allowed) and deadLetter firewall (trusted and untrusted messages, verdicts and reasons matching docs/POLICY_AND_LABELS.md).
+Phase 8: mission map and fast travel (M), Briefing logic and roles, console, deep links, GitHub telemetry and Cargo hold, contact form wiring, sound engine, tab-title swap, Konami.
