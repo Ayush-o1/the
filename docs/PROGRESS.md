@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 4 complete locally, PR pending. Next: Phase 5 (simulations A: Argus and BlackWater).
+Current phase: 5 complete locally, PR pending. Next: Phase 6 (simulations B: BeetleJuice and deadLetter).
 
 ## Phase log
 
@@ -72,6 +72,17 @@ PR #4 merged, CI green.
   Screenshots looked at: Belt, black hole at peak lensing, deadLetter, Europa with debris track.
 - Not verified: WebKit, real phone, how colour fringing and lensing feel in motion (only still frames). Sound for hazards arrives in Phase 8.
 
+### Phase 4 (merged, tag phase-4)
+PR #5 merged after CI went green (first run failed on a tier-dependent leak test; fixed by pinning the tier with ?tier=).
+
+### Phase 5: Simulations A, Argus and BlackWater (done locally)
+- Done: `src/sims/` with pure logic (`argus-logic.js`, `blackwater-logic.js`), DOM and Canvas UIs, `ui-kit.js`, lazy mounting per simulation (`sims/index.js`), `styles/sims.css`.
+  Argus: 36 synthetic accounts, seeded force layout, Inject anomaly (35 transactions in 6 hours), z-score detector, hover and a keyboard list of accounts, text outcome in an aria-live region.
+  BlackWater: internal view next to the public page (private incidents change one and not the other), declare incident, lifecycle buttons that refuse bad moves with the real message, publish toggle, audit trail.
+  Focus returns to the same control after a re-render, or to a sibling control when the pressed one disappears.
+- Verified (ran it): 20 new logic tests pass (lifecycle table equals the real one, health rule, public/private, one audit entry per change, burst count, z-score, determinism).
+  14 new Playwright tests pass in Chromium and WebKit (incl. axe at 360 and 1440 with both sims in use, keyboard flow). Screenshots at 1440 and 360 looked at; the first Argus layout piled nodes on the border, fixed by normalising the layout.
+- Not done: the sims do not run in the Phase 2 flight HUD (they are page content under the panel, work in both modes).
+
 ## Next
-Phase 5: Argus graph (Canvas 2D) and BlackWater status page and lifecycle (DOM), pure logic modules with `node --test`, keyboard access, text outcomes in aria-live.
-- `?tier=` now pins the tier (no adaptation) so tests are stable on slow machines (found when the leak test failed in CI).
+Phase 6: BeetleJuice maker-checker (self-approval blocked, second approver allowed) and deadLetter firewall (trusted and untrusted messages, verdicts and reasons matching docs/POLICY_AND_LABELS.md).

@@ -10,6 +10,7 @@ import { readSetting, writeSetting } from './core/store.js';
 import { runBoot } from './ui/boot.js';
 import { askRole, applyRole, savedRole } from './ui/role.js';
 import { mountDebug } from './ui/debug.js';
+import { mountSimulations } from './sims/index.js';
 import { setModeToggleLabel } from './ui/hud.js';
 import { $ } from './lib/dom.js';
 
@@ -34,6 +35,7 @@ const decision = decideMode(env);
 const modes = createModeController({ env, startTier: START_TIER, pinTier: TIER_PINNED });
 
 initBriefing();
+mountSimulations();
 initContact();
 initA11y();
 initKeys({ b: toggleBriefing, l: () => modes.toggle() });
