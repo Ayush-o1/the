@@ -1,0 +1,8 @@
+dist/
+node_modules/
+package-lock.json
+docs/PLAN.md
+public/
+shots/
+test-results/
+playwright-report/
