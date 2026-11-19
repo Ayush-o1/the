@@ -21,5 +21,7 @@ export default defineConfig({
   build: {
     target: 'es2022',
     assetsInlineLimit: 0,
+    // The Three.js chunk is over Vite's default warning size. scripts/check-budgets.js enforces the real budget.
+    chunkSizeWarningLimit: 700,
   },
 });

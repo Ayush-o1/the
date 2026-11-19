@@ -32,6 +32,9 @@
       <button type="button" class="btn btn--quiet needs-js" data-open-dialog="briefing">
         Briefing <kbd>B</kbd>
       </button>
+      <button type="button" class="btn btn--quiet needs-js" data-mode-toggle>
+        <span data-mode-label>Lite</span> <kbd>L</kbd>
+      </button>
     </header>
 
     <main id="main">
@@ -898,6 +901,19 @@
       <ol class="briefing__missions" data-briefing-missions></ol>
       <h3>Contact</h3>
       <ul class="briefing__links" data-briefing-links></ul>
+    </dialog>
+
+    <!-- Role chooser: shown once on a first visit by src/ui/role.js. Esc skips it. -->
+    <dialog id="role" class="panel role" aria-labelledby="role-title">
+      <h2 id="role-title">Who is flying?</h2>
+      <p>Pick one. It only changes what opens first.</p>
+      <div class="role__options">
+        <button type="button" class="btn" data-role="recruiter">Recruiter. I have a minute.</button>
+        <button type="button" class="btn btn--quiet" data-role="engineer">
+          Engineer. Show me how it is built.
+        </button>
+        <button type="button" class="btn btn--quiet" data-role="curious">Just looking.</button>
+      </div>
     </dialog>
 
     <script type="module" src="/src/main.js"></script>
