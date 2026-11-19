@@ -2,30 +2,904 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ayush Kumar</title>
-    <meta name="description" content="Ayush Kumar, backend developer. Site under construction." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Ayush Kumar | Backend developer</title>
+    <meta
+      name="description"
+      content="Ayush Kumar, final-year B.Tech CS student in Bengaluru, graduating 2027. Six backend projects about outages, mismatches and bad input, each with a small simulation."
+    />
     <meta name="theme-color" content="#06070A" />
-    <style>
-      body {
-        margin: 0;
-        background: #06070a;
-        color: #ede7da;
-        font:
-          1rem/1.6 system-ui,
-          sans-serif;
-      }
-      main {
-        padding: 4rem 1.25rem;
-        max-width: 40rem;
-      }
-    </style>
+    <link rel="canonical" href="https://ayush-o1.github.io/the/" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- Adds .js before first paint so controls that need JavaScript do not flash in and out. -->
+    <script>
+      document.documentElement.classList.add('js');
+    </script>
+    <link rel="stylesheet" href="/src/styles/main.css" />
   </head>
   <body>
-    <main>
-      <h1>Ayush Kumar</h1>
-      <p>Backend developer. The full site is on its way.</p>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="site-header__brand mono" href="#launch">AK-01</a>
+      <nav aria-label="Main">
+        <ul class="site-header__nav">
+          <li><a href="#missions">Missions</a></li>
+          <li><a href="#crew">Crew</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="btn btn--quiet needs-js" data-open-dialog="briefing">
+        Briefing <kbd>B</kbd>
+      </button>
+    </header>
+
+    <main id="main">
+      <!-- S0 Launch -->
+      <section id="launch" class="hero" aria-labelledby="hero-title" data-sector="Launch">
+        <p class="hero__eyebrow mono">AK-01 · Final-year B.Tech CS · Bengaluru · Graduating 2027</p>
+        <h1 id="hero-title" class="hero__name">Ayush Kumar</h1>
+        <p class="hero__line">
+          I build backend systems. Most of my projects are about what happens when something goes
+          wrong: an outage, a mismatch, bad input.
+        </p>
+        <p><span class="chip chip--active">Looking for SDE and backend roles</span></p>
+        <div class="hero__actions">
+          <a class="btn" href="#belt">Start the flight</a>
+          <button type="button" class="btn btn--quiet needs-js" data-open-dialog="briefing">
+            60-second briefing <kbd>B</kbd>
+          </button>
+          <!--resume:start-->
+          <a class="btn btn--quiet" href="./resume.pdf">Resume</a>
+          <!--resume:end-->
+          <a class="btn btn--quiet" href="https://github.com/Ayush-o1">GitHub</a>
+        </div>
+        <div class="hero__horizon" aria-hidden="true"></div>
+      </section>
+
+      <!-- S1 The Belt -->
+      <section id="belt" class="belt" aria-labelledby="belt-title" data-sector="The Belt">
+        <p class="mono section-kicker">Sector 01 · Hazard: filler</p>
+        <h2 id="belt-title">The Belt</h2>
+        <p class="section-intro">
+          Fourteen phrases that fill a lot of portfolios. Everything else on this site comes with a
+          link you can check.
+        </p>
+        <ul class="belt__rocks" data-belt>
+          <li>passionate developer</li>
+          <li>AI-powered solutions</li>
+          <li>scalable and robust</li>
+          <li>full-stack ninja</li>
+          <li>fast learner</li>
+          <li>team player</li>
+          <li>cutting-edge</li>
+          <li>results-driven</li>
+          <li>10x</li>
+          <li>seamless experience</li>
+          <li>detail-oriented</li>
+          <li>self-starter</li>
+          <li>synergy</li>
+          <li>hit the ground running</li>
+        </ul>
+      </section>
+
+      <!-- Missions M1 to M3 -->
+      <section
+        id="missions"
+        class="missions"
+        aria-labelledby="missions-title"
+        data-sector="Missions"
+      >
+        <p class="mono section-kicker">Sector 02 · Missions 01 to 03</p>
+        <h2 id="missions-title">Missions</h2>
+        <p class="section-intro">
+          Six projects, and each one is built around something going wrong. These three come first.
+        </p>
+
+        <!-- M1 ARGUS -->
+        <article
+          id="argus"
+          class="mission"
+          data-mission="argus"
+          data-sector="M1 Argus"
+          aria-labelledby="argus-title"
+        >
+          <div class="mission__art art art--argus" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 01 / Argus</p>
+            <h3 id="argus-title" class="dossier__callsign">Argus</h3>
+            <p><span class="chip chip--complete">Complete</span></p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              Argus is a graph investigation tool over a made-up world. It has 70 real cities in 50
+              countries and no real people. An analyst follows links between people, accounts and
+              shipments, runs graph algorithms and opens cases.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>Runs PageRank, community detection and cycle detection on the graph in Neo4j.</li>
+              <li>
+                Raises alerts from named, versioned rules and keeps an append-only audit log that a
+                command can re-check.
+              </li>
+              <li>
+                Lands every imported record untouched first. Rejected records go to a dead-letter
+                queue with a reason.
+              </li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>Hidden patterns.</strong> The anomaly detector flags an account only when an
+                Isolation Forest and a z-score of 3 or more both agree. It never reads the
+                generator's answer key.
+              </li>
+              <li>
+                <strong>Marking its own homework.</strong> Precision and recall are published
+                against ground truth the detectors never saw. Planted cases it cannot detect are
+                listed with a recall of 0 and the reason.
+              </li>
+              <li>
+                <strong>Silent data loss.</strong> A silent drop makes a gap look like a quiet
+                world. So nothing is dropped without a trace.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="argus">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <p>
+                  In the real run, a planted burst of 35 transactions inside six hours scored a
+                  z-score of about 37. The rule is simple: an account is flagged when its burst
+                  count sits 3 or more standard deviations above the rest and the Isolation Forest
+                  also calls it an outlier.
+                </p>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> Transactions are edge properties, not nodes. An account
+                  to account link is the money graph, so the algorithms run on it directly.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Neo4j holds the graph. PostgreSQL holds identity, the
+                  audit log and the job queue, which uses <code>FOR UPDATE SKIP LOCKED</code>. A
+                  restart postpones a batch instead of losing it.
+                </li>
+                <li>
+                  <strong>Decision.</strong> No hosted AI service. Entity narratives are composed
+                  from templates. A local model assistant exists and nothing depends on it.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> One instance, one tenant. Rate limiting is per
+                  process.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">Python</li>
+              <li class="tag">FastAPI</li>
+              <li class="tag">Neo4j</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">Redis</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/Argus">Read the code</a>
+              <a href="https://argus-rosy-one.vercel.app">Open live demo</a>
+              <a href="https://github.com/Ayush-o1/Argus/blob/main/docs/architecture.md"
+                >See the architecture</a
+              >
+            </p>
+          </div>
+        </article>
+
+        <!-- M2 BLACKWATER -->
+        <article
+          id="blackwater"
+          class="mission mission--flip"
+          data-mission="blackwater"
+          data-sector="M2 BlackWater"
+          aria-labelledby="blackwater-title"
+        >
+          <div class="mission__art art art--blackwater" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 02 / BlackWater</p>
+            <h3 id="blackwater-title" class="dossier__callsign">BlackWater</h3>
+            <p><span class="chip chip--active">Active</span></p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              BlackWater is incident management with a public status page. A team lists its
+              services, declares an incident when one breaks and works it through a fixed lifecycle.
+              It also decides which incidents customers get to see.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>
+                Moves an incident through TRIGGERED, ACKNOWLEDGED, RESOLVED and CLOSED. A closed
+                incident is final.
+              </li>
+              <li>Works out each service's health from its open incidents. Nobody types it in.</li>
+              <li>
+                Shows visitors only the incidents a team has published, and refreshes open pages
+                over Socket.IO.
+              </li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>Two people, one incident.</strong> Every change locks the incident row,
+                checks the lifecycle table and writes its audit entry in one transaction.
+              </li>
+              <li>
+                <strong>Health that disagrees with the incidents.</strong> Health is never stored.
+                It is calculated each time it is read, and the worst open incident wins.
+              </li>
+              <li>
+                <strong>A private incident on a public page.</strong> The public page reads an
+                allow-list of fields and only published incidents. Every query is filtered by
+                organization.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="blackwater">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <table class="sim__table">
+                  <caption>
+                    Allowed lifecycle moves, from the lookup table in the code
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">From</th>
+                      <th scope="col">May move to</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">TRIGGERED</th>
+                      <td>ACKNOWLEDGED, RESOLVED</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">ACKNOWLEDGED</th>
+                      <td>RESOLVED, TRIGGERED</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">RESOLVED</th>
+                      <td>TRIGGERED (reopen), CLOSED</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">CLOSED</th>
+                      <td>Nothing</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> The lifecycle is a lookup table checked inside the
+                  transaction, after the row lock. Two requests cannot both pass the same check.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Live updates are a doorbell. The server says "incident
+                  X changed" to the organization's room and each page refetches through the normal
+                  API.
+                </li>
+                <li>
+                  <strong>Decision.</strong> The interface is plain HTML, CSS and JavaScript served
+                  by the same Express app. No framework, no build step.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> One instance only, because rooms and rate limits live
+                  in process memory. No password reset and no email.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">Node.js</li>
+              <li class="tag">Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">Prisma</li>
+              <li class="tag">Socket.IO</li>
+              <li class="tag">Vanilla JS</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/BlackWater">Read the code</a>
+              <a href="https://blackwater-app.onrender.com">Open live demo</a>
+            </p>
+          </div>
+        </article>
+
+        <!-- M3 BEETLEJUICE -->
+        <article
+          id="beetlejuice"
+          class="mission"
+          data-mission="beetlejuice"
+          data-sector="M3 BeetleJuice"
+          aria-labelledby="beetlejuice-title"
+        >
+          <div class="mission__art art art--beetlejuice" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 03 / BeetleJuice</p>
+            <h3 id="beetlejuice-title" class="dossier__callsign">BeetleJuice</h3>
+            <p><span class="chip chip--active">Active</span></p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              A merchant records payments. Its processor reports what it settled. The two rarely
+              agree. BeetleJuice compares the two exports, explains every difference and sends each
+              exception through maker-checker approval. It uses synthetic data only.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>
+                Checks both CSV exports strictly and lists every rejected row with its reason.
+              </li>
+              <li>
+                Applies its rules in a fixed order, so every record ends with exactly one explained
+                outcome.
+              </li>
+              <li>Lets an analyst propose a fix. A different supervisor approves or rejects it.</li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>A reference that is not unique.</strong> A payment and its refund can share
+                one. When both sides have leftovers that do not line up, every record involved
+                becomes AMBIGUOUS_REFERENCE. Nothing is paired by guesswork.
+              </li>
+              <li>
+                <strong>Late is not missing.</strong> A settlement window and an as-of date decide.
+                Results never change in place. A later run looks again.
+              </li>
+              <li>
+                <strong>Approving your own fix.</strong> The service refuses it, and database
+                triggers refuse it again.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="beetlejuice">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <p>
+                  Example from the rules: the ledger says ₹1,200.00 and the settlement says
+                  ₹1,250.00. The outcome is AMOUNT_MISMATCH with a difference of +₹50.00. The
+                  analyst who proposes the fix cannot approve it. A different supervisor has to.
+                </p>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> Money is whole paise everywhere. Fees are exact
+                  fractions with one documented half-up rounding rule.
+                </li>
+                <li>
+                  <strong>Decision.</strong> The database enforces the invariants too: one result
+                  per record per run, one pending proposal per break, and no self-approval.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Plain SQL, no ORM. The matching engine is a pure
+                  function, so the same inputs always give the same output.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> No bank-holiday calendar. The settlement window counts
+                  calendar days.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">Node.js</li>
+              <li class="tag">Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">Plain SQL</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/BeetleJuice">Read the code</a>
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <!-- M4 to M6 The Fleet -->
+      <section
+        id="fleet"
+        class="missions fleet"
+        aria-labelledby="fleet-title"
+        data-sector="The Fleet"
+      >
+        <p class="mono section-kicker">Sector 03 · Missions 04 to 06</p>
+        <h2 id="fleet-title">The Fleet</h2>
+        <p class="section-intro">Three more, in a tighter format.</p>
+
+        <!-- M4 THEREDARMY -->
+        <article
+          id="theredarmy"
+          class="mission mission--compact"
+          data-mission="theredarmy"
+          data-sector="M4 theRedArmy"
+          aria-labelledby="theredarmy-title"
+        >
+          <div class="mission__art art art--theredarmy" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 04 / theRedArmy</p>
+            <h3 id="theredarmy-title" class="dossier__callsign">theRedArmy</h3>
+            <p>
+              <span class="chip chip--active">Active</span>
+              <span class="tag">Team project</span>
+            </p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              theRedArmy tests LLM prompts the way you test code. Write the test cases once, run
+              every new prompt version against them and see which cases broke. A CI pipeline can
+              call it and fail the build.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>Saves prompts as immutable versions and runs each one against a test suite.</li>
+              <li>
+                Turns a run into one job per test case in a PostgreSQL queue, worked by separate
+                worker processes.
+              </li>
+              <li>
+                Gates a CI build. With a baseline, a case that already failed is tolerated and a
+                case that used to pass and now fails stops the build.
+              </li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>Two workers, one job.</strong> Jobs are claimed with
+                <code>FOR UPDATE SKIP LOCKED</code> and leased. A late write from a dead worker is
+                rejected.
+              </li>
+              <li>
+                <strong>Rate limits and flaky calls.</strong> A shared Redis token bucket limits
+                each provider. Transient errors retry with backoff and jitter. Permanent errors do
+                not.
+              </li>
+              <li>
+                <strong>Silent regressions.</strong> A run is compared with its baseline, case by
+                case: regressed, fixed, still failing, added or removed.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="theredarmy">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <p>
+                  The seeded demo has a support-reply prompt. Version 1 quotes the order number and
+                  passes all 8 cases. Version 2 was shortened to save tokens and dropped the order
+                  number. Seven cases regress and one still passes, so the gate fails.
+                </p>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> The <code>run_cases</code> table is the queue. Starting
+                  a run inserts the run and its jobs in one transaction.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Only deterministic checks, such as contains, regex,
+                  is_json and length. A model judging a model would be slow, paid and different each
+                  time.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> The built-in provider echoes the prompt back. It
+                  exercises the pipeline for free and cannot say whether a real prompt is good.
+                </li>
+                <li>
+                  <strong>Team.</strong> This was built with others. The contributors page lists
+                  everyone.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">Node.js</li>
+              <li class="tag">Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">Prisma</li>
+              <li class="tag">Redis</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/theRedArmy">Read the code</a>
+              <a href="https://github.com/Ayush-o1/theRedArmy/blob/main/docs/architecture.md"
+                >See the architecture</a
+              >
+              <a href="https://github.com/Ayush-o1/theRedArmy/graphs/contributors">Contributors</a>
+            </p>
+          </div>
+        </article>
+
+        <!-- M5 DEADLETTER -->
+        <article
+          id="deadletter"
+          class="mission mission--compact mission--flip"
+          data-mission="deadletter"
+          data-sector="M5 deadLetter"
+          aria-labelledby="deadletter-title"
+        >
+          <div class="mission__art art art--deadletter" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 05 / deadLetter</p>
+            <h3 id="deadletter-title" class="dossier__callsign">deadLetter</h3>
+            <p><span class="chip chip--active">Active</span></p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              deadLetter is a firewall between an AI agent and its tools. The agent may read
+              untrusted text, such as an email, but that text cannot choose which tool runs or where
+              private data goes. It is a local prototype with fake tools, built on the CaMeL design
+              from a research paper.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>
+                Splits the agent in parts: a planner that sees only your request, a model with no
+                tools that reads untrusted text, and an interpreter that tracks where every value
+                came from.
+              </li>
+              <li>Checks every tool call against those labels and answers allow, ask or deny.</li>
+              <li>
+                Runs 20 prepared scenarios, 11 attacks and 9 normal tasks, against three defences.
+              </li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>Prompt injection.</strong> It does not guess whether text is malicious. It
+                asks where a value came from and whether that source may drive this action.
+              </li>
+              <li>
+                <strong>Private data leaving.</strong> If untrusted text picks the destination and
+                private data goes with it, the call is denied. Nobody can override a deny.
+              </li>
+              <li>
+                <strong>Grading itself kindly.</strong> The results use mock models and say so. One
+                attack still gets through, a misleading summary sent to an allowed recipient, and
+                the project lists it.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="deadletter">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <table class="sim__table">
+                  <caption>
+                    The policy matrix for a tool call that sends data somewhere
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Destination</th>
+                      <th scope="col">Data</th>
+                      <th scope="col">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Named by the user</td>
+                      <td>Anything</td>
+                      <td>Allow</td>
+                    </tr>
+                    <tr>
+                      <td>Trusted, not named, may not read it</td>
+                      <td>Private</td>
+                      <td>Ask</td>
+                    </tr>
+                    <tr>
+                      <td>Trusted</td>
+                      <td>Public</td>
+                      <td>Allow</td>
+                    </tr>
+                    <tr>
+                      <td>Untrusted</td>
+                      <td>Public</td>
+                      <td>Ask</td>
+                    </tr>
+                    <tr>
+                      <td>Untrusted</td>
+                      <td>Private</td>
+                      <td>Deny</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> Plans are JSON checked by a strict schema. Nothing is
+                  evaluated as code.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Labels can only get more restrictive when values
+                  combine. A second implementation, written separately, is checked against the real
+                  one on random graphs.
+                </li>
+                <li>
+                  <strong>Decision.</strong> A tool runs only with a single-use token bound to the
+                  exact call. The audit record is written before the action.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> Human approval can be mistaken, and the tools are
+                  fakes. It does not show that a real mailbox integration would be safe.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">Node.js</li>
+              <li class="tag">Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">Prisma</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/deadLetter">Read the code</a>
+              <a href="https://github.com/Ayush-o1/deadLetter/blob/main/docs/ARCHITECTURE.md"
+                >See the architecture</a
+              >
+              <a href="https://arxiv.org/abs/2503.18813">Read the paper</a>
+            </p>
+          </div>
+        </article>
+
+        <!-- M6 EUROPA -->
+        <article
+          id="europa"
+          class="mission mission--compact"
+          data-mission="europa"
+          data-sector="M6 Europa"
+          aria-labelledby="europa-title"
+        >
+          <div class="mission__art art art--europa" aria-hidden="true"></div>
+          <div class="dossier panel">
+            <p class="dossier__designation mono">Mission 06 / Europa</p>
+            <h3 id="europa-title" class="dossier__callsign">Europa</h3>
+            <p><span class="chip chip--complete">Complete</span></p>
+
+            <h4>Objective</h4>
+            <p class="dossier__objective">
+              Europa is a workbench for satellite close approaches. It reads public conjunction
+              reports, tracks how each predicted miss distance changes between updates, ranks what
+              to review first and keeps every review action in a hash-chained log.
+            </p>
+
+            <h4>What it does</h4>
+            <ul class="dossier__list">
+              <li>
+                Recognises the same pair of satellites across reports, even when the order of the
+                two swaps.
+              </li>
+              <li>
+                Scores review priority from 0 to 100 from miss distance, time to closest approach, a
+                probability bound and the age of the data.
+              </li>
+              <li>
+                Records each review action with a required reason. Every entry holds the hash of the
+                one before it.
+              </li>
+            </ul>
+
+            <h4>Hazards met</h4>
+            <ol class="hazards">
+              <li>
+                <strong>Same pair, different order.</strong> A pair gets one key built from the
+                smaller and larger catalog number, so A against B and B against A are one event.
+              </li>
+              <li>
+                <strong>Reports are snapshots.</strong> Predictions are matched over time. A miss
+                distance that shrinks by 20% or more flags the event for another review.
+              </li>
+              <li>
+                <strong>Tampered records.</strong> Database triggers block updates and deletes on
+                the log. A verifier walks the chain from the first entry to the last.
+              </li>
+            </ol>
+
+            <h4>Simulation</h4>
+            <div class="sim" data-sim="europa">
+              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+              <div class="sim__static">
+                <p>
+                  Each log entry is hashed with SHA-256 over its sequence number, action, actor,
+                  payload, the previous hash and the time. Change any field in an old entry and its
+                  hash no longer matches. So does every entry after it.
+                </p>
+              </div>
+            </div>
+
+            <details class="recorder" data-recorder>
+              <summary>Flight recorder</summary>
+              <ul class="dossier__list">
+                <li>
+                  <strong>Decision.</strong> The priority score is a review heuristic and not a
+                  collision probability. The project says so in its README.
+                </li>
+                <li>
+                  <strong>Decision.</strong> Appends are serialised with a database advisory lock,
+                  so two writers cannot both extend the same chain head.
+                </li>
+                <li>
+                  <strong>Trade-off.</strong> A database administrator could still rewrite the whole
+                  chain. Catching that needs the head hash stored somewhere else.
+                </li>
+              </ul>
+            </details>
+
+            <ul class="tags" aria-label="Stack">
+              <li class="tag">JavaScript</li>
+              <li class="tag">Node.js</li>
+              <li class="tag">Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">satellite.js</li>
+            </ul>
+            <p class="dossier__links">
+              <a href="https://github.com/Ayush-o1/Europa">Read the code</a>
+              <a href="https://github.com/Ayush-o1/Europa/blob/main/docs/architecture.md"
+                >See the architecture</a
+              >
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <!-- Cargo hold -->
+      <section id="cargo" class="cargo" aria-labelledby="cargo-title" data-sector="Cargo hold">
+        <p class="mono section-kicker">Sector 04</p>
+        <h2 id="cargo-title">Cargo hold</h2>
+        <p class="section-intro">
+          Smaller and older repositories are not on the route. They are all on
+          <a href="https://github.com/Ayush-o1?tab=repositories">GitHub</a>.
+        </p>
+        <ul class="cargo__list" data-cargo></ul>
+      </section>
+
+      <!-- Crew file -->
+      <section id="crew" class="crew" aria-labelledby="crew-title" data-sector="Crew file">
+        <p class="mono section-kicker">Sector 05</p>
+        <h2 id="crew-title">Crew file</h2>
+        <div class="crew__grid">
+          <div class="crew__text">
+            <p>
+              I am a final-year B.Tech student in Computer Science at Jain (Deemed-to-be University)
+              in Bengaluru. I graduate in 2027 and I am looking for SDE and backend roles.
+            </p>
+            <p>
+              I like the part of a system that only runs when something goes wrong. A lock that
+              stops two people editing the same record. An audit entry that says who did what. A
+              check that says no.
+            </p>
+            <p>
+              Five of the six projects here use plain HTML, CSS and JavaScript for the interface,
+              with no framework.
+            </p>
+          </div>
+          <dl class="crew__skills">
+            <div>
+              <dt class="mono">Use daily</dt>
+              <dd>JavaScript, Node.js, Express, PostgreSQL, Prisma</dd>
+            </div>
+            <div>
+              <dt class="mono">Used in a project</dt>
+              <dd>
+                Python, FastAPI, Neo4j, Redis, Socket.IO, Vitest, Supertest, Playwright, pytest,
+                GitHub Actions
+              </dd>
+            </div>
+            <div>
+              <dt class="mono">For practice</dt>
+              <dd>
+                C++, for data structures and algorithms on
+                <a href="https://leetcode.com/u/tZbaWZwiWk/">LeetCode</a>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="contact" aria-labelledby="contact-title" data-sector="Contact">
+        <p class="mono section-kicker">Sector 06 · Home</p>
+        <h2 id="contact-title">Open a channel</h2>
+        <div class="contact__grid">
+          <form
+            id="contact-form"
+            class="contact__form"
+            action="mailto:ayushh.pvt10@gmail.com"
+            method="post"
+            enctype="text/plain"
+          >
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" required></textarea>
+            </div>
+            <div class="hp" aria-hidden="true">
+              <label for="cf-website">Leave this empty</label>
+              <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <button type="submit" class="btn">Send</button>
+            <p id="contact-note" class="form-note" role="status">
+              This opens your email app with the message filled in.
+            </p>
+          </form>
+          <ul class="contact__links" data-contact-links>
+            <li><a href="mailto:ayushh.pvt10@gmail.com">ayushh.pvt10@gmail.com</a></li>
+            <!--resume:start-->
+            <li><a href="./resume.pdf">Resume</a></li>
+            <!--resume:end-->
+            <li><a href="https://linkedin.com/in/ayushh-o1">LinkedIn</a></li>
+            <li><a href="https://github.com/Ayush-o1">GitHub</a></li>
+          </ul>
+        </div>
+      </section>
     </main>
+
+    <footer class="site-footer">
+      <p class="mono">AK-01 · Ayush Kumar · 2026</p>
+      <p>No analytics. No cookies.</p>
+    </footer>
+
+    <!-- Briefing: the list of missions and the links are read from the page by src/ui/briefing.js. -->
+    <dialog id="briefing" class="panel briefing" aria-labelledby="briefing-title">
+      <div class="briefing__head">
+        <h2 id="briefing-title">60-second briefing</h2>
+        <form method="dialog">
+          <button class="btn btn--quiet">Close <kbd>Esc</kbd></button>
+        </form>
+      </div>
+      <p>
+        Ayush Kumar. Final-year B.Tech CS in Bengaluru, graduating 2027. Looking for SDE and backend
+        roles. I build backend systems and test them against failure.
+      </p>
+      <h3>Best three missions</h3>
+      <ol class="briefing__missions" data-briefing-missions></ol>
+      <h3>Contact</h3>
+      <ul class="briefing__links" data-briefing-links></ul>
+    </dialog>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

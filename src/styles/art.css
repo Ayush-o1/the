@@ -1,0 +1,171 @@
+/* CSS-only pictures for each destination. Decorative, aria-hidden, no image files. */
+
+.art {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--void);
+}
+
+.art::before,
+.art::after {
+  content: '';
+  position: absolute;
+}
+
+/* Argus: a banded gas giant with a ring and a few small satellites. */
+.art--argus::before {
+  left: 50%;
+  top: 50%;
+  width: 56%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: repeating-linear-gradient(
+    172deg,
+    #6b5a3c 0 8%,
+    #8a7650 8% 15%,
+    #4f4330 15% 24%,
+    #a38a5c 24% 30%
+  );
+  box-shadow: inset -22px -10px 40px rgba(6, 7, 10, 0.85);
+}
+
+.art--argus::after {
+  left: 50%;
+  top: 50%;
+  width: 92%;
+  height: 22%;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  border-radius: 50%;
+  border: 1px solid rgba(237, 231, 218, 0.45);
+  box-shadow:
+    0 0 0 6px rgba(237, 231, 218, 0.07),
+    0 0 0 7px rgba(237, 231, 218, 0.25);
+}
+
+/* BlackWater: a black disc inside a thin amber accretion ring. */
+.art--blackwater::before {
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #000;
+  box-shadow:
+    0 0 0 3px #ffb454,
+    0 0 26px 8px rgba(255, 180, 84, 0.45),
+    0 0 90px 30px rgba(255, 180, 84, 0.12);
+}
+
+.art--blackwater::after {
+  left: 50%;
+  top: 50%;
+  width: 96%;
+  height: 12%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(255, 180, 84, 0.5) 70%,
+    transparent 72%
+  );
+}
+
+/* BeetleJuice: a red supergiant, a big soft glow with a hot core. */
+.art--beetlejuice::before {
+  left: 50%;
+  top: 50%;
+  width: 62%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 42% 38%,
+    #ffd9a0 0%,
+    #ff7a3c 28%,
+    #b3341f 62%,
+    #4a120c 100%
+  );
+  box-shadow: 0 0 80px 20px rgba(255, 90, 60, 0.25);
+}
+
+.art--beetlejuice::after {
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 20%, var(--star) 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 78%, var(--star) 0 1px, transparent 2px);
+}
+
+/* theRedArmy: a rust-red planet with a pale polar cap. */
+.art--theredarmy::before {
+  left: 50%;
+  top: 50%;
+  width: 52%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 4%, #ede7da 0 7%, transparent 8%),
+    radial-gradient(circle at 36% 34%, #c8603a 0%, #8f3a1e 55%, #3d160b 100%);
+  box-shadow: inset -20px -8px 36px rgba(6, 7, 10, 0.8);
+}
+
+/* deadLetter: a small relay station, a hub with two panels and a dish. */
+.art--deadletter::before {
+  left: 50%;
+  top: 50%;
+  width: 14%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--star);
+  background: var(--panel);
+  box-shadow:
+    -64px 0 0 -2px var(--panel),
+    64px 0 0 -2px var(--panel),
+    -64px 0 0 -1px var(--dim),
+    64px 0 0 -1px var(--dim);
+}
+
+.art--deadletter::after {
+  left: 50%;
+  top: 50%;
+  width: 76%;
+  height: 1px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, transparent, var(--amber) 20%, var(--amber) 80%, transparent);
+  opacity: 0.55;
+}
+
+/* Europa: a pale ice moon with Jupiter's banded edge behind it. */
+.art--europa::before {
+  left: 62%;
+  top: 44%;
+  width: 130%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: repeating-linear-gradient(
+    168deg,
+    #5a4630 0 6%,
+    #7a6240 6% 11%,
+    #3f3223 11% 17%,
+    #8f7650 17% 21%
+  );
+  opacity: 0.55;
+}
+
+.art--europa::after {
+  left: 36%;
+  top: 62%;
+  width: 34%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    linear-gradient(35deg, transparent 46%, rgba(160, 90, 60, 0.6) 47% 48%, transparent 49%),
+    radial-gradient(circle at 36% 34%, #f2eee4 0%, #c9c6bb 60%, #6f6d66 100%);
+  box-shadow: inset -12px -6px 22px rgba(6, 7, 10, 0.7);
+}
