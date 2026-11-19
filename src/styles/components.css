@@ -1,0 +1,221 @@
+/* Buttons, tags, chips, panels, form fields. */
+
+/* Chamfered corners are drawn with two small gradients so the 1px border survives the clip-path. */
+.btn {
+  --edge: var(--amber);
+  --corner: var(--chamfer);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  min-height: 44px;
+  padding: var(--s3) var(--s5);
+  border: 1px solid var(--edge);
+  background-color: transparent;
+  background-image:
+    linear-gradient(135deg, transparent 5.2px, var(--edge) 5.2px 6.4px, transparent 6.4px),
+    linear-gradient(315deg, transparent 5.2px, var(--edge) 5.2px 6.4px, transparent 6.4px);
+  background-position:
+    top left,
+    bottom right;
+  background-size: var(--corner) var(--corner);
+  background-repeat: no-repeat;
+  clip-path: polygon(
+    var(--corner) 0,
+    100% 0,
+    100% calc(100% - var(--corner)),
+    calc(100% - var(--corner)) 100%,
+    0 100%,
+    0 var(--corner)
+  );
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    color 120ms;
+}
+
+.btn:hover {
+  background-color: var(--amber);
+  color: var(--void);
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+/* clip-path would cut the focus outline, so the focus ring is drawn inside the button. */
+.btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: -5px;
+}
+
+.btn--quiet {
+  --edge: var(--line);
+  color: var(--star);
+}
+
+.btn--quiet:hover {
+  --edge: var(--amber);
+}
+
+.btn kbd {
+  padding: 0 var(--s2);
+  border: 1px solid currentcolor;
+  font: inherit;
+  opacity: 0.8;
+}
+
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.tag {
+  padding: var(--s1) var(--s3);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  letter-spacing: 0.04em;
+  color: var(--star);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px var(--s3);
+  border: 1px solid currentcolor;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.chip--active {
+  color: var(--amber);
+}
+
+.chip--complete {
+  color: var(--ok);
+}
+
+.chip--archived {
+  color: var(--dim);
+}
+
+/* Panel: one chamfered corner, 1px hairline, no blur. */
+.panel {
+  position: relative;
+  background: rgba(13, 16, 23, 0.92);
+  border: 1px solid var(--line);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--chamfer-panel)) 0,
+    100% var(--chamfer-panel),
+    100% 100%,
+    0 100%
+  );
+}
+
+.panel::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: calc(var(--chamfer-panel) + 1px);
+  height: calc(var(--chamfer-panel) + 1px);
+  background: linear-gradient(
+    to bottom left,
+    transparent calc(50% - 0.6px),
+    var(--line) calc(50% - 0.6px) calc(50% + 0.6px),
+    transparent calc(50% + 0.6px)
+  );
+  pointer-events: none;
+}
+
+/* Form fields */
+.field {
+  display: grid;
+  gap: var(--s2);
+}
+
+.field label {
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--void);
+  color: var(--star);
+  font: inherit;
+}
+
+.field textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-color: var(--amber);
+}
+
+.form-note {
+  min-height: 1.6em;
+  font-size: 0.9375rem;
+  color: var(--dim);
+}
+
+.form-note[data-state='ok'] {
+  color: var(--ok);
+}
+
+.form-note[data-state='error'] {
+  color: var(--alert);
+}
+
+/* Honeypot: off screen for people, still present for bots. */
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Native dialog */
+dialog {
+  width: min(44rem, calc(100vw - 2 * var(--gutter)));
+  max-height: calc(100svh - 2 * var(--s5));
+  padding: 0;
+  overflow: auto;
+  color: var(--star);
+}
+
+dialog::backdrop {
+  background: rgba(6, 7, 10, 0.85);
+}

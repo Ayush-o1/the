@@ -1,0 +1,8 @@
+/* One stylesheet entry. Vite bundles the imports into a single file. */
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './layout.css';
+@import './dossier.css';
+@import './art.css';
+@import './lite.css';

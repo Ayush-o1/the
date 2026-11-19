@@ -1,0 +1,26 @@
+/* Lite mode: the plain page. A CSS star field stands in for the canvas.
+   When the 3D scene is running it adds .scene to <html> and this layer steps aside. */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(237, 231, 218, 0.8), transparent),
+    radial-gradient(1px 1px at 120px 90px, rgba(237, 231, 218, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 200px 40px, rgba(255, 180, 84, 0.7), transparent),
+    radial-gradient(1px 1px at 60px 160px, rgba(237, 231, 218, 0.5), transparent),
+    radial-gradient(1px 1px at 260px 190px, rgba(237, 231, 218, 0.7), transparent);
+  background-size:
+    280px 220px,
+    340px 260px,
+    420px 300px,
+    230px 280px,
+    380px 240px;
+}
+
+html.scene body::before {
+  display: none;
+}

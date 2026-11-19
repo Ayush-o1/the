@@ -45,3 +45,30 @@ The HUD line stays short; the dossier names the real rule.
 
 `resume.pdf` was not found in the project folder. The Resume button is hidden when `public/resume.pdf` is absent
 at build time. Listed in `HANDOFF.md`.
+
+## D09 Skills wording
+Plan 7.6 offers three words: Use daily, Used in a project, Basic. C++ does not fit any of them (it is DSA practice, not a project, and "Basic" undersells it).
+The Crew file adds a fourth group, "For practice". Docker is left out on purpose (plan 7.3) even though repos contain Dockerfiles.
+Vitest, Supertest, Playwright, pytest and GitHub Actions appear in "Used in a project" (BlackWater, Argus, theRedArmy CI files). MongoDB is left out: none of the six repos use it.
+
+## D10 Status chips
+Chips are static HTML, set by one rule: ACTIVE = the repo had a commit in the 30 days before 19 Nov 2026; COMPLETE = shipped (live URL or documented release or launch checklist) with no commit in that window; ARCHIVED = none used.
+BlackWater (9 Nov), BeetleJuice (9 Nov), theRedArmy (9 Nov) and deadLetter (5 Nov) are ACTIVE. Argus (26 Aug) and Europa (19 Oct) are COMPLETE.
+They go stale if Ayush stops or restarts work. `HANDOFF.md` says so.
+
+## D11 Live demo links
+Argus (https://argus-rosy-one.vercel.app) and BlackWater (https://blackwater-app.onrender.com) both answered HTTP 200 on 19 Nov 2026.
+Argus's page is a landing page with an "Enter Argus" button. BlackWater needs a sign-in or registration. The label stays "Open live demo".
+`HANDOFF.md` asks Ayush to confirm what visitors can actually do there.
+
+## D12 Roles and the "no login" rule
+C2 says visitors to this site never log in. The two external demos are other sites. The simulations on this site need no login.
+
+## D13 Hero line
+Kept the plan's draft verbatim. It passes the voice rules.
+
+## D14 Missions are shown in HTML order, not randomised
+Plan 3 puts the featured three first. The page follows that.
+
+## D15 Preview server note
+`vite preview` answers unknown paths with index.html (status 200), so tests that check for a missing file must also check the content type.

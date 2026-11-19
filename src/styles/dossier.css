@@ -1,0 +1,231 @@
+/* Mission dossier: the project panel and the row that holds it. */
+
+.mission {
+  display: grid;
+  gap: var(--s5);
+  margin-top: var(--s8);
+}
+
+/* min-width 0 lets grid children shrink below their content width on narrow screens. */
+.mission > * {
+  min-width: 0;
+}
+
+.mission__art {
+  min-height: 200px;
+}
+
+@media (min-width: 900px) {
+  .mission {
+    grid-template-columns: 4fr 8fr;
+    gap: var(--s7);
+    align-items: start;
+  }
+
+  .mission--flip {
+    grid-template-columns: 8fr 4fr;
+  }
+
+  .mission--flip .mission__art {
+    order: 2;
+  }
+
+  /* The picture stays in view while a long dossier scrolls past. */
+  .mission__art {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s5));
+    min-height: 360px;
+  }
+
+  .mission--compact .mission__art {
+    min-height: 260px;
+  }
+}
+
+.dossier {
+  padding: var(--s5) var(--s5) var(--s6);
+}
+
+@media (min-width: 600px) {
+  .dossier {
+    padding: var(--s6) var(--s7) var(--s7);
+  }
+}
+
+.dossier > * + * {
+  margin-top: var(--s3);
+}
+
+.dossier > h4 {
+  margin-top: var(--s6);
+}
+
+.dossier__designation {
+  color: var(--dim);
+}
+
+.dossier__callsign {
+  font-size: var(--text-h3);
+}
+
+.dossier__callsign + p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+
+.dossier__list {
+  display: grid;
+  gap: var(--s3);
+}
+
+.dossier__list li {
+  position: relative;
+  max-width: var(--measure);
+  padding-left: var(--s5);
+}
+
+.dossier__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 10px;
+  height: 1px;
+  background: var(--amber);
+}
+
+.hazards {
+  display: grid;
+  gap: var(--s4);
+  counter-reset: hazard;
+}
+
+.hazards li {
+  position: relative;
+  max-width: var(--measure);
+  padding-left: var(--s7);
+  counter-increment: hazard;
+}
+
+.hazards li::before {
+  content: 'H' counter(hazard);
+  position: absolute;
+  left: 0;
+  top: 0.2em;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  letter-spacing: 0.12em;
+  color: var(--alert);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--star);
+  padding: 0 var(--s1);
+  border: 1px solid var(--line);
+}
+
+/* Simulation box */
+.sim {
+  overflow-x: auto;
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s4);
+  border: 1px dashed var(--line);
+}
+
+.sim__label {
+  color: var(--dim);
+}
+
+.sim__static > * + * {
+  margin-top: var(--s3);
+}
+
+.sim__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.sim__table caption {
+  padding-bottom: var(--s3);
+  text-align: left;
+  color: var(--dim);
+}
+
+.sim__table th,
+.sim__table td {
+  padding: var(--s2) var(--s3) var(--s2) 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.sim__table thead th {
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+}
+
+.sim__table tbody th {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+/* Flight recorder */
+.recorder {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.recorder summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+  list-style: none;
+}
+
+.recorder summary::-webkit-details-marker {
+  display: none;
+}
+
+.recorder summary::after {
+  content: '+';
+  font-size: 1.25rem;
+}
+
+.recorder[open] summary::after {
+  content: '\2212';
+}
+
+.recorder .dossier__list {
+  padding-bottom: var(--s4);
+}
+
+.dossier__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s5);
+  max-width: none;
+}
+
+.dossier__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
