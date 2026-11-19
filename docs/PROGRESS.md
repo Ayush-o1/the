@@ -48,7 +48,7 @@ PR #3 merged, CI green.
   Per-world framing: each world sits on the side of the screen opposite its dossier panel. `?tier=low|mid|high` forces a tier for testing. CSS pictures hide in flight mode.
 - Verified (ran it): `npm run check` passes (22 logic tests; JS 177 KB gzip of 350, first load 19 KB, total 294 KB). 43 Playwright tests pass (17 skipped in WebKit by design).
   New scene tests: second full flight forwards and back ends with identical geometry and texture counts (no leak), low and high tiers fly the route without errors, draw calls under 200 and triangles under 300k.
-  Real GPU numbers with ?debug: draw calls 11-33, triangles 1.4k-31k, 60 fps at 1440x900 and 360x740, no console errors, zero texture downloads (textures count stays 1: the shader-less probe uses none; the 1 is three.js's internal).
+  Real GPU numbers with ?debug: draw calls 11-33, triangles 1.4k-31k, 60 fps at 1440x900 and 360x740, no console errors, zero image, texture or model downloads (checked by an e2e test that watches every request; the debug overlay shows textures 1, which is not a downloaded file).
   Screenshots at 360 and 1440 were looked at: all six worlds, the jump tunnel mid-flight, contact with the home dot.
 - Fixes found by looking: CSS pictures covered the 3D worlds, CSS horizon hid the 3D Earth, photon ring too thick, relay too small.
 - Not verified: Safari, a real phone. Mobile portrait hides most of each world behind the dossier (by design: worlds move up and toward the middle).

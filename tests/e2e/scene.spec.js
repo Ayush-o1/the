@@ -156,6 +156,24 @@ test.describe('with a returning visitor', () => {
     expect(peak).toBeLessThan(60);
   });
 
+  test('the flight downloads no images, textures or model files', async ({ page }) => {
+    const downloaded = [];
+    page.on('request', (request) => {
+      if (['image', 'media'].includes(request.resourceType())) downloaded.push(request.url());
+      if (/\.(png|jpe?g|webp|gif|ktx2?|glb|gltf|hdr|exr)(\?|$)/i.test(request.url())) {
+        downloaded.push(request.url());
+      }
+    });
+    await page.goto('/');
+    await waitForScene(page);
+    for (const id of ['argus', 'blackwater', 'europa', 'contact']) {
+      await scrollToSection(page, id);
+      await page.waitForTimeout(300);
+    }
+    // The favicon is an SVG and is not counted as a texture.
+    expect(downloaded.filter((url) => !url.endsWith('favicon.svg'))).toEqual([]);
+  });
+
   for (const tier of ['low', 'high']) {
     test(`the ${tier} tier flies the whole route without errors`, async ({ page }) => {
       const errors = [];
