@@ -43,3 +43,15 @@ export function nearestStop(scrolls, y) {
   }
   return best;
 }
+
+// How strong the jump tunnel is at this progress. Each jump is a pair of stop numbers. The
+// tunnel is off at both ends and peaks half way, so it only plays while the probe is travelling.
+export function jumpIntensity(param, jumps) {
+  for (const [from, to] of jumps) {
+    if (param > from && param < to) {
+      const wave = Math.sin((Math.PI * (param - from)) / (to - from));
+      return wave * wave;
+    }
+  }
+  return 0;
+}

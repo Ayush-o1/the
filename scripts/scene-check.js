@@ -27,6 +27,8 @@ const stopsToShoot = [
   'argus',
   'blackwater',
   'beetlejuice',
+  'theredarmy',
+  'deadletter',
   'europa',
   'crew',
   'contact',

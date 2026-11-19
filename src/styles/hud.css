@@ -231,3 +231,16 @@ html.scene .site-footer {
   text-transform: none;
   pointer-events: none;
 }
+
+/* In flight mode the real 3D worlds replace the CSS pictures and the CSS horizon.
+   The pictures keep their grid space so the layout does not move. */
+html.scene .art {
+  background: transparent;
+  border-color: transparent;
+}
+
+html.scene .art::before,
+html.scene .art::after,
+html.scene .hero__horizon {
+  display: none;
+}
