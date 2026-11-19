@@ -13,7 +13,7 @@ Things the automated tests cannot judge. About 30 minutes. Tick them off on a re
 - [ ] Try every simulation with your finger: drag-free, tap only. Check the text under each one updates.
 - [ ] Switch to Lite with the L button. The page should stay where you were.
 - [ ] Turn on Low Power Mode and reload. Still usable?
-- [ ] Open the site, lock the phone, unlock it. The flight should resume, not show a black screen.
+- [ ] Open the site, lock the phone, then wake it again. The flight should resume, not show a black screen.
 
 ## On your Mac
 

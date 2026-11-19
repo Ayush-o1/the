@@ -173,3 +173,7 @@ Playwright is run in Chromium and WebKit. Firefox is not installed in this envir
 
 ## D43 INP
 Measured by scripted interaction in the flight under a 4x CPU throttle (PerformanceObserver event timing): worst click or key response 160 ms on a desktop viewport, 88 ms on a phone viewport. Target is 200 ms. Not measured on a real phone.
+
+## D44 Deep link race
+CI caught a deep link (`/#blackwater`) that sometimes landed on the launch sector. An early scroll event, before the browser's own jump to the hash had landed, made the address updater rewrite the address to the top-of-page sector and erase the link.
+The hash is now captured at start, address updates are held until it has settled (about 1.8 s, or until the visitor scrolls), and the jump back uses instant scrolling and re-checks twice.
