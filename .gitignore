@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+test-results/
+playwright-report/
+.lighthouseci/
+shots/
+# Planning inputs that are not part of the site
+BUILD_PROMPT.md
+RESEARCH_PROMPT.md
+/PLAN.md
