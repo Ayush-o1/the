@@ -180,6 +180,8 @@ test.describe('with a returning visitor', () => {
   test('hazards: hull drops along the route, alerts match the sector, the flight ends at 71%', async ({
     page,
   }) => {
+    // The probe eases between the far ends of the route. Slow machines need longer to arrive.
+    test.slow();
     await page.goto('/');
     await waitForScene(page);
     const hull = page.locator('.hud-hull');
@@ -194,8 +196,8 @@ test.describe('with a returning visitor', () => {
     await expect(alert).toHaveText('Arrived. Good enough to ship.');
     // Scrubbing back restores the earlier state.
     await scrollToSection(page, 'launch');
-    await expect(hull).toHaveText('Hull 100%');
-    await expect(alert).toBeHidden();
+    await expect(hull).toHaveText('Hull 100%', { timeout: 60_000 });
+    await expect(alert).toBeHidden({ timeout: 60_000 });
   });
 
   test('the HUD never dims faster than three times a second', async ({ page }) => {

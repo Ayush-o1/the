@@ -46,9 +46,10 @@ test('no banned words or filler text in shipped files', () => {
   for (const file of files) {
     let text = readFileSync(file, 'utf8');
     if (file === 'index.html') text = withoutBeltList(text);
-    const lower = text.toLowerCase();
+    // Whole words only, so "resolutions" in a file path does not count as "solutions".
     for (const word of BANNED) {
-      if (lower.includes(word)) hits.push(`${file}: ${word}`);
+      const pattern = new RegExp(`\\b${word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+      if (pattern.test(text)) hits.push(`${file}: ${word}`);
     }
     if (file === 'index.html' && /!(?!--|doctype)/i.test(text.replace(/<!--[\s\S]*?-->/g, ''))) {
       hits.push(`${file}: exclamation mark`);

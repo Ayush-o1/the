@@ -122,3 +122,19 @@ See PROGRESS Phase 4. Keep the sanitise pass unless the source of the bad pixel 
 ## D27 Click to break
 The canvas sits behind the page, so clicks cannot reach it. A click on bare page background (html, body, main or section, not on any control or panel) is cast into the scene.
 Broken rocks stay broken for that visit. This is the one place scene state depends on a user action, not on scroll alone (plan 5.2 allows it: it is a click, not a hazard).
+
+## D28 BeetleJuice maker-checker, honestly
+In the real app the role rule comes first: only analysts propose and only supervisors decide, so an analyst trying to approve is refused for their role. The "cannot approve your own proposal" check is a second guard, also in a database trigger.
+The simulation shows both. To make the second guard testable it has a switch, "Let supervisors propose too (simulation only)". That switch is not a feature of BeetleJuice and is labelled as such. The plan's "try to approve your own fix, blocked; second approver, allowed" is covered by that switch.
+
+## D29 deadLetter simulation scope
+Five of the 20 real scenarios, three defences, fake tools, no models. It does not reproduce the project's evaluation numbers. It shows one of the project's own limits (the misleading summary), as the project does.
+
+## D30 theRedArmy simulation scope
+Checks implemented: contains, not_contains, max_length. The real engine has more (equals, regex, is_json, json_field_equals, min_length, latency). Retries, rate limiting and random provider failures are not simulated.
+
+## D31 Europa simulation
+Scoring bands and hash-chain fields are copied from the repo. SGP4 propagation and the correlation windows are not simulated. In the real scoring the rule "under 0.5 km and under 24 hours is critical" can never decide alone with the default weights (that case already scores 75), and the simulation notes this in a test.
+
+## D32 Phases 6 and 7 shipped together
+Both sets of simulations share `src/sims/index.js`, the styles and the e2e file, so splitting them cleanly would have meant two half-working branches. They are one PR. Tags phase-6 and phase-7 point at the same merge commit.
