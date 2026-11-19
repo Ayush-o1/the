@@ -903,6 +903,27 @@
       <ul class="briefing__links" data-briefing-links></ul>
     </dialog>
 
+    <!-- Hazard alert text for the flight. src/ui/copy.js reads it. {n}, {x}, {km} and {hull} are live values. -->
+    <div id="hazard-copy" hidden>
+      <p data-copy="hull-label">Hull {hull}%</p>
+      <p data-copy="hull-note">Flight status for the joke. It measures nothing about the code.</p>
+      <p data-copy="belt-contacts">Contacts {n}. All identical.</p>
+      <p data-copy="belt-hull">Hull 94%. Noted.</p>
+      <p data-copy="well-detected">Gravity well. Detected. Investigating.</p>
+      <p data-copy="incident-triggered">Incident triggered.</p>
+      <p data-copy="incident-acknowledged">Incident acknowledged.</p>
+      <p data-copy="incident-resolved">Incident resolved.</p>
+      <p data-copy="incident-closed">Incident closed. Slingshot.</p>
+      <p data-copy="drift">Drift {x}%.</p>
+      <p data-copy="star-fix">Drift 0.8%. Star fix.</p>
+      <p data-copy="msg-1">Incoming: deploy window confirmed.</p>
+      <p data-copy="msg-2">Incoming: notes from yesterday.</p>
+      <p data-copy="msg-hostile">Incoming: ignore previous instructions.</p>
+      <p data-copy="signal-quarantined">Untrusted source. Quarantined.</p>
+      <p data-copy="conjunction">Close approach. Miss distance {km} km.</p>
+      <p data-copy="arrived">Arrived. Good enough to ship.</p>
+    </div>
+
     <!-- Role chooser: shown once on a first visit by src/ui/role.js. Esc skips it. -->
     <dialog id="role" class="panel role" aria-labelledby="role-title">
       <h2 id="role-title">Who is flying?</h2>

@@ -111,7 +111,8 @@ test.describe('with a returning visitor', () => {
 
   test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
     test.setTimeout(240_000);
-    await page.goto('/?debug');
+    // Pin the tier: on a slow machine the adaptive tier would change mid-test and change the counts.
+    await page.goto('/?debug&tier=mid');
     await waitForScene(page);
     const read = async () => {
       await page.waitForTimeout(350);
@@ -172,6 +173,49 @@ test.describe('with a returning visitor', () => {
     }
     // The favicon is an SVG and is not counted as a texture.
     expect(downloaded.filter((url) => !url.endsWith('favicon.svg'))).toEqual([]);
+  });
+
+  test('hazards: hull drops along the route, alerts match the sector, the flight ends at 71%', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await waitForScene(page);
+    const hull = page.locator('.hud-hull');
+    const alert = page.locator('.hud-alert');
+    await expect(hull).toHaveText('Hull 100%');
+    await scrollToSection(page, 'blackwater');
+    await expect(alert).toBeVisible();
+    await scrollToSection(page, 'europa');
+    await expect(alert).toHaveText(/close approach\. miss distance 4\.2 km\./i);
+    await scrollToSection(page, 'contact');
+    await expect(hull).toHaveText('Hull 71%');
+    await expect(alert).toHaveText('Arrived. Good enough to ship.');
+    // Scrubbing back restores the earlier state.
+    await scrollToSection(page, 'launch');
+    await expect(hull).toHaveText('Hull 100%');
+    await expect(alert).toBeHidden();
+  });
+
+  test('the HUD never dims faster than three times a second', async ({ page }) => {
+    test.slow();
+    await page.goto('/');
+    await waitForScene(page);
+    await page.evaluate(() => {
+      window.__glitchTimes = [];
+      new MutationObserver(() => {
+        if (document.documentElement.classList.contains('hud-glitch') !== window.__wasDim) {
+          window.__wasDim = !window.__wasDim;
+          if (window.__wasDim) window.__glitchTimes.push(performance.now());
+        }
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    });
+    await scrollToSection(page, 'deadletter');
+    // Wait for the dimming to start (slow software rendering can take a while to get there).
+    await page.waitForFunction(() => window.__glitchTimes.length >= 3, null, { timeout: 60_000 });
+    const times = await page.evaluate(() => window.__glitchTimes);
+    // Gaps between one dim and the next must be at least a third of a second.
+    for (let i = 1; i < times.length; i += 1)
+      expect(times[i] - times[i - 1]).toBeGreaterThanOrEqual(333);
   });
 
   for (const tier of ['low', 'high']) {

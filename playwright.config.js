@@ -3,7 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 // Tests run against the built site served by `vite preview`, the same files that get deployed.
 export default defineConfig({
   testDir: 'tests/e2e',
-  timeout: 30_000,
+  timeout: 60_000,
+  // Software-rendered WebGL is slow, so assertions about the flight get longer to settle.
+  expect: { timeout: 15_000 },
   fullyParallel: true,
   reporter: [['list']],
   use: { baseURL: 'http://localhost:4173/' },

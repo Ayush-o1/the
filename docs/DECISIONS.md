@@ -104,3 +104,21 @@ Without JavaScript the nav stays.
 
 ## D22 Start the flight
 The hero button "Start the flight" is a link to #belt. In flight mode that scrolls the probe into the first sector. In Lite it jumps to the same place.
+
+## D23 Hazard text lives in HTML
+Alert lines, the hull label and its tooltip are in `#hazard-copy` in index.html, read by `src/ui/copy.js`. One place to edit in the Phase 9 copy pass.
+The alert for the Belt says "Contacts {n}" with the real number of probes drawn on the current tier (500, 1,200 or 2,000), not always 2,000.
+
+## D24 Hull numbers
+Steps: 100, 94 (Belt), 85 (BlackWater), 81 (BeetleJuice), 76 (deadLetter), 71 (Europa). It is labelled as flight status and its tooltip says it measures nothing about the code (plan 5.3).
+
+## D25 Conjunction miss distance
+The debris moves along a fixed straight track relative to the moon. `lib/orbit.js` computes the closest approach, and the HUD shows `distance x 0.35 km per unit`.
+The geometry was chosen so the result is 4.2 km, the plan's example, but the number shown is what the function returns. A unit test covers the maths.
+
+## D26 NaN guard before bloom
+See PROGRESS Phase 4. Keep the sanitise pass unless the source of the bad pixel is found and fixed.
+
+## D27 Click to break
+The canvas sits behind the page, so clicks cannot reach it. A click on bare page background (html, body, main or section, not on any control or panel) is cast into the scene.
+Broken rocks stay broken for that visit. This is the one place scene state depends on a user action, not on scroll alone (plan 5.2 allows it: it is a click, not a hazard).

@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 3 complete locally, PR pending. Next: Phase 4 (hazards).
+Current phase: 4 complete locally, PR pending. Next: Phase 5 (simulations A: Argus and BlackWater).
 
 ## Phase log
 
@@ -54,6 +54,24 @@ PR #3 merged, CI green.
 - Not verified: Safari, a real phone. Mobile portrait hides most of each world behind the dossier (by design: worlds move up and toward the middle).
 - Note: "lens flare" is the glow plane with streaks on the star and black hole. Gravity-well lensing pass and chromatic aberration are Phase 4.
 
+### Phase 3 (merged, tag phase-3)
+PR #4 merged, CI green.
+
+### Phase 4: Hazards (done locally)
+- Done: `core/hazard-timeline.js` (pure function of progress: hull, gravity, time scale, chroma, drift, fix, flicker, alert key and level), `lib/orbit.js` (closest approach, tested),
+  `scene/post.js` (sanitise pass, bloom, lens pass with gravitational lensing, colour fringing at the peak only, faint vignette and grain, tone mapping; low tier renders directly),
+  Belt (InstancedMesh of identical probes, 14 rocks with phrase sprites read from the page's Belt list, one rock on the flight path, click to break with fragments),
+  drift markers (ghost ring, line, star-fix pulse), Europa conjunction (orbit arc, dashed debris track, debris moving along it, miss distance computed from the geometry: 4.2 km),
+  camera shake (300 ms, 4 px max, once on first forward crossing), HUD hull gauge, alert line, flicker (about 2 per second at most), slowing mission clock near the well.
+  All alert copy lives in `#hazard-copy` in index.html. Reduced motion (only reachable with ?lite=0): no shake, no tunnels, no flicker, no colour fringing, half lens strength.
+- Found and fixed by looking: with bloom on, the Belt frame went fully black at 1440x900 (proved by switching bloom off: frame fine). Some pixel held NaN or infinity and the blur spread it.
+  A sanitise pass before bloom fixes it. I did not find which pixel. It is a guard, not a diagnosis.
+- Verified (ran it): `npm run check` passes (32 logic tests, JS 190 KB gzip of 350). 46 Playwright tests, WebKit scene tests skipped by design (D20).
+  New: hull 100 to 94 to 71 along the route and back to 100 when scrubbed, europa alert reads "Close approach. Miss distance 4.2 km.", flight ends with "Arrived. Good enough to ship.",
+  HUD dims at least 333 ms apart, hazards flow through low and high tiers without errors. Real GPU: 60 fps, draw calls 29-55, triangles under 32,000 (post passes included).
+  Screenshots looked at: Belt, black hole at peak lensing, deadLetter, Europa with debris track.
+- Not verified: WebKit, real phone, how colour fringing and lensing feel in motion (only still frames). Sound for hazards arrives in Phase 8.
+
 ## Next
-Phase 4: hazard timeline (pure functions of progress), the Belt (instanced probes, text rocks, steering, click to break, hull hit), gravity-well lensing, signal flicker, conjunction readout, drift and star fix, reduced-motion variants, camera shake.
-Phase 2: capability and tier detection, lazy Three.js, renderer, loop, starfield, camera path, Lenis+GSAP, probe, HUD frame, boot, role chooser, Lite toggle, ?debug.
+Phase 5: Argus graph (Canvas 2D) and BlackWater status page and lifecycle (DOM), pure logic modules with `node --test`, keyboard access, text outcomes in aria-live.
+- `?tier=` now pins the tier (no adaptation) so tests are stable on slow machines (found when the leak test failed in CI).
