@@ -46,7 +46,8 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 
-const files = listFiles(DIST);
+// The social card is only fetched by link previews, never by a visitor loading the page.
+const files = listFiles(DIST).filter((file) => !file.endsWith('og.jpg') && !file.endsWith('.map'));
 const htmlPath = join(DIST, 'index.html');
 const firstLoad = [htmlPath, ...firstLoadFiles(readFileSync(htmlPath, 'utf8'))];
 

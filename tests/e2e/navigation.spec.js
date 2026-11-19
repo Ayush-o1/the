@@ -187,11 +187,24 @@ test.describe('deep links', () => {
 });
 
 test.describe('GitHub data', () => {
+  test('nothing is requested from GitHub until the Cargo hold is near', async ({ page }) => {
+    let calls = 0;
+    await page.route('https://api.github.com/**', (route) => {
+      calls += 1;
+      return route.fulfill({ json: REPOS });
+    });
+    await page.goto('/?lite=1');
+    await page.waitForTimeout(800);
+    expect(calls).toBe(0);
+  });
+
   test('the Cargo hold skips forks and mission repositories, and the footer shows the last push', async ({
     page,
   }) => {
     await page.route('https://api.github.com/**', (route) => route.fulfill({ json: REPOS }));
     await page.goto('/?lite=1');
+    // The request waits until the Cargo hold is near the screen.
+    await page.locator('#cargo').scrollIntoViewIfNeeded();
     const cargo = page.locator('[data-cargo] li');
     await expect(cargo).toHaveCount(2);
     await expect(cargo.first()).toContainText('Cadentra');
@@ -210,6 +223,7 @@ test.describe('GitHub data', () => {
     page.on('pageerror', (error) => errors.push(error.message));
     await page.route('https://api.github.com/**', (route) => route.abort());
     await page.goto('/?lite=1');
+    await page.locator('#cargo').scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
     await expect(page.locator('[data-telemetry]')).toBeHidden();
     await expect(page.locator('[data-cargo] li')).toHaveCount(0);
@@ -223,8 +237,10 @@ test.describe('GitHub data', () => {
       return route.fulfill({ json: REPOS });
     });
     await page.goto('/?lite=1');
+    await page.locator('#cargo').scrollIntoViewIfNeeded();
     await expect(page.locator('[data-cargo] li')).toHaveCount(2);
     await page.reload();
+    await page.locator('#cargo').scrollIntoViewIfNeeded();
     await expect(page.locator('[data-cargo] li')).toHaveCount(2);
     expect(calls).toBe(1);
   });

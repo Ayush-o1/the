@@ -275,8 +275,10 @@ test.describe('with a returning visitor', () => {
 
   for (const size of [
     { width: 360, height: 740 },
+    { width: 390, height: 844 },
     { width: 768, height: 1024 },
     { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
   ]) {
     test(`axe finds no violations in flight mode at ${size.width}px`, async ({ page }) => {
       await page.setViewportSize(size);

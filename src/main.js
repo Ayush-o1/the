@@ -25,7 +25,10 @@ import { $ } from './lib/dom.js';
 // ?tier=low, mid or high pins that tier, for testing. Otherwise it starts on mid and adapts.
 const requestedTier = new URLSearchParams(window.location.search).get('tier');
 const TIER_PINNED = ['low', 'mid', 'high'].includes(requestedTier);
-const START_TIER = TIER_PINNED ? requestedTier : 'mid';
+// Phones start on the low tier (plan 8.4, "small device"): no post-processing, pixel ratio 1.
+// The tier monitor can still move it up if frames come easily.
+const SMALL_DEVICE = window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 768;
+const START_TIER = TIER_PINNED ? requestedTier : SMALL_DEVICE ? 'low' : 'mid';
 
 function afterFirstPaint(callback) {
   requestAnimationFrame(() => requestAnimationFrame(callback));

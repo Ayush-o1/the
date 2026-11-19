@@ -12,6 +12,16 @@ const LOADERS = {
   europa: () => import('./europa.js').then((module) => module.mountEuropa),
 };
 
+// The simulation could not start. Keep the written summary on screen and say what happened.
+function showLoadError(sim) {
+  sim.querySelector('.sim__static')?.removeAttribute('hidden');
+  const note = document.createElement('p');
+  note.className = 'sim__note';
+  note.textContent =
+    'This simulation did not load. The summary above still applies. Reload to try again.';
+  sim.append(note);
+}
+
 // Returns a promise that settles when every simulation has mounted (or failed), so callers can
 // react to the layout change that mounting causes.
 export function mountSimulations() {
@@ -20,7 +30,10 @@ export function mountSimulations() {
     .map((sim) =>
       LOADERS[sim.dataset.sim]()
         .then((mount) => mount(sim))
-        .catch((error) => console.warn(`Simulation ${sim.dataset.sim} failed to load:`, error)),
+        .catch((error) => {
+          console.warn(`Simulation ${sim.dataset.sim} failed to load:`, error);
+          showLoadError(sim);
+        }),
     );
   return Promise.allSettled(jobs);
 }
