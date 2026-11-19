@@ -14,13 +14,15 @@ export function createCameraPath(curve, camera, probe) {
 
   return {
     // param runs 0 to (stops - 1). steer is -1 to 1 from the pointer. steerVelocity is its change per second.
-    update(param, stops, steer, steerVelocity) {
+    // Where the route itself is, without steering or drift. Hazards use it to mark "where we should be".
+    pathPosition: position,
+    update(param, stops, steer, steerVelocity, driftUnits = 0) {
       const t = Math.min(1, Math.max(0, stops > 1 ? param / (stops - 1) : 0));
       curve.getPoint(t, position);
       curve.getTangent(t, tangent);
       right.crossVectors(tangent, UP).normalize();
 
-      probe.position.copy(position).addScaledVector(right, steer * MAX_LATERAL);
+      probe.position.copy(position).addScaledVector(right, steer * MAX_LATERAL + driftUnits);
       target.copy(probe.position).add(tangent);
       probe.lookAt(target);
       // Banking: lean into the sideways motion, plus a little for where the pointer is.

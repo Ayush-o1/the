@@ -3,6 +3,7 @@
 // the canvas is gone, the HUD is gone, html.lite is set and the content is untouched.
 import { writeSetting } from './store.js';
 import { setModeToggleLabel, mountHud } from '../ui/hud.js';
+import { readCopy } from '../ui/copy.js';
 
 export function createModeController({ env, startTier }) {
   const html = document.documentElement;
@@ -42,7 +43,7 @@ export function createModeController({ env, startTier }) {
         onSector: (stop) => hud?.setSector(stop),
         onFrame: (state) => hud?.update(state),
       });
-      hud = mountHud(scene.stops);
+      hud = mountHud(scene.stops, readCopy());
       hud.setSector(scene.stops[0]);
       current = 'scene';
       html.classList.remove('lite');

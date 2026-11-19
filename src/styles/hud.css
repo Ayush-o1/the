@@ -244,3 +244,55 @@ html.scene .art::after,
 html.scene .hero__horizon {
   display: none;
 }
+
+/* Hull gauge and hazard alerts */
+.hud-hull {
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.hud-alert {
+  position: fixed;
+  top: calc(var(--header-h) + var(--s3));
+  left: 50%;
+  z-index: 25;
+  max-width: calc(100vw - 2 * var(--gutter));
+  margin: 0;
+  padding: var(--s2) var(--s4);
+  transform: translateX(-50%);
+  background: rgba(13, 16, 23, 0.92);
+  border: 1px solid var(--alert);
+  color: var(--alert);
+  font-size: var(--text-hud);
+  text-align: center;
+  pointer-events: none;
+}
+
+.hud-alert[data-level='info'] {
+  border-color: var(--line);
+  color: var(--star);
+}
+
+.hud-alert[data-key='arrived'] {
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.hud-alert[hidden] {
+  display: none;
+}
+
+/* While the hostile signal is near, the HUD dims in steps, at most about twice a second. */
+html.hud-glitch .hud-sector,
+html.hud-glitch .hud-clock,
+html.hud-glitch .hud-hull,
+html.hud-glitch .hud-frame,
+html.hud-glitch .hud-path {
+  opacity: 0.4;
+}
+
+@media (max-width: 899px) {
+  .hud-hull {
+    display: none;
+  }
+}

@@ -14,9 +14,14 @@ import { createWorldManager } from './worlds/index.js';
 import { createNebula } from './nebula.js';
 import { createJump } from './jump.js';
 import { createCameraPath } from './camera-path.js';
+import { createPost } from './post.js';
+import { createHazards } from './hazards/index.js';
 import { buildRoute } from './route.js';
 
 const FOLLOW_RATE = 6; // docs/PLAN.md 5.2: tune between 4 and 8
+// A click on one of these, or inside one, belongs to the page and never breaks a rock.
+const INTERACTIVE =
+  'a, button, input, textarea, select, summary, dialog, form, header, nav, label, details, .panel';
 
 export function startScene({ env, startTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
@@ -35,6 +40,19 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
   const worlds = createWorldManager({ scene, stops, tier: startTier });
   const nebula = createNebula();
   const jump = createJump();
+  const probe = createProbe();
+  scene.add(nebula.object, starfield.object, jump.object, probe.object);
+  const rig = createCameraPath(curve, camera, probe.object);
+  const hazards = createHazards({
+    scene,
+    curve,
+    stops,
+    canvas,
+    worlds,
+    tier: startTier,
+    reducedMotion: env.reducedMotion,
+  });
+
   // J1 runs from Argus to BlackWater and J2 from BlackWater to BeetleJuice.
   const jumps = [
     ['argus', 'blackwater'],
@@ -42,13 +60,11 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
   ]
     .map(([a, b]) => [a, b].map((id) => stops.findIndex((stop) => stop.id === id)))
     .filter(([a, b]) => a >= 0 && b >= 0);
-  const probe = createProbe();
-  scene.add(nebula.object, starfield.object, jump.object, probe.object);
-  const rig = createCameraPath(curve, camera, probe.object);
 
   const scroll = createScroll();
   const tierMonitor = createTierMonitor(startTier);
   let tier = startTier;
+  let post = null;
 
   let scrolls = [];
   let param = 0;
@@ -57,8 +73,13 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
   let thrust = 0;
   let sectorIndex = -1;
   let fps = 60;
+  let lastTime = 0;
   let stopped = false;
   let firstFrame = true;
+
+  function sizePost() {
+    post?.setSize(window.innerWidth, window.innerHeight, rendererBundle.pixelRatio);
+  }
 
   function applyTier(name) {
     tier = name;
@@ -66,7 +87,15 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     rendererBundle.setDprCap(settings.dpr);
     starfield.setCount(settings.stars);
     worlds.setTier(name);
+    hazards.setTier(name);
     nebula.object.visible = name !== 'low';
+    // The low tier skips post-processing and renders straight to the screen.
+    if (settings.post && !post) post = createPost({ renderer, scene, camera });
+    if (!settings.post && post) {
+      post.dispose();
+      post = null;
+    }
+    sizePost();
   }
 
   function measure() {
@@ -77,6 +106,7 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     rendererBundle.resize();
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    sizePost();
     measure();
   }
 
@@ -86,9 +116,23 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     steerTarget = (event.clientX / window.innerWidth) * 2 - 1;
   }
 
+  // The canvas sits behind the page, so clicks never reach it. A click on bare page background
+  // is cast into the scene to see if it hit a rock in the Belt.
+  function onPointerDown(event) {
+    if (event.button !== 0 || !(event.target instanceof Element)) return;
+    if (event.target.closest(INTERACTIVE)) return;
+    if (!['HTML', 'BODY', 'MAIN', 'SECTION'].includes(event.target.tagName)) return;
+    const ndc = {
+      x: (event.clientX / window.innerWidth) * 2 - 1,
+      y: -(event.clientY / window.innerHeight) * 2 + 1,
+    };
+    hazards.pick(ndc, camera, lastTime);
+  }
+
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(document.body);
   window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerdown', onPointerDown);
   applyTier(startTier);
   resize();
   document.body.prepend(canvas);
@@ -100,6 +144,8 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     if (stopped || document.hidden) return;
     const dt = Math.min(deltaMs / 1000, 0.1);
     if (dt <= 0) return;
+    lastTime = time;
+    renderer.info.reset();
 
     const target = stopParam(scrolls, window.scrollY);
     const previous = param;
@@ -110,20 +156,30 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
     const speed = Math.abs(param - previous) / dt; // stops per second
     thrust = damp(thrust, Math.min(1, speed / 1.5), 8, dt);
 
-    const jumpAmount = jumpIntensity(param, jumps);
-    rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
+    // Tunnels are off under reduced motion, even if the flight was asked for explicitly.
+    const jumpAmount = env.reducedMotion ? 0 : jumpIntensity(param, jumps);
     const fov = jump.fovFor(jumpAmount);
     if (Math.abs(camera.fov - fov) > 0.05) {
       camera.fov = fov;
       camera.updateProjectionMatrix();
     }
+
+    // Hazards come first: drift changes where the probe sits.
+    const hazard = hazards.update({ param, time, camera, rig, probe: probe.object });
+    rig.update(param, stops.length, steer, (steer - previousSteer) / dt, hazard.driftUnits);
     worlds.update(param, time, camera);
     nebula.update(time, camera.position);
     jump.update(jumpAmount, time, camera);
+
     const workStart = performance.now();
     probe.update(time, thrust);
     starfield.update(time, rendererBundle.pixelRatio, window.innerHeight);
-    renderer.render(scene, camera);
+    if (post) {
+      post.setLens({ ...hazard.lens, time });
+      post.render();
+    } else {
+      renderer.render(scene, camera);
+    }
 
     fps = damp(fps, 1000 / Math.max(deltaMs, 1), 3, dt);
     const nextTier = tierMonitor.sample(deltaMs, performance.now() - workStart);
@@ -134,7 +190,7 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
       sectorIndex = nearest;
       onSector(stops[nearest], nearest);
     }
-    onFrame({ param, stops: stops.length, sectorIndex });
+    onFrame({ param, stops: stops.length, dt, hazard: hazard.state, values: hazard.values });
 
     if (firstFrame) {
       firstFrame = false;
@@ -165,7 +221,10 @@ export function startScene({ env, startTier, onContextLost, onSector, onFrame })
       gsap.ticker.remove(tick);
       resizeObserver.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
       scroll.destroy();
+      post?.dispose();
+      hazards.dispose();
       starfield.dispose();
       worlds.dispose();
       nebula.dispose();

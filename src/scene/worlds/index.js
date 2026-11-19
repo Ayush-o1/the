@@ -101,7 +101,7 @@ export function createWorldManager({ scene, stops, tier }) {
         }
         if (entry.instance) {
           place(entry, portrait);
-          entry.instance.update(time, camera);
+          entry.instance.update(time, camera, param - entry.index);
         }
       }
     },
@@ -110,6 +110,10 @@ export function createWorldManager({ scene, stops, tier }) {
       if (nextTier === currentTier) return;
       currentTier = nextTier;
       for (const entry of entries) if (entry.instance) remove(entry);
+    },
+    // The group of a world that currently exists, or null. Used to aim the lens pass at the black hole.
+    groupOf(id) {
+      return entries.find((entry) => entry.id === id)?.instance?.group ?? null;
     },
     get active() {
       return entries.filter((entry) => entry.instance).map((entry) => entry.id);

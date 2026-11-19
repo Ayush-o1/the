@@ -8,6 +8,9 @@ export function createRenderer({ onContextLost }) {
     alpha: false,
   });
   renderer.setClearColor(new Color(0x06070a), 1);
+  // With post-processing there are several passes per frame. Counting them all (a manual reset in
+  // the loop) gives honest draw call and triangle numbers for the ?debug overlay.
+  renderer.info.autoReset = false;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
 

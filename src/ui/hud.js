@@ -2,6 +2,7 @@
 // (data-sector, data-mission), so nothing is written twice. Decorative parts are aria-hidden.
 // The one part that matters to a screen reader, the current sector, is a polite live region.
 import { $ } from '../lib/dom.js';
+import { fillCopy } from './copy.js';
 
 function element(tag, className, text) {
   const el = document.createElement(tag);
@@ -22,7 +23,7 @@ export function setModeToggleLabel(mode) {
   if (label) label.textContent = mode === 'scene' ? 'Lite' : 'Flight';
 }
 
-export function mountHud(stops) {
+export function mountHud(stops, copy) {
   const header = $('.site-header');
   const parts = [];
   const add = (parent, node, before = null) => {
@@ -35,6 +36,15 @@ export function mountHud(stops) {
   sector.setAttribute('aria-hidden', 'true');
   const clock = add(header, element('span', 'hud-clock mono', 'T+00:00'), $('nav', header));
   clock.setAttribute('aria-hidden', 'true');
+  // The hull is a flavour gauge for the flight. Its tooltip says so.
+  const hull = add(header, element('span', 'hud-hull mono'), $('nav', header));
+  hull.setAttribute('aria-hidden', 'true');
+  hull.title = copy['hull-note'] ?? '';
+
+  // Hazard alerts. Decorative: they repeat what the scene shows, and the page text is the content.
+  const alert = add(document.body, element('p', 'hud-alert mono'));
+  alert.setAttribute('aria-hidden', 'true');
+  alert.hidden = true;
 
   // Corner brackets. Nothing else is drawn on top of the page.
   const frame = add(document.body, element('div', 'hud-frame'));
@@ -66,8 +76,33 @@ export function mountHud(stops) {
   const live = add(document.body, element('p', 'visually-hidden'));
   live.setAttribute('aria-live', 'polite');
 
-  const started = performance.now();
+  let elapsed = 0;
   let lastSecond = -1;
+  let lastHull = null;
+  let lastAlert = '';
+  let lastLevel = '';
+  let glitching = false;
+
+  function showAlert(hazard, values) {
+    const key = hazard.alert?.key;
+    const text = key ? fillCopy(copy[key], values) : '';
+    const level = hazard.alert?.level ?? '';
+    if (text === lastAlert && level === lastLevel) return;
+    lastAlert = text;
+    lastLevel = level;
+    alert.textContent = text;
+    alert.dataset.level = level;
+    alert.dataset.key = key ?? '';
+    alert.hidden = text === '';
+  }
+
+  // The hostile signal makes the HUD dim in short steps, about twice a second. Never faster than 3 a second.
+  function setGlitch(hazard) {
+    const on = hazard.flicker > 0.2 && Math.floor(performance.now() / 450) % 3 === 0;
+    if (on === glitching) return;
+    glitching = on;
+    document.documentElement.classList.toggle('hud-glitch', on);
+  }
 
   return {
     // Called once when the sector changes. Updates the label and the screen reader text.
@@ -76,15 +111,24 @@ export function mountHud(stops) {
       live.textContent = `Sector: ${stop.name}`;
     },
     // Called every frame: only touches the DOM when a value changed.
-    update({ param, stops: count }) {
+    update({ param, stops: count, dt, hazard, values }) {
       marker.style.left = `${(param / Math.max(1, count - 1)) * 100}%`;
-      const second = Math.floor((performance.now() - started) / 1000);
+      // Time runs slow near the black hole, so the clock advances by dt times the time scale.
+      elapsed += dt * hazard.timeScale;
+      const second = Math.floor(elapsed);
       if (second !== lastSecond) {
         lastSecond = second;
         clock.textContent = formatClock(second);
       }
+      if (hazard.hull !== lastHull) {
+        lastHull = hazard.hull;
+        hull.textContent = fillCopy(copy['hull-label'], { hull: hazard.hull });
+      }
+      showAlert(hazard, values);
+      setGlitch(hazard);
     },
     destroy() {
+      document.documentElement.classList.remove('hud-glitch');
       for (const node of parts) node.remove();
     },
   };
