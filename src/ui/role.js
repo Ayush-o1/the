@@ -2,7 +2,7 @@
 // Recruiter opens the Briefing, Engineer opens every flight recorder, Curious changes nothing.
 import { $, $$ } from '../lib/dom.js';
 import { readSetting, writeSetting } from '../core/store.js';
-import { toggleBriefing } from './briefing.js';
+import { openDialog } from './dialogs.js';
 
 const ROLES = ['recruiter', 'engineer', 'curious'];
 
@@ -12,7 +12,7 @@ export function applyRole(role, { opening = false } = {}) {
     for (const recorder of $$('[data-recorder]')) recorder.open = true;
   }
   // The Briefing only pops open at the moment of choosing, never on a later visit.
-  if (role === 'recruiter' && opening) toggleBriefing();
+  if (role === 'recruiter' && opening) openDialog('briefing');
 }
 
 export function savedRole() {

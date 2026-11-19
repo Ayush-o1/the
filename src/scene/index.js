@@ -18,6 +18,7 @@ import { createPost } from './post.js';
 import { createHazards } from './hazards/index.js';
 import { buildRoute } from './route.js';
 
+const ROLL_SECONDS = 1.2;
 const FOLLOW_RATE = 6; // docs/PLAN.md 5.2: tune between 4 and 8
 // A click on one of these, or inside one, belongs to the page and never breaks a rock.
 const INTERACTIVE =
@@ -74,6 +75,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let sectorIndex = -1;
   let fps = 60;
   let lastTime = 0;
+  let rollStart = -1;
   let stopped = false;
   let firstFrame = true;
 
@@ -167,6 +169,11 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     // Hazards come first: drift changes where the probe sits.
     const hazard = hazards.update({ param, time, camera, rig, probe: probe.object });
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt, hazard.driftUnits);
+    if (rollStart >= 0) {
+      const t = (time - rollStart) / ROLL_SECONDS;
+      if (t >= 1) rollStart = -1;
+      else probe.object.rotateZ(t * t * (3 - 2 * t) * Math.PI * 2);
+    }
     worlds.update(param, time, camera);
     nebula.update(time, camera.position);
     jump.update(jumpAmount, time, camera);
@@ -191,7 +198,14 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
       sectorIndex = nearest;
       onSector(stops[nearest], nearest);
     }
-    onFrame({ param, stops: stops.length, dt, hazard: hazard.state, values: hazard.values });
+    onFrame({
+      param,
+      stops: stops.length,
+      dt,
+      hazard: hazard.state,
+      values: hazard.values,
+      thrust,
+    });
 
     if (firstFrame) {
       firstFrame = false;
@@ -204,6 +218,12 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
   return {
     stops,
+    // The Konami code. One full turn of the probe. Skipped under reduced motion.
+    barrelRoll() {
+      if (env.reducedMotion) return false;
+      rollStart = lastTime;
+      return true;
+    },
     getStats() {
       const info = renderer.info;
       return {

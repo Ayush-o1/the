@@ -51,6 +51,8 @@ test('no banned words or filler text in shipped files', () => {
       const pattern = new RegExp(`\\b${word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
       if (pattern.test(text)) hits.push(`${file}: ${word}`);
     }
+    // No dashes used as pauses in the copy (plan 7.1: no em-dash chains).
+    if (/\u2014/.test(text)) hits.push(`${file}: em dash`);
     if (file === 'index.html' && /!(?!--|doctype)/i.test(text.replace(/<!--[\s\S]*?-->/g, ''))) {
       hits.push(`${file}: exclamation mark`);
     }

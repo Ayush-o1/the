@@ -12,12 +12,15 @@ const LOADERS = {
   europa: () => import('./europa.js').then((module) => module.mountEuropa),
 };
 
+// Returns a promise that settles when every simulation has mounted (or failed), so callers can
+// react to the layout change that mounting causes.
 export function mountSimulations() {
-  for (const sim of $$('[data-sim]')) {
-    const load = LOADERS[sim.dataset.sim];
-    if (!load) continue;
-    load()
-      .then((mount) => mount(sim))
-      .catch((error) => console.warn(`Simulation ${sim.dataset.sim} failed to load:`, error));
-  }
+  const jobs = $$('[data-sim]')
+    .filter((sim) => LOADERS[sim.dataset.sim])
+    .map((sim) =>
+      LOADERS[sim.dataset.sim]()
+        .then((mount) => mount(sim))
+        .catch((error) => console.warn(`Simulation ${sim.dataset.sim} failed to load:`, error)),
+    );
+  return Promise.allSettled(jobs);
 }

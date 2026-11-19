@@ -1,5 +1,6 @@
 // The Briefing dialog. Its text lives in index.html: the mission list is read from the
 // mission articles and the links are copied from the Contact section, so nothing is written twice.
+// Opening and closing is handled by ui/dialogs.js.
 import { $, $$ } from '../lib/dom.js';
 
 const MISSIONS_SHOWN = 3;
@@ -26,25 +27,6 @@ function fillLinks(list) {
 export function initBriefing() {
   const dialog = $('#briefing');
   if (!dialog) return;
-
   fillMissions($('[data-briefing-missions]', dialog));
   fillLinks($('[data-briefing-links]', dialog));
-
-  // Following a link inside the dialog closes it so the page underneath is visible.
-  dialog.addEventListener('click', (event) => {
-    const clickedBackdrop = event.target === dialog;
-    const clickedLink = event.target instanceof Element && event.target.closest('a[href^="#"]');
-    if (clickedBackdrop || clickedLink) dialog.close();
-  });
-
-  for (const button of $$('[data-open-dialog="briefing"]')) {
-    button.addEventListener('click', () => dialog.showModal());
-  }
-}
-
-export function toggleBriefing() {
-  const dialog = $('#briefing');
-  if (!dialog) return;
-  if (dialog.open) dialog.close();
-  else dialog.showModal();
 }

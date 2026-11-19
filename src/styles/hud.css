@@ -42,9 +42,6 @@ html.scene .site-header {
   .hud-clock {
     display: none;
   }
-  .site-header .btn {
-    margin-left: 0;
-  }
   .hud-sector {
     margin-left: auto;
   }

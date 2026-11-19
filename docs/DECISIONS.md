@@ -138,3 +138,19 @@ Scoring bands and hash-chain fields are copied from the repo. SGP4 propagation a
 
 ## D32 Phases 6 and 7 shipped together
 Both sets of simulations share `src/sims/index.js`, the styles and the e2e file, so splitting them cleanly would have meant two half-working branches. They are one PR. Tags phase-6 and phase-7 point at the same merge commit.
+
+## D33 Mission shortcuts
+Next and previous mission are J and K only. The plan also mentions arrow keys, but the arrows scroll the page and are part of the Konami code, so using them would make both worse. Every shortcut is listed in the Map dialog.
+A key that is part of the Konami code (the B) is kept away from the Briefing shortcut while the code is being typed.
+
+## D34 GitHub data and the footer
+The Cargo hold and "Last transmission" call GitHub's public API from the visitor's browser (plan 8.9), cached in sessionStorage for 10 minutes and hidden on failure. That request is visible to GitHub, so the footer says where the list comes from. "No analytics. No cookies." stays true.
+
+## D35 Skipped: the Argus satellite fact
+Plan 5.6 item 15 ("click the tiny Argus satellite in the hero sky for a fact") is a Could and is not built. It would need a clickable object in the 3D sky and a fact list that duplicates dossier text.
+
+## D36 Contact form service path
+With an empty key in `src/config.js` the form opens a prefilled email, which the tests cover. The path that posts to Web3Forms is written and read-checked but cannot be tested without a real key. It is on the HANDOFF list for Ayush to try once.
+
+## D37 Deep links and the simulations
+Mounting the simulations changes the height of everything above a mission, so a link like `/#blackwater` could land away from its section. After the simulations mount, the page scrolls back to the hash, unless the visitor has already scrolled.

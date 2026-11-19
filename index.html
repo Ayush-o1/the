@@ -10,6 +10,44 @@
     />
     <meta name="theme-color" content="#06070A" />
     <link rel="canonical" href="https://ayush-o1.github.io/the/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ayush Kumar | Backend developer" />
+    <meta
+      property="og:description"
+      content="Six backend projects about outages, mismatches and bad input, each with a small simulation. Fly through them or read the page."
+    />
+    <meta property="og:url" content="https://ayush-o1.github.io/the/" />
+    <meta property="og:image" content="https://ayush-o1.github.io/the/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Ayush Kumar written large over a star field, with Earth below and a small probe."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ayush Kumar | Backend developer" />
+    <meta
+      name="twitter:description"
+      content="Six backend projects about outages, mismatches and bad input, each with a small simulation."
+    />
+    <meta name="twitter:image" content="https://ayush-o1.github.io/the/og.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Ayush Kumar",
+        "url": "https://ayush-o1.github.io/the/",
+        "jobTitle": "Software engineering student",
+        "description": "Final-year B.Tech Computer Science student in Bengaluru, graduating 2027, looking for SDE and backend roles.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressCountry": "IN"
+        },
+        "affiliation": { "@type": "CollegeOrUniversity", "name": "Jain (Deemed-to-be University)" },
+        "sameAs": ["https://github.com/Ayush-o1", "https://linkedin.com/in/ayushh-o1"]
+      }
+    </script>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <!-- Adds .js before first paint so controls that need JavaScript do not flash in and out. -->
     <script>
@@ -29,12 +67,25 @@
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
-      <button type="button" class="btn btn--quiet needs-js" data-open-dialog="briefing">
-        Briefing <kbd>B</kbd>
-      </button>
-      <button type="button" class="btn btn--quiet needs-js" data-mode-toggle>
-        <span data-mode-label>Lite</span> <kbd>L</kbd>
-      </button>
+      <div class="site-header__tools">
+        <button type="button" class="btn btn--quiet needs-js" data-open-dialog="briefing">
+          <span class="btn__label">Briefing</span> <kbd>B</kbd>
+        </button>
+        <button type="button" class="btn btn--quiet needs-js" data-open-dialog="map">
+          <span class="btn__label">Map</span> <kbd>M</kbd>
+        </button>
+        <button
+          type="button"
+          class="btn btn--quiet needs-js"
+          data-sound-toggle
+          aria-pressed="false"
+        >
+          <span class="btn__label" data-sound-label>Sound off</span> <kbd>S</kbd>
+        </button>
+        <button type="button" class="btn btn--quiet needs-js" data-mode-toggle>
+          <span class="btn__label" data-mode-label>Lite</span> <kbd>L</kbd>
+        </button>
+      </div>
     </header>
 
     <main id="main">
@@ -882,7 +933,8 @@
 
     <footer class="site-footer">
       <p class="mono">AK-01 · Ayush Kumar · 2026</p>
-      <p>No analytics. No cookies.</p>
+      <p class="mono" data-telemetry hidden></p>
+      <p>No analytics. No cookies. The Cargo hold list is read from GitHub's public API.</p>
     </footer>
 
     <!-- Briefing: the list of missions and the links are read from the page by src/ui/briefing.js. -->
@@ -923,6 +975,66 @@
       <p data-copy="conjunction">Close approach. Miss distance {km} km.</p>
       <p data-copy="arrived">Arrived. Good enough to ship.</p>
     </div>
+
+    <!-- Mission map: fast travel and the list of keyboard shortcuts. src/ui/map.js fills the sector list. -->
+    <dialog id="map" class="panel briefing" aria-labelledby="map-title">
+      <div class="briefing__head">
+        <h2 id="map-title">Mission map</h2>
+        <form method="dialog">
+          <button class="btn btn--quiet">Close <kbd>Esc</kbd></button>
+        </form>
+      </div>
+      <p>Pick a sector to fly there. Each one is also a link you can share.</p>
+      <ol class="map__list" data-map-list></ol>
+      <h3>Keyboard shortcuts</h3>
+      <dl class="map__keys">
+        <div>
+          <dt><kbd>B</kbd></dt>
+          <dd>Briefing</dd>
+        </div>
+        <div>
+          <dt><kbd>M</kbd></dt>
+          <dd>This map</dd>
+        </div>
+        <div>
+          <dt><kbd>`</kbd></dt>
+          <dd>Mission console</dd>
+        </div>
+        <div>
+          <dt><kbd>J</kbd> <kbd>K</kbd></dt>
+          <dd>Next and previous mission</dd>
+        </div>
+        <div>
+          <dt><kbd>L</kbd></dt>
+          <dd>Switch between the flight and the plain page</dd>
+        </div>
+        <div>
+          <dt><kbd>S</kbd></dt>
+          <dd>Sound on and off</dd>
+        </div>
+        <div>
+          <dt><kbd>Esc</kbd></dt>
+          <dd>Close a dialog</dd>
+        </div>
+      </dl>
+    </dialog>
+
+    <!-- Mission console: opened with the backtick key. src/ui/console.js runs the commands. -->
+    <dialog id="console" class="panel briefing" aria-labelledby="console-title">
+      <div class="briefing__head">
+        <h2 id="console-title">Mission console</h2>
+        <form method="dialog">
+          <button class="btn btn--quiet">Close <kbd>Esc</kbd></button>
+        </form>
+      </div>
+      <ol class="console__log" data-console-log aria-live="polite" aria-label="Console output"></ol>
+      <form class="console__form" autocomplete="off">
+        <label for="console-input" class="mono">Command. Try help.</label>
+        <input id="console-input" type="text" spellcheck="false" autocapitalize="off" />
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
 
     <!-- Role chooser: shown once on a first visit by src/ui/role.js. Esc skips it. -->
     <dialog id="role" class="panel role" aria-labelledby="role-title">

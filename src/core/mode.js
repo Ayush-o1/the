@@ -5,14 +5,17 @@ import { writeSetting } from './store.js';
 import { setModeToggleLabel, mountHud } from '../ui/hud.js';
 import { readCopy } from '../ui/copy.js';
 
-export function createModeController({ env, startTier, pinTier }) {
+export function createModeController({ env, startTier, pinTier, onFrame }) {
   const html = document.documentElement;
   let current = 'lite';
   let scene = null;
   let hud = null;
   let loading = false;
+  let stopMotion = null;
 
   function teardown() {
+    stopMotion?.();
+    stopMotion = null;
     hud?.destroy();
     scene?.dispose();
     hud = null;
@@ -42,7 +45,10 @@ export function createModeController({ env, startTier, pinTier }) {
         pinTier,
         onContextLost: () => enterLite('graphics context lost'),
         onSector: (stop) => hud?.setSector(stop),
-        onFrame: (state) => hud?.update(state),
+        onFrame: (state) => {
+          hud?.update(state);
+          onFrame?.(state);
+        },
       });
       hud = mountHud(scene.stops, readCopy());
       hud.setSector(scene.stops[0]);
@@ -50,6 +56,16 @@ export function createModeController({ env, startTier, pinTier }) {
       html.classList.remove('lite');
       delete html.dataset.liteReason;
       setModeToggleLabel('scene');
+      // Text reveals and the hull decode. Optional polish: a failure here changes nothing else.
+      if (!env.reducedMotion) {
+        import('../ui/motion.js')
+          .then((motion) => {
+            if (current !== 'scene') return;
+            stopMotion = motion.initReveals();
+            setTimeout(motion.decodeHull, 400);
+          })
+          .catch((error) => console.warn('Motion polish failed to load:', error));
+      }
     } catch (error) {
       // A scene failure must never break the page. Warn for developers and carry on in lite.
       console.warn('Flight scene failed to start:', error);
@@ -75,6 +91,8 @@ export function createModeController({ env, startTier, pinTier }) {
     get current() {
       return current;
     },
+    // True if there is a probe to turn. In lite mode there is not.
+    barrelRoll: () => scene?.barrelRoll() ?? false,
     getStats: () => scene?.getStats() ?? null,
   };
 }

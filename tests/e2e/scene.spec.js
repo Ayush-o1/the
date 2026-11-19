@@ -44,7 +44,9 @@ test.describe('with a returning visitor', () => {
     await waitForScene(page);
     await scrollToSection(page, 'blackwater');
     await expect(page.locator('.hud-sector')).toHaveText('M2 BlackWater');
-    await expect(page.locator('[aria-live="polite"]')).toContainText('M2 BlackWater');
+    await expect(page.locator('p.visually-hidden[aria-live="polite"]')).toContainText(
+      'M2 BlackWater',
+    );
     await scrollToSection(page, 'contact');
     await expect(page.locator('.hud-sector')).toHaveText('Contact');
     await scrollToSection(page, 'launch');
@@ -220,6 +222,31 @@ test.describe('with a returning visitor', () => {
     // Gaps between one dim and the next must be at least a third of a second.
     for (let i = 1; i < times.length; i += 1)
       expect(times[i] - times[i - 1]).toBeGreaterThanOrEqual(333);
+  });
+
+  test('in flight the Konami code rolls the probe and the S key toggles sound', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await waitForScene(page);
+    for (const key of [
+      'ArrowUp',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowLeft',
+      'ArrowRight',
+      'b',
+      'a',
+    ]) {
+      await page.keyboard.press(key);
+    }
+    await expect(page.locator('#toast')).toHaveText('Barrel roll.');
+    await expect(page.locator('html')).toHaveAttribute('data-sound', 'off');
+    await page.keyboard.press('s');
+    await expect(page.locator('html')).toHaveAttribute('data-sound', 'on');
   });
 
   for (const tier of ['low', 'high']) {
