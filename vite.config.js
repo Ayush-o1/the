@@ -21,6 +21,8 @@ export default defineConfig({
   build: {
     target: 'es2022',
     assetsInlineLimit: 0,
+    // Source maps are only fetched by developer tools. They are left out of the size budgets.
+    sourcemap: true,
     // The Three.js chunk is over Vite's default warning size. scripts/check-budgets.js enforces the real budget.
     chunkSizeWarningLimit: 700,
   },

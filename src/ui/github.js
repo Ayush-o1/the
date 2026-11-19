@@ -66,7 +66,7 @@ function renderTelemetry(repos) {
   line.hidden = false;
 }
 
-export async function initGithub() {
+async function load() {
   try {
     const repos = await loadRepos();
     renderCargo(repos);
@@ -74,4 +74,21 @@ export async function initGithub() {
   } catch {
     // Hidden on failure, as planned. The page already says where the repositories live.
   }
+}
+
+// GitHub allows only a few unauthenticated requests per hour from one address, and many visitors
+// never reach the Cargo hold. So the request waits until the Cargo hold or the footer is close to
+// the screen, and is made once.
+export function initGithub() {
+  const targets = [$('#cargo'), $('.site-footer')].filter(Boolean);
+  if (targets.length === 0 || !('IntersectionObserver' in window)) return;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      load();
+    },
+    { rootMargin: '600px 0px' },
+  );
+  for (const target of targets) observer.observe(target);
 }

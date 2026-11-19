@@ -7,10 +7,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 const MISSIONS = ['argus', 'blackwater', 'beetlejuice', 'theredarmy', 'deadletter', 'europa'];
+// The five viewports from docs/PLAN.md section 10.
 const SIZES = [
   { width: 360, height: 740 },
+  { width: 390, height: 844 },
   { width: 768, height: 1024 },
   { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
 ];
 
 test('every section renders and the console is clean', async ({ page }) => {

@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 8 complete locally, PR pending. Phase 9 partly started. Next: finish Phase 9 (copy and motion polish).
+Current phase: 9 and 10 complete locally, PR pending. Next: Phase 11 (launch).
 
 ## Phase log
 
@@ -108,5 +108,18 @@ PR #7 merged after CI went green (two earlier CI runs failed on slow-renderer ti
   New tests: map, console, shortcuts, deep links, GitHub data with a stand-in answer, cache, failure path, tab title, Konami in both modes, sound toggle, axe with map and console open.
 - Not verified: sound by ear, the contact form's service path (needs a key, D36), motion reveals by eye in a real run.
 
+### Phase 8 (merged, tag phase-8)
+PR #8 merged, CI green.
+
+### Phases 9 and 10: polish, QA, performance (done locally, one PR)
+- Phase 9 done: 404 page, social card (`public/og.jpg` from `scripts/og-image.js`), Open Graph, Twitter and JSON-LD tags, GSAP text reveals and hull decode (checked by eye mid-animation and settled, no leftover markup),
+  sim load-error message, em-dash check added to the banned-word test, voice read-through of Crew and hazard copy (one line reworded). Empty/loading/error states: contact form sending and error notes, GitHub hidden on failure, simulation load failure.
+- Phase 10 done: test matrix run: 110 logic tests, 133 Playwright tests passed (25 skipped: flight tests in WebKit by design), five viewports (360, 390, 768, 1440, 1920) with axe and no horizontal scroll, JS disabled, WebGL disabled, reduced motion, scrub forward and back, resize mid-flight, tab hidden, Lite toggled mid-flight, 4x CPU throttle.
+- Measured (local build, Lighthouse 12): desktop flight 99 / 100 / 100 / 100 (performance, accessibility, best practices, SEO); mobile flight 82 / 100 / 100 / 100; LCP 1.5 s mobile, CLS 0.011 mobile; INP proxy 160 ms worst on desktop under 4x throttle (D43).
+  Budgets from `npm run budgets`: first load 26 KB (limit 60), JS 218 KB (350), fonts 102 KB (150), total 339 KB (700).
+- Found by measuring and fixed: mobile performance 66 on the mid tier (D38), GitHub 403 console error (D39), missing source maps (D41).
+- Budget misses recorded: flight length versus 1,100 vh (D17). Firefox not tested (D42).
+- Not verified: real phone, real Safari, VoiceOver (docs/MANUAL_QA.md).
+
 ## Next
-Finish Phase 9: voice pass over every line, OG image, check the reveals by eye, loading and error states. Then Phase 10 (QA, budgets, Lighthouse) and Phase 11 (launch).
+Phase 11: set repo description and topics, release notes, tag v1.0.0, final live check with Playwright, final message.

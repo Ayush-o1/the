@@ -154,3 +154,22 @@ With an empty key in `src/config.js` the form opens a prefilled email, which the
 
 ## D37 Deep links and the simulations
 Mounting the simulations changes the height of everything above a mission, so a link like `/#blackwater` could land away from its section. After the simulations mount, the page scrolls back to the hash, unless the visitor has already scrolled.
+
+## D38 Phones start on the low tier
+Plan 8.4 lists "small device" as a reason for the low tier. A coarse pointer and a viewport under 768 px now start on low (no post-processing, pixel ratio 1). The tier monitor can still raise it.
+Found by Lighthouse: mobile performance was 66 on the mid tier and 82 on low (TBT 3.7 s down to 0.7 s).
+
+## D39 GitHub is requested late
+The request waits until the Cargo hold or footer is within 600 px of the screen, and is made once. GitHub allows few unauthenticated requests per hour per address, and a 403 prints a console error that costs Lighthouse Best Practices. Most visitors never reach the Cargo hold, so most visits make no request.
+
+## D40 Share card is a JPEG outside the budget
+`public/og.jpg` (195 KB) is a screenshot of the real hero from `scripts/og-image.js`. Only link previews fetch it, so it and the `.map` files are left out of the page budgets in `scripts/check-budgets.js`.
+
+## D41 Source maps
+`build.sourcemap` is on, because Lighthouse's `valid-source-maps` audit asks for them. Browsers only download maps when developer tools are open.
+
+## D42 Firefox
+Playwright is run in Chromium and WebKit. Firefox is not installed in this environment, so Firefox is a manual check (docs/MANUAL_QA.md).
+
+## D43 INP
+Measured by scripted interaction in the flight under a 4x CPU throttle (PerformanceObserver event timing): worst click or key response 160 ms on a desktop viewport, 88 ms on a phone viewport. Target is 200 ms. Not measured on a real phone.

@@ -1,4 +1,4 @@
-// Generates the social card, public/og.png (1200x630), from the real hero.
+// Generates the social card, public/og.jpg (1200x630), from the real hero.
 // It starts the built site, loads the flight on the Mac's GPU, hides the page chrome and takes
 // one screenshot. Run it once and commit the picture; it is not part of the build.
 // Usage: npm run build && npm run preview, then in another terminal: node scripts/og-image.js
@@ -25,6 +25,6 @@ await page.addStyleTag({
   `,
 });
 await page.waitForTimeout(3000);
-await page.screenshot({ path: 'public/og.png' });
+await page.screenshot({ path: 'public/og.jpg', type: 'jpeg', quality: 82 });
 await browser.close();
-console.log('Saved public/og.png');
+console.log('Saved public/og.jpg');
