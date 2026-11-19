@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 9 and 10 complete locally, PR pending. Next: Phase 11 (launch).
+Current phase: 11 complete (all phases done). See the Phase 11 entry.
 
 ## Phase log
 
@@ -121,5 +121,16 @@ PR #8 merged, CI green.
 - Budget misses recorded: flight length versus 1,100 vh (D17). Firefox not tested (D42).
 - Not verified: real phone, real Safari, VoiceOver (docs/MANUAL_QA.md).
 
-## Next
-Phase 11: set repo description and topics, release notes, tag v1.0.0, final live check with Playwright, final message.
+### Phases 9 and 10 (merged, tags phase-9 and phase-10)
+PR #9 merged after CI went green.
+
+### Phase 11: Launch (done)
+- Done: README written as a short case study, `docs/ARCHITECTURE.md`, `docs/HANDOFF.md`, `docs/MANUAL_QA.md`, `docs/DEPLOY.md`, repository description, homepage and topics set with `gh`,
+  `scripts/live-check.js`, release notes, tag v1.0.0.
+- Verified (ran it) on the deployed URL https://ayush-o1.github.io/the/ with `node scripts/live-check.js`: 16 of 16 checks passed (200, h1, six missions, BlackWater and Europa simulations mounted,
+  Europa tamper caught at sequence 3, no console errors on the plain page and in flight, flight starts, HUD sector shown, conjunction alert reads 4.2 km, og.jpg, robots.txt, sitemap.xml and favicon served, unknown address gives the 404 page).
+- Pages deployments: every merge to main deployed successfully.
+
+## Final status
+All 12 phases (0 to 11) complete. Misses recorded in DECISIONS: flight length versus 1,100 vh (D17); Firefox, real phone, real Safari and VoiceOver not tested (D20, D42, MANUAL_QA); Argus satellite fact not built (D35); contact form service path needs a key (D36).
+Open for Ayush: see docs/HANDOFF.md.
