@@ -1,6 +1,6 @@
 # Progress
 
-Current phase: 6 and 7 complete locally, PR pending. Next: Phase 8 (navigation and interaction layer).
+Current phase: 8 complete locally, PR pending. Phase 9 partly started. Next: finish Phase 9 (copy and motion polish).
 
 ## Phase log
 
@@ -95,5 +95,18 @@ PR #6 merged. Its first CI run failed on the leak test again on the slow CI rend
   Playwright sims.spec.js: 42 tests pass in Chromium and WebKit, including axe at 360 and 1440 with every simulation in use. Screenshots looked at (1440 and 360); fixes: BeetleJuice table overflow on 360 solved with card layout.
 - Not done: real-phone test; no screen reader pass (listed for MANUAL_QA).
 
+### Phases 6 and 7 (merged, tags phase-6 and phase-7 on the same commit)
+PR #7 merged after CI went green (two earlier CI runs failed on slow-renderer timing in scene tests; those tests now wait longer or compare steady state).
+
+### Phase 8: Navigation and interaction layer (done locally)
+- Done: Map dialog (M) listing every sector and every shortcut, fast travel by link; mission console (backtick) with help, missions, open, resume, contact, stack, uptime, whoami (pure `core/commands.js`);
+  shortcuts B M ` J K L S (disabled while typing or a dialog is open); Briefing via shared dialog code; deep links that update the address as you move; return to the hash after simulations mount;
+  GitHub data (Cargo hold, "Last transmission", 10-minute cache, hidden on failure); synthesized sound (ambient, thrust follows scroll speed, tick, alarm once per hazard), off by default, saved choice starts at first gesture;
+  tab title "Signal lost"; Konami code (barrel roll in flight, a toast on the plain page); header buttons shrink to key letters below 1200 px with their names kept for screen readers.
+- Also started (Phase 9): GSAP text reveals and hull decode (flight mode only), 404 page, social card tags and JSON-LD Person, `scripts/og-image.js` (the picture itself is not generated yet), `docs/ARCHITECTURE.md`, `docs/MANUAL_QA.md`.
+- Verified (ran it): `npm run check` passes (110 logic tests; JS 217 KB gzip of 350, first load 26 KB). Full Playwright run: 120 of 121 passed, the one failure was a test selector that matched the new live regions; fixed and re-run green.
+  New tests: map, console, shortcuts, deep links, GitHub data with a stand-in answer, cache, failure path, tab title, Konami in both modes, sound toggle, axe with map and console open.
+- Not verified: sound by ear, the contact form's service path (needs a key, D36), motion reveals by eye in a real run.
+
 ## Next
-Phase 8: mission map and fast travel (M), Briefing logic and roles, console, deep links, GitHub telemetry and Cargo hold, contact form wiring, sound engine, tab-title swap, Konami.
+Finish Phase 9: voice pass over every line, OG image, check the reveals by eye, loading and error states. Then Phase 10 (QA, budgets, Lighthouse) and Phase 11 (launch).
