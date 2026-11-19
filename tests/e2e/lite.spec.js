@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { markVisited } from './helpers.js';
+
+test.beforeEach(async ({ page }) => {
+  await markVisited(page);
+});
 
 const MISSIONS = ['argus', 'blackwater', 'beetlejuice', 'theredarmy', 'deadletter', 'europa'];
 const SIZES = [
@@ -12,7 +17,7 @@ test('every section renders and the console is clean', async ({ page }) => {
   const errors = [];
   page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()));
   page.on('pageerror', (err) => errors.push(err.message));
-  await page.goto('/');
+  await page.goto('/?lite=1');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ayush Kumar');
   for (const id of ['launch', 'belt', 'missions', 'fleet', 'cargo', 'crew', 'contact']) {
     await expect(page.locator(`#${id}`)).toBeAttached();
@@ -22,7 +27,7 @@ test('every section renders and the console is clean', async ({ page }) => {
 });
 
 test('every link has a real target', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?lite=1');
   const hrefs = await page
     .locator('a')
     .evaluateAll((links) => links.map((a) => a.getAttribute('href')));
@@ -36,7 +41,7 @@ test('every link has a real target', async ({ page }) => {
 });
 
 test('resume links are removed when there is no resume.pdf', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?lite=1');
   const resumeLinks = await page.locator('a[href$="resume.pdf"]').count();
   const response = await page.request.get('/resume.pdf');
   // The preview server answers unknown paths with index.html, so check the file type too.
@@ -48,14 +53,14 @@ test('resume links are removed when there is no resume.pdf', async ({ page }) =>
 for (const size of SIZES) {
   test(`axe finds no violations at ${size.width}px`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await page.goto('/?lite=1');
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes[0].html}`)).toEqual([]);
   });
 
   test(`no horizontal scroll at ${size.width}px`, async ({ page }) => {
     await page.setViewportSize(size);
-    await page.goto('/');
+    await page.goto('/?lite=1');
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -67,7 +72,7 @@ test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
   test('all content is readable and the JS-only buttons are hidden', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?lite=1');
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
     await expect(page.locator('#europa .hazards li')).toHaveCount(3);
     await expect(page.locator('#contact-form')).toBeVisible();
@@ -78,7 +83,7 @@ test.describe('without JavaScript', () => {
 test('briefing opens with B, lists three missions, closes with Escape and returns focus', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/?lite=1');
   const button = page.locator('header [data-open-dialog="briefing"]');
   await button.focus();
   await page.keyboard.press('b');
@@ -92,13 +97,13 @@ test('briefing opens with B, lists three missions, closes with Escape and return
 });
 
 test('typing b in the message box does not open the briefing', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?lite=1');
   await page.locator('#cf-message').fill('b');
   await expect(page.locator('#briefing')).toBeHidden();
 });
 
 test('contact form falls back to a mailto link', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?lite=1');
   await page.locator('#cf-name').fill('Test Person');
   await page.locator('#cf-email').fill('test@example.com');
   await page.locator('#cf-message').fill('Hello');

@@ -1,0 +1,233 @@
+/* HUD, canvas, boot sequence, role chooser and debug overlay. Only used when scripts run. */
+
+.scene-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+
+.scene-canvas.on {
+  opacity: 1;
+}
+
+/* Header extras: sector name and mission clock. */
+.hud-sector {
+  color: var(--amber);
+  white-space: nowrap;
+}
+
+.hud-clock {
+  margin-left: auto;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+html.scene .site-header nav {
+  margin-left: 0;
+}
+
+/* The header is transparent over the scene so the flight stays visible behind it. */
+html.scene .site-header {
+  background: rgba(6, 7, 10, 0.92);
+}
+
+@media (max-width: 599px) {
+  html.js .site-header nav {
+    display: none;
+  }
+  .hud-clock {
+    display: none;
+  }
+  .site-header .btn {
+    margin-left: 0;
+  }
+  .hud-sector {
+    margin-left: auto;
+  }
+}
+
+/* Corner brackets */
+.hud-frame {
+  position: fixed;
+  inset: calc(var(--header-h) + 8px) 12px 48px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.hud-frame span {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line);
+}
+
+.hud-frame .hud-frame__tl {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+.hud-frame .hud-frame__tr {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+.hud-frame .hud-frame__bl {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.hud-frame .hud-frame__br {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Flight path along the bottom */
+.hud-path {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  height: 44px;
+  padding: 0 calc(var(--gutter) + 12px);
+  background: linear-gradient(to top, rgba(6, 7, 10, 0.8), transparent);
+}
+
+.hud-path__line {
+  position: absolute;
+  left: calc(var(--gutter) + 12px);
+  right: calc(var(--gutter) + 12px);
+  top: 22px;
+  height: 1px;
+  background: var(--line);
+}
+
+.hud-path__stop {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.hud-path__link {
+  position: absolute;
+  top: -22px;
+  left: -22px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+}
+
+.hud-path__dot {
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--star);
+  border-radius: 50%;
+  background: var(--void);
+}
+
+.hud-path__link:hover .hud-path__dot {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+
+.hud-path__marker {
+  position: absolute;
+  left: calc(var(--gutter) + 12px);
+  top: 17px;
+  width: 11px;
+  height: 11px;
+  margin-left: -5px;
+  background: var(--amber);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* The path bar covers the bottom of the page, so leave room for it. */
+html.scene .site-footer {
+  padding-bottom: calc(var(--s8) + 44px);
+}
+
+/* Boot sequence */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  align-content: center;
+  padding: var(--gutter);
+  background: var(--void);
+  transition: opacity 180ms;
+}
+
+.boot--out {
+  opacity: 0;
+}
+
+.boot__text {
+  max-width: 30rem;
+  margin: 0 auto;
+  width: 100%;
+  color: var(--amber);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  white-space: pre-wrap;
+}
+
+/* Role chooser */
+.role {
+  padding: var(--s6);
+  max-width: 34rem;
+}
+
+.role > * + * {
+  margin-top: var(--s4);
+}
+
+.role h2 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+.role__options {
+  display: grid;
+  gap: var(--s3);
+}
+
+.role__options .btn {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* Programmatic focus on a heading after navigation should not draw a ring. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* ?debug overlay */
+.debug {
+  position: fixed;
+  left: var(--s3);
+  bottom: 56px;
+  z-index: 300;
+  margin: 0;
+  padding: var(--s2) var(--s3);
+  background: rgba(6, 7, 10, 0.85);
+  border: 1px solid var(--line);
+  color: var(--ok);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  pointer-events: none;
+}

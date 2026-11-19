@@ -72,3 +72,35 @@ Plan 3 puts the featured three first. The page follows that.
 
 ## D15 Preview server note
 `vite preview` answers unknown paths with index.html (status 200), so tests that check for a missing file must also check the content type.
+
+## D16 Headless WebGL flags
+Software rendering works in headless Chromium with `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`.
+It is slow (16 to 55 fps in my runs) and only proves the scene runs. These flags are in `playwright.config.js`.
+For frame rate I used the Mac's GPU: `--use-gl=angle --use-angle=metal --ignore-gpu-blocklist` (`GL=metal node scripts/scene-check.js`).
+With that, the scene held 58 to 60 fps at 1440x900, 768x1024 and 360x740, also under a 4x CPU throttle (CDP `Emulation.setCPUThrottlingRate`).
+60 is the display's refresh cap, so this shows "not below 60", not how much headroom there is.
+
+## D17 Flight length is driven by the content, not by 1,100 vh
+Plan 5.1 wants about 1,100 vh and says to cut, not squeeze. The six dossiers are real content with evidence behind each line,
+so the page is longer: about 13.7 screens at 1440x900 (12,317 px) as of Phase 1. Positions are measured from the DOM, as the plan asks,
+and the probe holds still while a dossier is read. Cutting would remove claims or the simulations. Flight recorders are collapsed by default, which already trims it.
+Recorded as a miss against 5.1. Revisit in Phase 10 if the pacing feels long.
+
+## D18 Tier monitor measures work time for "fast"
+Plan 8.4 says `high` needs frame time under 12 ms. On a 60 Hz screen the gap between frames is 16.7 ms at best, so that could never happen.
+`sample(frameMs, workMs)` now promotes to `high` when the frame's own JS and submit time stays under 6 ms and frames arrive on time (under 20 ms) for 300 frames.
+Demotion is unchanged: 90 frames over 24 ms.
+
+## D19 GSAP use so far
+Phase 2 uses only GSAP's ticker (to share one clock with Lenis). ScrollTrigger, SplitText and ScrambleText are not imported yet. They arrive with the Phase 9 text reveals if needed, to keep the bundle small.
+
+## D20 WebKit and the scene
+Playwright's WebKit does not get the software-GL flags, so the scene tests run in Chromium only and WebKit runs the Lite tests (and falls back to Lite if it has no WebGL 2).
+Real Safari behaviour (iOS viewport units, context loss) goes on `docs/MANUAL_QA.md`.
+
+## D21 Phone header
+At 599 px and narrower, with JavaScript on, the header nav links are hidden. The header keeps the brand, sector name, Briefing and Lite buttons, and the flight path bar at the bottom is the way around.
+Without JavaScript the nav stays.
+
+## D22 Start the flight
+The hero button "Start the flight" is a link to #belt. In flight mode that scrolls the probe into the first sector. In Lite it jumps to the same place.

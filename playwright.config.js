@@ -14,7 +14,21 @@ export default defineConfig({
     timeout: 120_000,
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      // Software GL flags so headless Chromium can run WebGL. See docs/DECISIONS.md D16.
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader',
+            '--enable-unsafe-swiftshader',
+            '--ignore-gpu-blocklist',
+          ],
+        },
+      },
+    },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
 });
