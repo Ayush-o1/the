@@ -7,24 +7,19 @@
 }
 
 html {
-  background: var(--void);
-  color: var(--star);
+  background: var(--ink);
+  color: var(--bone-2);
   font-family: var(--font-body);
   font-size: 100%;
+  font-weight: 400;
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + var(--s4));
+  scroll-padding-top: calc(var(--header-h) + var(--s5));
   color-scheme: dark;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
 /* The page background is set on <html>. Body stays transparent so the star layer and the
-   canvas, which sit at z-index -1, show through. */
+   canvas, which sit behind the content, show through. */
 body {
   margin: 0;
   min-height: 100svh;
@@ -53,10 +48,11 @@ ol {
 h1,
 h2,
 h3 {
+  color: var(--bone);
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 0.98;
-  letter-spacing: -0.01em;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 h2 {
@@ -65,15 +61,17 @@ h2 {
 
 h3 {
   font-size: var(--text-h3);
+  line-height: 1.1;
 }
 
+/* Small headings inside a dossier are labels, not display type. */
 h4 {
+  color: var(--cold);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--dim);
 }
 
 p {
@@ -81,6 +79,7 @@ p {
 }
 
 strong {
+  color: var(--bone);
   font-weight: 600;
 }
 
@@ -90,26 +89,31 @@ svg {
   max-width: 100%;
 }
 
-/* Links are amber and underlined. Colour alone never marks a link. */
+/* Links are underlined. Colour alone never marks a link. */
 a {
-  color: var(--amber);
+  color: var(--bone);
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
   text-decoration-thickness: 1px;
+  transition: color var(--t-fast) var(--ease-settle);
 }
 
 a:hover {
-  text-decoration-thickness: 2px;
+  color: var(--cold);
+  text-decoration-color: currentcolor;
 }
 
+/* Two colours, so the ring shows on both the dark page and the lit planet behind it. */
 :focus-visible {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--bone);
   outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--ink);
 }
 
 ::selection {
-  background: var(--amber);
-  color: var(--void);
+  background: var(--signal);
+  color: var(--ink);
 }
 
 .skip-link {
@@ -118,12 +122,10 @@ a:hover {
   top: -100px;
   z-index: 100;
   padding: var(--s3) var(--s4);
-  background: var(--amber);
-  color: var(--void);
+  background: var(--bone);
+  color: var(--ink);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-size: var(--text-label);
 }
 
 .skip-link:focus {
@@ -147,25 +149,24 @@ html:not(.js) .needs-js {
   display: none !important;
 }
 
-/* Small label text used all over the site: HUD, tags, designations. */
+/* Small label text used across the site: section numbers, tags, designations. */
 .mono {
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Lenis adds these classes to <html> while it smooths the wheel. It needs native smooth-scroll
-   off, otherwise the two fight each other. */
-html.lenis,
-html.lenis body {
-  height: auto;
+/* Programmatic focus on a heading after navigation should not draw a ring. */
+[tabindex='-1']:focus {
+  outline: none;
+  box-shadow: none;
 }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
+/* Smooth scrolling here only softens jumps to an anchor. The wheel, touch and keys stay native. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

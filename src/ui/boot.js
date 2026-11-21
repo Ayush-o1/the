@@ -6,13 +6,12 @@ const FADE_MS = 180;
 function buildLines(env, tier) {
   const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
   return [
-    'AK-01 FLIGHT COMPUTER',
+    'Ayush Kumar',
     `> display .... ${window.innerWidth}x${window.innerHeight} @${dpr}x`,
     `> webgl ...... ${env.webgl2 ? 'ok' : 'missing'}  (tier: ${tier})`,
     `> motion ..... ${env.reducedMotion ? 'reduced' : 'full'}`,
     '> audio ...... off',
-    '> hull ....... 100%',
-    'READY',
+    'Ready',
   ];
 }
 

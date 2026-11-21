@@ -1,81 +1,59 @@
-/* Buttons, tags, chips, panels, form fields. */
+/* Buttons, chips, panels, form fields, dialogs and the toast. No chamfers, no glow. */
 
-/* Chamfered corners are drawn with two small gradients so the 1px border survives the clip-path. */
 .btn {
-  --edge: var(--amber);
-  --corner: var(--chamfer);
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--s3);
+  gap: var(--s2);
   min-height: 44px;
-  padding: var(--s3) var(--s5);
-  border: 1px solid var(--edge);
-  background-color: transparent;
-  background-image:
-    linear-gradient(135deg, transparent 5.2px, var(--edge) 5.2px 6.4px, transparent 6.4px),
-    linear-gradient(315deg, transparent 5.2px, var(--edge) 5.2px 6.4px, transparent 6.4px);
-  background-position:
-    top left,
-    bottom right;
-  background-size: var(--corner) var(--corner);
-  background-repeat: no-repeat;
-  clip-path: polygon(
-    var(--corner) 0,
-    100% 0,
-    100% calc(100% - var(--corner)),
-    calc(100% - var(--corner)) 100%,
-    0 100%,
-    0 var(--corner)
-  );
-  color: var(--amber);
+  padding: var(--s2) var(--s5);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--bone);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color 120ms,
-    color 120ms;
+    background-color var(--t-fast) var(--ease-settle),
+    border-color var(--t-fast) var(--ease-settle),
+    color var(--t-fast) var(--ease-settle);
 }
 
 .btn:hover {
-  background-color: var(--amber);
-  color: var(--void);
-  text-decoration: none;
+  border-color: var(--bone);
+  color: var(--bone);
 }
 
 .btn:active {
-  transform: translateY(2px);
+  background: var(--ink-3);
 }
 
-/* clip-path would cut the focus outline, so the focus ring is drawn inside the button. */
-.btn:focus-visible {
-  outline: 2px solid var(--amber);
-  outline-offset: -5px;
+.btn--primary {
+  border-color: var(--bone);
+  background: var(--bone);
+  color: var(--ink);
+}
+
+.btn--primary:hover {
+  background: var(--bone-2);
+  border-color: var(--bone-2);
+  color: var(--ink);
 }
 
 .btn--quiet {
-  --edge: var(--line);
-  color: var(--star);
+  min-height: 44px;
+  padding-inline: var(--s4);
+  border-color: var(--line);
+  color: var(--bone-2);
 }
 
-.btn--quiet:hover {
-  --edge: var(--amber);
-}
-
-.btn kbd {
-  padding: 0 var(--s2);
-  border: 1px solid currentcolor;
-  font: inherit;
-  opacity: 0.8;
-}
-
-.btn[disabled] {
-  opacity: 0.5;
+.btn[disabled],
+.btn[aria-disabled='true'] {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -88,24 +66,27 @@
 .tag {
   padding: var(--s1) var(--s3);
   border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--bone-2);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   letter-spacing: 0.04em;
-  color: var(--star);
 }
 
 .chip {
   display: inline-block;
   padding: 2px var(--s3);
   border: 1px solid currentcolor;
+  border-radius: var(--radius);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
 .chip--active {
-  color: var(--amber);
+  color: var(--signal);
 }
 
 .chip--complete {
@@ -116,34 +97,11 @@
   color: var(--dim);
 }
 
-/* Panel: one chamfered corner, 1px hairline, no blur. */
+/* Panel: a raised block with a hairline. No blur, no glow. */
 .panel {
-  position: relative;
-  background: rgba(13, 16, 23, 0.92);
+  background: rgba(16, 21, 29, 0.94);
   border: 1px solid var(--line);
-  clip-path: polygon(
-    0 0,
-    calc(100% - var(--chamfer-panel)) 0,
-    100% var(--chamfer-panel),
-    100% 100%,
-    0 100%
-  );
-}
-
-.panel::after {
-  content: '';
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  width: calc(var(--chamfer-panel) + 1px);
-  height: calc(var(--chamfer-panel) + 1px);
-  background: linear-gradient(
-    to bottom left,
-    transparent calc(50% - 0.6px),
-    var(--line) calc(50% - 0.6px) calc(50% + 0.6px),
-    transparent calc(50% + 0.6px)
-  );
-  pointer-events: none;
+  border-radius: var(--radius);
 }
 
 /* Form fields */
@@ -153,11 +111,12 @@
 }
 
 .field label {
+  color: var(--cold);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--dim);
 }
 
 .field input,
@@ -165,23 +124,16 @@
   width: 100%;
   min-height: 44px;
   padding: var(--s3) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: 0;
-  background: var(--void);
-  color: var(--star);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--ink-3);
+  color: var(--bone);
   font: inherit;
 }
 
 .field textarea {
   min-height: 9rem;
   resize: vertical;
-}
-
-.field input:focus-visible,
-.field textarea:focus-visible {
-  outline: 2px solid var(--amber);
-  outline-offset: 2px;
-  border-color: var(--amber);
 }
 
 .form-note {
@@ -195,7 +147,7 @@
 }
 
 .form-note[data-state='error'] {
-  color: var(--alert);
+  color: var(--signal);
 }
 
 /* Honeypot: off screen for people, still present for bots. */
@@ -209,95 +161,22 @@
 
 /* Native dialog */
 dialog {
-  width: min(44rem, calc(100vw - 2 * var(--gutter)));
+  width: min(40rem, calc(100vw - 2 * var(--s5)));
   max-height: calc(100svh - 2 * var(--s5));
   padding: 0;
   overflow: auto;
-  color: var(--star);
+  color: var(--bone-2);
 }
 
 dialog::backdrop {
-  background: rgba(6, 7, 10, 0.85);
+  background: rgba(10, 13, 18, 0.86);
 }
 
-/* Mission map and keyboard shortcuts */
-.map__list {
-  display: grid;
-  gap: var(--s1);
-  margin-top: var(--s4);
-}
-
-.map__list a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-}
-
-.map__keys {
-  display: grid;
-  gap: var(--s3);
-  margin-top: var(--s4);
-}
-
-.map__keys > div {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: var(--s3);
-  align-items: center;
-}
-
-.map__keys kbd {
-  display: inline-block;
-  min-width: 2rem;
-  padding: 0 var(--s2);
-  border: 1px solid var(--line);
-  font: inherit;
-  font-family: var(--font-mono);
-  text-align: center;
-}
-
-/* Mission console */
-.console__log {
-  display: grid;
-  gap: var(--s1);
-  max-height: 40svh;
-  margin-block: var(--s4);
-  overflow: auto;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  white-space: pre-wrap;
-  color: var(--star);
-}
-
-.console__echo {
-  color: var(--amber);
-}
-
-.console__form {
-  display: grid;
-  gap: var(--s2);
-}
-
-.console__form label {
-  color: var(--dim);
-}
-
-.console__form input {
-  min-height: 44px;
-  padding: var(--s2) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: 0;
-  background: var(--void);
-  color: var(--star);
-  font: 1rem var(--font-mono);
-}
-
-/* Toasts */
 .toast {
   position: fixed;
   left: 50%;
   bottom: 60px;
-  z-index: 40;
+  z-index: var(--z-toast);
   display: grid;
   gap: var(--s2);
   transform: translateX(-50%);
@@ -307,24 +186,9 @@ dialog::backdrop {
 .toast__message {
   margin: 0;
   padding: var(--s2) var(--s4);
-  background: rgba(13, 16, 23, 0.95);
+  background: var(--ink-2);
   border: 1px solid var(--line);
-  color: var(--star);
+  border-radius: var(--radius);
+  color: var(--bone);
   text-align: center;
-}
-
-/* Cargo hold and footer telemetry */
-.cargo__list li {
-  padding: var(--s3) var(--s4);
-  border: 1px solid var(--line);
-}
-
-.cargo__list p {
-  margin-top: var(--s2);
-  color: var(--dim);
-  font-size: 0.9375rem;
-}
-
-.site-footer [data-telemetry] {
-  color: var(--ok);
 }
