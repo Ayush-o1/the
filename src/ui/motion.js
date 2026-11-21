@@ -18,9 +18,22 @@ function inViewNow(el) {
   return rect.top < window.innerHeight && rect.bottom > 0;
 }
 
-export function initReveals() {
+// How close the flight must be to a heading's section before the heading plays, in stops. The
+// headings and the camera read the same smoothed progress in the same frame, so the text arrives
+// with the world, not ahead of it.
+const ARRIVE = 0.35;
+
+// stops: the flight's sections in order (scene.stops). Returns { update(param), stop() }: the
+// scene's frame loop calls update with its smoothed progress.
+export function initReveals(stops = []) {
   const observers = [];
   const splits = [];
+  const waiting = [];
+
+  function stopIndexOf(heading) {
+    const index = stops.findIndex((stop) => stop.el?.contains(heading));
+    return index < 0 ? 0 : index;
+  }
 
   // Headings are split after fonts load, so the line breaks match what the visitor will see.
   document.fonts.ready.then(() => {
@@ -43,13 +56,14 @@ export function initReveals() {
         play();
         continue;
       }
-      // Below the fold: hold the lines out of sight until the heading scrolls in, then play once.
+      // Below the fold: hold the lines out of sight until the heading is on screen and the flight
+      // has reached its section, then play once.
       gsap.set(split.lines, { yPercent: 110 });
+      const item = { play, index: stopIndexOf(heading), seen: false, done: false };
+      waiting.push(item);
       const observer = new IntersectionObserver(
         (entries) => {
-          if (!entries.some((entry) => entry.isIntersecting)) return;
-          observer.disconnect();
-          play();
+          item.seen = entries.some((entry) => entry.isIntersecting);
         },
         { rootMargin: '0px 0px -10% 0px' },
       );
@@ -58,9 +72,18 @@ export function initReveals() {
     }
   });
 
-  return () => {
-    for (const observer of observers) observer.disconnect();
-    for (const split of splits) split.revert();
+  return {
+    update(param) {
+      for (const item of waiting) {
+        if (item.done || !item.seen || param < item.index - ARRIVE) continue;
+        item.done = true;
+        item.play();
+      }
+    },
+    stop() {
+      for (const observer of observers) observer.disconnect();
+      for (const split of splits) split.revert();
+    },
   };
 }
 

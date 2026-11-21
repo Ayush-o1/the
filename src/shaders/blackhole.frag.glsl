@@ -43,7 +43,7 @@ void main() {
   vec3 dir = normalize(uToLocal * dirWorld);
 
   // Jump straight to a sphere around the hole: nothing bends much farther out.
-  float start = uOuter * 1.6;
+  float start = uOuter * 1.2;
   float b = dot(pos, dir);
   float c = dot(pos, pos) - start * start;
   if (c > 0.0) {
@@ -63,7 +63,7 @@ void main() {
       break;
     }
     if (r > start * 1.05 && dot(pos, dir) > 0.0) break;
-    float dt = clamp(0.06 * r * r / (1.0 + r), 0.02, 0.9);
+    float dt = clamp(0.09 * r * r / (1.0 + r), 0.03, 1.2);
     // The photon orbit equation in Cartesian form: acceleration -1.5 h^2 x / r^5.
     vec3 accel = -1.5 * h2 * pos / pow(r, 5.0);
     vec3 next = pos + dir * dt;

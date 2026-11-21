@@ -88,6 +88,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let scrolls = [];
   const follower = createFollower(0);
   let param = 0;
+  // Where the scroll alone would put the flight this frame, before smoothing (for ?debug).
+  let lastTarget = 0;
   let steer = 0;
   let steerTarget = 0;
   let thrust = 0;
@@ -163,6 +165,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     renderer.info.reset();
 
     const target = stopParam(scrolls, window.scrollY);
+    lastTarget = target;
     const previous = param;
     param = follower.step(target, dt);
     const previousSteer = steer;
@@ -202,6 +205,15 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     // One exposure per world (bright stars darker, dim planets brighter), blended between stops.
     renderer.toneMappingExposure = exposureAt(param, exposures);
 
+    // The page's own moving parts (progress line, heading reveals) read the same smoothed
+    // progress in the same frame, before it is drawn, so text and camera never drift apart.
+    const nearest = nearestStop(scrolls, window.scrollY);
+    if (nearest !== sectorIndex) {
+      sectorIndex = nearest;
+      onSector(stops[nearest], nearest);
+    }
+    onFrame({ param, target, time, stops: stops.length, dt, thrust });
+
     const workStart = performance.now();
     probe.update(time, thrust);
     // The key light follows the probe so its shadow box stays around it. The direction is fixed.
@@ -220,13 +232,6 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     // A pinned tier (?tier=) never adapts, so tests see the same scene on fast and slow machines.
     const nextTier = pinTier ? null : tierMonitor.sample(deltaMs, performance.now() - workStart);
     if (nextTier) applyTier(nextTier);
-
-    const nearest = nearestStop(scrolls, window.scrollY);
-    if (nearest !== sectorIndex) {
-      sectorIndex = nearest;
-      onSector(stops[nearest], nearest);
-    }
-    onFrame({ param, stops: stops.length, dt, thrust });
 
     if (firstFrame) {
       firstFrame = false;
@@ -275,6 +280,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
         programs: info.programs?.length ?? 0,
         warmMs: Math.round(warmMs),
         param,
+        target: lastTarget,
         worlds: worlds.active.join(','),
       };
     },

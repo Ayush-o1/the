@@ -12,10 +12,12 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
   let loading = false;
   let pending = Promise.resolve();
   let stopMotion = null;
+  let reveals = null;
 
   function teardown() {
     stopMotion?.();
     stopMotion = null;
+    reveals = null;
     hud?.destroy();
     scene?.dispose();
     hud = null;
@@ -50,8 +52,11 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         pinTier,
         onContextLost: () => enterLite('graphics context lost'),
         onSector: (stop) => hud?.setSector(stop),
+        // Everything on the page that moves with the flight reads this one smoothed progress,
+        // once per frame, before the frame is drawn: the progress line and the heading reveals.
         onFrame: (state) => {
           hud?.update(state);
+          reveals?.update(state.param);
           onFrame?.(state);
         },
       });
@@ -71,7 +76,8 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         import('../ui/motion.js')
           .then((motion) => {
             if (current !== 'scene') return;
-            stopMotion = motion.initReveals();
+            reveals = motion.initReveals(scene.stops);
+            stopMotion = () => reveals.stop();
           })
           .catch((error) => console.warn('Motion polish failed to load:', error));
       }

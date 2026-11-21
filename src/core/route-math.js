@@ -56,7 +56,9 @@ export function stopParam(ranges, y) {
   let i = 0;
   while (y >= ranges[i + 1].from) i += 1;
   if (y <= ranges[i].to) return i;
-  return i + smoothstep((y - ranges[i].to) / (ranges[i + 1].from - ranges[i].to));
+  // smootherstep, not smoothstep: its acceleration is also zero where a section starts and ends,
+  // so crossing a section boundary has no jump in acceleration (a jerk spike).
+  return i + smootherstep((y - ranges[i].to) / (ranges[i + 1].from - ranges[i].to));
 }
 
 // The stop whose range is nearest to the current scroll position. Drives the section label.

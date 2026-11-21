@@ -20,7 +20,7 @@ import fragment from '../../shaders/blackhole.frag.glsl?raw';
 const SCALE = 2.7;
 const INNER = 3;
 const OUTER = 11;
-const STEPS = { high: 140, mid: 100, low: 60 };
+const STEPS = { high: 90, mid: 70, low: 44 };
 
 export function createBlackWater({ tier }) {
   const group = new Group();
@@ -44,7 +44,7 @@ export function createBlackWater({ tier }) {
     blending: NormalBlending,
     premultipliedAlpha: true,
   });
-  const size = OUTER * 1.7 * SCALE * 2;
+  const size = OUTER * 1.3 * SCALE * 2;
   const quad = new Mesh(new PlaneGeometry(size, size), material);
   quad.frustumCulled = false;
   group.add(quad);
