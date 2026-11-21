@@ -17,7 +17,7 @@ import {
   Vector3,
   Quaternion,
 } from 'three';
-import { shaderMaterial, SUN_DIRECTION, disposeTree } from './util.js';
+import { shaderMaterial, disposeTree } from './util.js';
 import { createRng } from '../../lib/rng.js';
 import ringVertex from '../../shaders/ring.vert.glsl?raw';
 import ringFragment from '../../shaders/ring.frag.glsl?raw';
