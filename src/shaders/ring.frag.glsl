@@ -1,15 +1,31 @@
-// Planet ring: fine bands with a few gaps. Radius is normalised between inner and outer edge.
+// A planet's ring: many ringlets and two gaps (rings.glsl). Lit from the front it is matte cream;
+// seen from the unlit side it glows faintly with light scattered through it. The planet's shadow
+// falls across it.
 uniform float uInner;
 uniform float uOuter;
 uniform vec3 uColor;
+uniform vec3 uCenter;
+uniform float uPlanetRadius;
+uniform vec3 uRingNormal;
 varying float vRadius;
-varying float vAngle;
+varying vec3 vWorldPos;
 
 void main() {
   float t = (vRadius - uInner) / (uOuter - uInner);
-  float bands = fbm(vec3(t * 40.0, 1.0, 2.0));
-  float gap = smoothstep(0.52, 0.55, t) * (1.0 - smoothstep(0.58, 0.61, t));
-  float edge = smoothstep(0.0, 0.05, t) * (1.0 - smoothstep(0.9, 1.0, t));
-  float alpha = (0.25 + 0.6 * bands) * (1.0 - 0.85 * gap) * edge;
-  gl_FragColor = vec4(uColor * (0.6 + 0.6 * bands), alpha * 0.8);
+  float density = ringDensity(t);
+  vec3 ringN = normalize(uRingNormal);
+  vec3 toCamera = normalize(cameraPosition - vWorldPos);
+  float sunSide = dot(ringN, sunDir());
+  float viewSide = dot(ringN, toCamera);
+  // Same side as the sun: reflected light. Other side: light scattered through the ring.
+  float lit = sunSide * viewSide > 0.0 ? abs(sunSide) : 0.25 * (1.0 - density) * abs(sunSide) + 0.05;
+  // The planet's shadow: does the ray toward the sun pass through the planet?
+  vec3 oc = vWorldPos - uCenter;
+  float b = dot(oc, sunDir());
+  float c = dot(oc, oc) - uPlanetRadius * uPlanetRadius;
+  float shadow = (b < 0.0 && b * b - c > 0.0) ? 1.0 : 0.0;
+  vec3 color = uColor * (0.75 + 0.35 * density) * (SUN_COLOR * lit * (1.0 - shadow) + FILL_COLOR);
+  gl_FragColor = vec4(color, density * 0.92 * uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

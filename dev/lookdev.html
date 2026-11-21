@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Look-dev</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #05070a;
+        color: #ddd;
+        font:
+          12px/1.4 ui-monospace,
+          monospace;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      form {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        display: grid;
+        grid-template-columns: auto 160px;
+        gap: 4px 8px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.6);
+      }
+      body.clean form {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="controls">
+      <label for="asset">asset</label>
+      <select id="asset" name="asset"></select>
+      <label for="yaw">yaw</label><input id="yaw" name="yaw" type="range" min="-180" max="180" />
+      <label for="pitch">pitch</label
+      ><input id="pitch" name="pitch" type="range" min="-80" max="80" />
+      <label for="dist">distance</label
+      ><input id="dist" name="dist" type="range" min="1" max="400" />
+      <label for="sunAz">sun azimuth</label
+      ><input id="sunAz" name="sunAz" type="range" min="-180" max="180" />
+      <label for="sunEl">sun elevation</label
+      ><input id="sunEl" name="sunEl" type="range" min="-80" max="80" />
+      <label for="spin">turntable</label><input id="spin" name="spin" type="checkbox" />
+      <label for="lit">lit</label><input id="lit" name="lit" type="checkbox" />
+      <label for="sil">silhouette</label><input id="sil" name="sil" type="checkbox" />
+      <label for="tm">tone mapping</label>
+      <select id="tm" name="tm">
+        <option>aces</option>
+        <option>agx</option>
+        <option>neutral</option>
+      </select>
+    </form>
+    <script type="module" src="./lookdev.js"></script>
+  </body>
+</html>

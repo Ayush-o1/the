@@ -37,22 +37,29 @@ test('when the target reverses, the position stays continuous and the speed chan
   const positions = [];
   const speeds = [];
   for (let i = 0; i < 90; i += 1) {
-    follower.step(i < 45 ? 10 : 0, dt);
+    // Reverse while it is still moving fast (a third of a second in).
+    follower.step(i < 20 ? 10 : 0, dt);
     positions.push(follower.value);
     speeds.push(follower.velocity);
   }
   // Speed can only change as fast as the spring pulls: omega squared times the distance, per frame.
   // An exponential ease would flip its speed in one frame at the reversal. This cannot.
-  const pull = omegaFor(CAMERA_HALF_LIFE) ** 2 * 10 * dt;
+  // Plus the braking of its own speed (2 omega v), since the reversal comes while it is moving.
+  const omega = omegaFor(CAMERA_HALF_LIFE);
+  const pull = (omega ** 2 * 10 + 2 * omega * ((10 * omega) / Math.E)) * dt;
   for (let i = 1; i < positions.length; i += 1) {
-    assert.ok(Math.abs(positions[i] - positions[i - 1]) < 0.4);
+    // A critically damped spring released toward a step of 10 peaks at 10 * omega / e in speed.
+    assert.ok(
+      Math.abs(positions[i] - positions[i - 1]) <=
+        (10 * omegaFor(CAMERA_HALF_LIFE) * dt) / Math.E + 1e-9,
+    );
     assert.ok(Math.abs(speeds[i] - speeds[i - 1]) <= pull + 1e-9, `jump at frame ${i}`);
   }
   // At the reversal frame the speed is still forward, and it comes back through zero.
-  assert.ok(speeds[45] > 0);
+  assert.ok(speeds[20] > 0);
   assert.ok(speeds[89] <= 0);
   // It was still travelling forward a moment after the reversal: it slowed down, it did not snap.
-  assert.ok(positions[46] > positions[44]);
+  assert.ok(positions[21] > positions[19]);
 });
 
 test('scrubbing forward and back follows the same curve in mirror image', () => {

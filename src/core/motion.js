@@ -5,7 +5,7 @@
 // Nothing else in the site smooths scroll, so there is no double smoothing.
 
 // Seconds for the camera to cover half the distance to where the scroll has put it.
-export const CAMERA_HALF_LIFE = 0.35;
+export const CAMERA_HALF_LIFE = 0.25;
 
 // For a critically damped spring, x(t) = (1 + wt) e^(-wt). It is half-way when wt is about 1.68.
 const HALF_LIFE_FACTOR = 1.68;

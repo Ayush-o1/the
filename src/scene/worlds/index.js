@@ -18,45 +18,81 @@ import { createEuropa } from './europa.js';
 // stays. Once the probe has gone by, the world is behind the camera, so it must not hang in front
 // of the next one.
 // How far past its stop a world stays visible, in stops.
-const AFTER = 0.85;
+const AFTER = 0.3;
+// A world fades in and out over this many seconds instead of popping. Whether it should be shown
+// is a pure function of progress; only the fade toward that answer takes time.
+export const FADE_SECONDS = 0.5;
+
+// Every material under a world reads one shared fade value: shader materials through a uFade
+// uniform, the others through their opacity.
+export function collectFade(group, fade) {
+  const plain = [];
+  group.traverse((node) => {
+    const materials = Array.isArray(node.material) ? node.material : [node.material];
+    for (const material of materials) {
+      if (!material) continue;
+      if (material.isShaderMaterial) {
+        material.uniforms.uFade = fade;
+        material.transparent = true;
+      } else {
+        material.transparent = true;
+        plain.push({ material, opacity: material.opacity });
+      }
+    }
+  });
+  return plain;
+}
+
+// Moves value toward target at a steady rate, so a fade takes FADE_SECONDS whatever the frame rate.
+export function stepFade(value, target, dt) {
+  const step = dt / FADE_SECONDS;
+  return target > value ? Math.min(target, value + step) : Math.max(target, value - step);
+}
 
 const DEFINITIONS = [
-  { id: 'earth', stop: 'launch', create: createEarth, at: [55, -70, -25], near: 2.2 },
-  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.8 },
+  {
+    id: 'earth',
+    stop: 'launch',
+    create: createEarth,
+    at: [33.16, -49.48, -96.07],
+    atPortrait: [6.5, -44.2, -17.07],
+    near: 2.2,
+  },
+  { id: 'argus', stop: 'argus', create: createArgus, offset: [-19, 1, 46], near: 0.85 },
   {
     id: 'blackwater',
     stop: 'blackwater',
     create: createBlackWater,
-    offset: [24, 4, 52],
-    near: 1.6,
+    offset: [19, 3, 64],
+    near: 0.85,
   },
   {
     id: 'beetlejuice',
     stop: 'beetlejuice',
     create: createBeetleJuice,
     offset: [-34, 2, 56],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'theredarmy',
     stop: 'theredarmy',
     create: createMars,
-    offset: [-24, 0, 36],
-    near: 1.6,
+    offset: [-21, 0, 48],
+    near: 0.85,
   },
   {
     id: 'deadletter',
     stop: 'deadletter',
     create: createRelay,
     offset: [22, 6, 40],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'europa',
     stop: 'europa',
     create: createEuropa,
     offset: [-26, -2, 40],
-    near: 1.6,
+    near: 0.85,
   },
   { id: 'home', stop: 'contact', create: createHome, at: [0, 6, -1050], near: 1.25 },
 ];
@@ -66,7 +102,10 @@ export function createWorldManager({ scene, stops, tier }) {
     ...definition,
     index: stops.findIndex((stop) => stop.id === definition.stop),
     instance: null,
+    fade: { value: 0 },
+    plain: [],
   })).filter((entry) => entry.index >= 0);
+  let first = true;
 
   // Builds the worlds one at a time, handing the thread back between them, so no single task is
   // long. Called once, before the first frame.
@@ -74,15 +113,23 @@ export function createWorldManager({ scene, stops, tier }) {
     for (const entry of entries) {
       entry.instance = entry.create({ tier });
       entry.instance.group.visible = false;
+      entry.plain = collectFade(entry.instance.group, entry.fade);
       scene.add(entry.instance.group);
       await yieldToMain();
     }
   }
 
+  function applyFade(entry) {
+    const amount = entry.fade.value;
+    entry.instance.group.visible = amount > 0.001;
+    for (const { material, opacity } of entry.plain) material.opacity = opacity * amount;
+  }
+
   function place(entry, portrait) {
     const { group } = entry.instance;
     if (entry.at) {
-      group.position.set(...entry.at);
+      // On a phone the text fills the top of the screen, so a fixed world can sit lower.
+      group.position.set(...(portrait && entry.atPortrait ? entry.atPortrait : entry.at));
       return;
     }
     const [x, y, ahead] = entry.offset;
@@ -92,18 +139,21 @@ export function createWorldManager({ scene, stops, tier }) {
   }
 
   return {
-    update(param, time, camera) {
+    update(param, time, camera, dt) {
       const portrait = camera.aspect <= 1.2;
       for (const entry of entries) {
         const offset = param - entry.index; // negative before the stop, positive after
-        const { group } = entry.instance;
         // A pure function of progress, so flying forward and scrubbing back show the same worlds.
-        group.visible = offset > -entry.near && offset < AFTER;
-        if (group.visible) {
+        const wanted = offset > -entry.near && offset < AFTER ? 1 : 0;
+        // The first frame starts where the page is (a deep link does not fade in from nothing).
+        entry.fade.value = first ? wanted : stepFade(entry.fade.value, wanted, dt);
+        applyFade(entry);
+        if (entry.instance.group.visible) {
           place(entry, portrait);
           entry.instance.update(time, camera, param - entry.index);
         }
       }
+      first = false;
     },
     build,
     // Shows each world alone for one render, so the renderer compiles and uploads it, then hides it.
@@ -111,11 +161,31 @@ export function createWorldManager({ scene, stops, tier }) {
     async warmEach(render, yieldToMain) {
       for (const entry of entries) {
         place(entry, false);
-        entry.instance.group.visible = true;
+        entry.fade.value = 1;
+        applyFade(entry);
         render();
-        entry.instance.group.visible = false;
+        entry.fade.value = 0;
+        applyFade(entry);
         await yieldToMain();
       }
+    },
+    // Shows or hides every world at once, for compiling all their shaders together in warm-up.
+    setAllVisible(visible) {
+      for (const entry of entries) {
+        entry.fade.value = visible ? 1 : 0;
+        applyFade(entry);
+        if (visible) place(entry, false);
+      }
+    },
+    // A world's definition, for the ?debug framing scripts.
+    debugEntry(id) {
+      return entries.find((entry) => entry.id === id) ?? null;
+    },
+    // The maps each world asks for, and where to send each one when it arrives.
+    mapRequests() {
+      return entries.flatMap((entry) =>
+        (entry.instance?.maps ?? []).map((name) => ({ name, world: entry.instance })),
+      );
     },
     // The group of a world, or null. Used to aim the lens pass at the black hole.
     groupOf(id) {

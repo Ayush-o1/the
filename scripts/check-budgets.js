@@ -12,6 +12,9 @@ const BUDGET = {
   totalJsKb: 350,
   fontsKb: 150,
   totalTransferKb: 700,
+  // Planet maps (NASA and USGS imagery, WebP). Fetched only after the flight has started, never
+  // on slow connections, Save-Data or the low tier, so they are not part of the page's own weight.
+  planetMapsKb: 1536,
 };
 
 function listFiles(dir) {
@@ -47,7 +50,12 @@ if (!existsSync(DIST)) {
 }
 
 // The social card is only fetched by link previews, never by a visitor loading the page.
-const files = listFiles(DIST).filter((file) => !file.endsWith('og.jpg') && !file.endsWith('.map'));
+const isMap = (file) => extname(file) === '.webp';
+const allFiles = listFiles(DIST).filter(
+  (file) => !file.endsWith('og.jpg') && !file.endsWith('.map'),
+);
+const files = allFiles.filter((file) => !isMap(file));
+const planetMaps = allFiles.filter(isMap);
 const htmlPath = join(DIST, 'index.html');
 const firstLoad = [htmlPath, ...firstLoadFiles(readFileSync(htmlPath, 'utf8'))];
 
@@ -60,6 +68,8 @@ const result = {
   totalJsKb: sum(jsFiles, gzipSize) / KB,
   fontsKb: sum(fontFiles, transferSize) / KB,
   totalTransferKb: sum(files, transferSize) / KB,
+  // WebP is already compressed, like the fonts: raw bytes.
+  planetMapsKb: sum(planetMaps, (path) => statSync(path).size) / KB,
 };
 
 let failed = false;

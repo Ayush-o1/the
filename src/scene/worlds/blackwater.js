@@ -1,71 +1,64 @@
-// M2 BlackWater: a black hole. A dark sphere, a swirling accretion disk, a thin photon ring and a
-// second, upright ring that hints at light from the far side of the disk bending over the top.
+// M2 BlackWater: a black hole, traced per pixel (shaders/blackhole.frag.glsl), drawn on a quad that
+// always faces the camera, with a faint warm glow around it. The disk is tilted so the camera sees
+// it a little from above, the angle at which the lensed far side arches over the shadow.
 import {
   Group,
   Mesh,
-  SphereGeometry,
-  RingGeometry,
-  MeshBasicMaterial,
-  DoubleSide,
-  AdditiveBlending,
+  PlaneGeometry,
+  Vector3,
+  Matrix3,
+  Matrix4,
+  Euler,
+  NormalBlending,
 } from 'three';
 import { shaderMaterial, disposeTree } from './util.js';
 import { createGlow } from './glow.js';
-import ringVertex from '../../shaders/ring.vert.glsl?raw';
-import diskFragment from '../../shaders/disk.frag.glsl?raw';
+import vertex from '../../shaders/atmosphere.vert.glsl?raw';
+import fragment from '../../shaders/blackhole.frag.glsl?raw';
 
-const RADIUS = 7;
-
-function diskMaterial(inner, outer, alpha) {
-  return shaderMaterial({
-    vertex: ringVertex,
-    fragment: diskFragment,
-    uniforms: { uInner: { value: inner }, uOuter: { value: outer }, uAlpha: { value: alpha } },
-    transparent: true,
-    side: DoubleSide,
-    depthWrite: false,
-    blending: AdditiveBlending,
-  });
-}
+// World units per event-horizon radius. The shadow is about 2.6 of these across in radius.
+const SCALE = 2.7;
+const INNER = 3;
+const OUTER = 11;
+const STEPS = { high: 90, mid: 70, low: 44 };
 
 export function createBlackWater({ tier }) {
   const group = new Group();
-  const detail = tier === 'low' ? 96 : 192;
+  const center = new Vector3();
+  const tilt = new Matrix4().makeRotationFromEuler(new Euler(0.2, 0, 0.16));
+  const toLocal = new Matrix3().setFromMatrix4(tilt).transpose();
 
-  const hole = new Mesh(
-    new SphereGeometry(RADIUS, 48, 32),
-    new MeshBasicMaterial({ color: 0x000000 }),
-  );
-  group.add(hole);
+  const material = shaderMaterial({
+    vertex,
+    fragment,
+    uniforms: {
+      uCenter: { value: center },
+      uScale: { value: SCALE },
+      uToLocal: { value: toLocal },
+      uInner: { value: INNER },
+      uOuter: { value: OUTER },
+    },
+    defines: { STEPS: STEPS[tier] ?? 100 },
+    transparent: true,
+    depthWrite: false,
+    blending: NormalBlending,
+    premultipliedAlpha: true,
+  });
+  const size = OUTER * 1.3 * SCALE * 2;
+  const quad = new Mesh(new PlaneGeometry(size, size), material);
+  quad.frustumCulled = false;
+  group.add(quad);
 
-  const flatMaterial = diskMaterial(RADIUS * 1.5, RADIUS * 4.2, 1);
-  const flat = new Mesh(new RingGeometry(RADIUS * 1.5, RADIUS * 4.2, detail, 1), flatMaterial);
-  flat.rotation.x = Math.PI / 2 - 0.2;
-  flat.rotation.z = 0.15;
-  group.add(flat);
-
-  const bentMaterial = diskMaterial(RADIUS * 1.5, RADIUS * 2.4, 0.55);
-  const bent = new Mesh(new RingGeometry(RADIUS * 1.5, RADIUS * 2.4, detail, 1), bentMaterial);
-  bent.rotation.z = 0.15;
-  group.add(bent);
-
-  const photon = new Mesh(
-    new RingGeometry(RADIUS * 1.1, RADIUS * 1.14, detail, 1),
-    new MeshBasicMaterial({ color: 0xffc27a, side: DoubleSide, transparent: true, opacity: 0.7 }),
-  );
-  group.add(photon);
-
-  const glow = createGlow({ color: 0xffb454, size: RADIUS * 9, intensity: 0.35 });
+  const glow = createGlow({ color: 0xff9a4a, size: size * 1.1, intensity: 0.16 });
+  glow.mesh.renderOrder = -1;
   group.add(glow.mesh);
 
   return {
     group,
     update(time, camera) {
-      flatMaterial.uniforms.uTime.value = time;
-      bentMaterial.uniforms.uTime.value = time;
-      // The photon ring and the upright ring always face the camera, as a lensed ring does.
-      photon.quaternion.copy(camera.quaternion);
-      bent.quaternion.copy(camera.quaternion);
+      material.uniforms.uTime.value = time;
+      group.getWorldPosition(center);
+      quad.quaternion.copy(camera.quaternion);
       glow.face(camera);
     },
     dispose: () => disposeTree(group),

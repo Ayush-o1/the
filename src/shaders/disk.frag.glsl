@@ -15,5 +15,7 @@ void main() {
   vec3 color = mix(vec3(1.0, 0.45, 0.12), vec3(1.0, 0.92, 0.7), heat);
   float brightness = (0.25 + 0.95 * streaks) * (0.25 + 1.2 * heat) * doppler;
   float edge = smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.7, 1.0, t));
-  gl_FragColor = vec4(color * brightness, edge * uAlpha);
+  gl_FragColor = vec4(color * brightness, edge * uAlpha * uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

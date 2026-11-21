@@ -12,8 +12,13 @@ export function yieldToMain() {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-export async function warmUp({ renderer, scene, camera, worlds, render }) {
+export async function warmUp({ renderer, scene, camera, worlds, render, before = [] }) {
   const start = performance.now();
+  // Setup work that has to happen before compiling (the reflection map), one task each.
+  for (const step of before) {
+    await yieldToMain();
+    step();
+  }
   await worlds.build(yieldToMain);
   const culled = [];
   scene.traverse((object) => {
@@ -23,12 +28,17 @@ export async function warmUp({ renderer, scene, camera, worlds, render }) {
     }
   });
   camera.updateMatrixWorld();
+  // compileAsync skips hidden objects, and every world is hidden until it is near. Without this,
+  // nothing in the worlds was compiled here, and each world's shaders were compiled and linked
+  // synchronously in warmEach below: one long task per world.
+  worlds.setAllVisible(true);
   try {
     await renderer.compileAsync(scene, camera);
   } catch (error) {
     // A browser without parallel compile still works. The renders below compile synchronously.
     console.warn('compileAsync failed, compiling on first render:', error);
   }
+  worlds.setAllVisible(false);
   await worlds.warmEach(render, yieldToMain);
   render();
   for (const object of culled) object.frustumCulled = true;
