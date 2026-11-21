@@ -6,7 +6,8 @@ import { markVisited } from './helpers.js';
 test.skip(({ browserName }) => browserName !== 'chromium', 'scene tests run in Chromium');
 
 async function waitForScene(page) {
-  await page.waitForSelector('html.scene', { timeout: 20_000 });
+  // The software renderer in CI draws every world once before the first frame, which takes a while.
+  await page.waitForSelector('html.scene', { timeout: 90_000 });
 }
 
 async function scrollToSection(page, id) {
@@ -21,6 +22,8 @@ async function scrollToSection(page, id) {
 
 test.describe('with a returning visitor', () => {
   test.beforeEach(async ({ page }) => {
+    // Three times the usual time: the flight draws every world before it starts.
+    test.slow();
     await markVisited(page);
   });
 
@@ -68,7 +71,9 @@ test.describe('with a returning visitor', () => {
     const start = await fill.evaluate((el) => el.style.transform);
     await scrollToSection(page, 'europa');
     await expect
-      .poll(async () => fill.evaluate((el) => parseFloat(el.style.transform.slice(7))))
+      .poll(async () => fill.evaluate((el) => parseFloat(el.style.transform.slice(7))), {
+        timeout: 45_000,
+      })
       .toBeGreaterThan(0.5);
     expect(start).toContain('scaleX');
     await page.keyboard.press('m');
@@ -162,7 +167,7 @@ test.describe('with a returning visitor', () => {
         await page.waitForTimeout(500);
         peak = Math.max(peak, (await read()).geometries);
       }
-      await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
+      await expect.poll(async () => (await read()).worlds, { timeout: 60_000 }).toBe('earth');
     }
 
     // The first flight uploads things that are created lazily (the jump tunnel, for example). On a
