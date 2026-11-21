@@ -68,10 +68,15 @@ export function createWorldManager({ scene, stops, tier }) {
     instance: null,
   })).filter((entry) => entry.index >= 0);
 
-  for (const entry of entries) {
-    entry.instance = entry.create({ tier });
-    entry.instance.group.visible = false;
-    scene.add(entry.instance.group);
+  // Builds the worlds one at a time, handing the thread back between them, so no single task is
+  // long. Called once, before the first frame.
+  async function build(yieldToMain) {
+    for (const entry of entries) {
+      entry.instance = entry.create({ tier });
+      entry.instance.group.visible = false;
+      scene.add(entry.instance.group);
+      await yieldToMain();
+    }
   }
 
   function place(entry, portrait) {
@@ -100,25 +105,28 @@ export function createWorldManager({ scene, stops, tier }) {
         }
       }
     },
-    // Shows every world for one frame, so the renderer compiles and uploads everything up front.
-    showAll() {
+    build,
+    // Shows each world alone for one render, so the renderer compiles and uploads it, then hides it.
+    // One world per task keeps every task short.
+    async warmEach(render, yieldToMain) {
       for (const entry of entries) {
         place(entry, false);
         entry.instance.group.visible = true;
+        render();
+        entry.instance.group.visible = false;
+        await yieldToMain();
       }
-    },
-    hideAll() {
-      for (const entry of entries) entry.instance.group.visible = false;
     },
     // The group of a world, or null. Used to aim the lens pass at the black hole.
     groupOf(id) {
       return entries.find((entry) => entry.id === id)?.instance?.group ?? null;
     },
     get active() {
-      return entries.filter((entry) => entry.instance.group.visible).map((entry) => entry.id);
+      return entries.filter((entry) => entry.instance?.group.visible).map((entry) => entry.id);
     },
     dispose() {
       for (const entry of entries) {
+        if (!entry.instance) continue;
         scene.remove(entry.instance.group);
         entry.instance.dispose();
       }

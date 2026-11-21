@@ -200,10 +200,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     else renderer.render(scene, camera);
   }
   const ready = (async () => {
-    worlds.showAll();
-    camera.updateMatrixWorld();
-    warmMs = await warmUp({ renderer, scene, camera, render: renderOnce });
-    worlds.hideAll();
+    warmMs = await warmUp({ renderer, scene, camera, worlds, render: renderOnce });
     if (stopped) return;
     gsap.ticker.add(tick);
     // GSAP skips time after a slow frame by default, which would make the camera jump.
