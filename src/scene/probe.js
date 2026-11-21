@@ -1,16 +1,23 @@
-// The probe, built from basic shapes: bus, gold foil, dish, two panels, a boom and two nozzles.
-// The nose points along +z (the direction Object3D.lookAt aims). No model files.
+// The probe, built from basic shapes: a round bus in gold foil, a high-gain dish that points back
+// toward home, two long solar arrays on booms, an antenna and an engine bell. The nose points along
+// +z, the direction Object3D.lookAt aims. No model files.
 import {
   Group,
   Mesh,
-  BoxGeometry,
   CylinderGeometry,
   SphereGeometry,
   ConeGeometry,
-  MeshStandardMaterial,
+  BoxGeometry,
+  PlaneGeometry,
+  LatheGeometry,
+  Vector2,
+  MeshPhongMaterial,
   ShaderMaterial,
   AdditiveBlending,
+  DoubleSide,
 } from 'three';
+import { shaderMaterial, SUN_DIRECTION } from './worlds/util.js';
+import panelFragment from '../shaders/panel.frag.glsl?raw';
 import plumeVertex from '../shaders/plume.vert.glsl?raw';
 import plumeFragment from '../shaders/plume.frag.glsl?raw';
 
@@ -30,40 +37,88 @@ export function createProbe() {
   };
 
   const foil = own(
-    new MeshStandardMaterial({
-      color: 0xd9a85a,
-      metalness: 0.7,
-      roughness: 0.38,
-      emissive: 0x2a1c08,
+    new MeshPhongMaterial({
+      color: 0xb8893f,
+      specular: 0xffe6b0,
+      shininess: 55,
+      flatShading: true,
     }),
   );
+  const white = own(
+    new MeshPhongMaterial({ color: 0xd9d6cc, specular: 0x888888, shininess: 30, side: DoubleSide }),
+  );
+  const dark = own(new MeshPhongMaterial({ color: 0x2a2d33, specular: 0x555555, shininess: 20 }));
   const panel = own(
-    new MeshStandardMaterial({
-      color: 0x1b2230,
-      metalness: 0.4,
-      roughness: 0.5,
-      emissive: 0x0a0f18,
+    shaderMaterial({
+      fragment: panelFragment,
+      uniforms: { uSunDir: { value: SUN_DIRECTION }, uCells: { value: new Vector2(10, 4) } },
+      side: DoubleSide,
     }),
   );
-  const metal = own(new MeshStandardMaterial({ color: 0xc9c4b8, metalness: 0.7, roughness: 0.4 }));
 
-  group.add(part(own(new BoxGeometry(1, 0.8, 1.1)), foil, [0, 0, 0]));
+  // Bus: a drum lying along the flight direction, with two bands of white insulation.
+  group.add(
+    part(own(new CylinderGeometry(0.55, 0.55, 1.15, 24)), foil, [0, 0, 0], [Math.PI / 2, 0, 0]),
+  );
+  for (const z of [-0.3, 0.3]) {
+    group.add(
+      part(
+        own(new CylinderGeometry(0.565, 0.565, 0.07, 24)),
+        white,
+        [0, 0, z],
+        [Math.PI / 2, 0, 0],
+      ),
+    );
+  }
+
+  // Dish: a shallow bowl, open toward the back and up, toward home. The cap's pole is its back, so
+  // it is turned until the pole points forward and down.
   group.add(
     part(
-      own(new SphereGeometry(0.55, 24, 8, 0, Math.PI * 2, 0, Math.PI / 2.3)),
-      metal,
-      [0, 0.55, 0.1],
-      [-Math.PI / 5, 0, 0],
+      own(new SphereGeometry(0.85, 32, 8, 0, Math.PI * 2, 0, Math.PI / 4)),
+      white,
+      [0, 0.95, -0.12],
+      [2.04, 0, 0],
     ),
   );
-  group.add(part(own(new BoxGeometry(2.1, 0.04, 0.9)), panel, [-1.6, 0, 0]));
-  group.add(part(own(new BoxGeometry(2.1, 0.04, 0.9)), panel, [1.6, 0, 0]));
-  group.add(
-    part(own(new CylinderGeometry(0.03, 0.03, 1.2, 8)), metal, [0, 0, 1.4], [Math.PI / 2, 0, 0]),
-  );
-  group.add(part(own(new BoxGeometry(0.16, 0.16, 0.16)), metal, [0, 0, 2.05]));
+  group.add(part(own(new CylinderGeometry(0.03, 0.03, 0.5, 6)), dark, [0, 0.72, -0.1]));
 
-  // Plumes sit behind the bus (-z) and are scaled by thrust. Additive blending makes them glow.
+  // Solar arrays on booms, one each side. They are long and thin, which is the silhouette.
+  for (const side of [-1, 1]) {
+    group.add(
+      part(
+        own(new CylinderGeometry(0.045, 0.045, 0.9, 8)),
+        dark,
+        [side * 0.95, 0, 0],
+        [0, 0, Math.PI / 2],
+      ),
+    );
+    group.add(
+      part(own(new PlaneGeometry(2.8, 1.15)), panel, [side * 2.75, 0, 0], [-Math.PI / 2, 0, 0]),
+    );
+  }
+
+  // A long antenna boom out the front.
+  group.add(
+    part(own(new CylinderGeometry(0.02, 0.02, 1.5, 6)), dark, [0, 0, 1.3], [Math.PI / 2, 0, 0]),
+  );
+  group.add(part(own(new BoxGeometry(0.1, 0.1, 0.1)), white, [0, 0, 2.08]));
+
+  // Engine bell at the back, turned from a profile.
+  const bell = own(
+    new LatheGeometry(
+      [
+        new Vector2(0.06, 0),
+        new Vector2(0.12, 0.08),
+        new Vector2(0.24, 0.3),
+        new Vector2(0.3, 0.42),
+      ].map((point) => point),
+      16,
+    ),
+  );
+  group.add(part(bell, dark, [0, 0, -0.58], [-Math.PI / 2, 0, 0]));
+
+  // The plume sits behind the bell (-z) and is scaled by thrust. Additive blending makes it glow.
   const plumeMaterial = own(
     new ShaderMaterial({
       vertexShader: plumeVertex,
@@ -74,22 +129,13 @@ export function createProbe() {
       blending: AdditiveBlending,
     }),
   );
-  const plumeGeometry = own(new ConeGeometry(0.16, 1, 12, 1, true));
+  const plumeGeometry = own(new ConeGeometry(0.22, 1, 14, 1, true));
   // The cone is centred on its middle. Move it so the base sits at the nozzle, then turn +y into -z.
   plumeGeometry.translate(0, 0.5, 0);
   plumeGeometry.rotateX(-Math.PI / 2);
-  const plumes = [-0.28, 0.28].map((x) => {
-    const nozzle = part(
-      own(new ConeGeometry(0.1, 0.2, 10)),
-      metal,
-      [x, -0.1, -0.62],
-      [Math.PI / 2, 0, 0],
-    );
-    const plume = new Mesh(plumeGeometry, plumeMaterial);
-    plume.position.set(x, -0.1, -0.72);
-    group.add(nozzle, plume);
-    return plume;
-  });
+  const plume = new Mesh(plumeGeometry, plumeMaterial);
+  plume.position.set(0, 0, -1.0);
+  group.add(plume);
 
   return {
     object: group,
@@ -97,8 +143,7 @@ export function createProbe() {
     update(time, thrust) {
       plumeMaterial.uniforms.uTime.value = time;
       plumeMaterial.uniforms.uPower.value = 0.35 + thrust * 0.65;
-      const length = 0.4 + thrust * 2.6;
-      for (const plume of plumes) plume.scale.set(1, 1, length);
+      plume.scale.set(1, 1, 0.5 + thrust * 3);
     },
     dispose() {
       for (const resource of owned) resource.dispose();

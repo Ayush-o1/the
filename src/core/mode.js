@@ -10,6 +10,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
   let scene = null;
   let hud = null;
   let loading = false;
+  let pending = Promise.resolve();
   let stopMotion = null;
 
   function teardown() {
@@ -31,14 +32,19 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
     setModeToggleLabel('lite');
   }
 
-  async function enterScene() {
-    if (loading || current === 'scene') return;
+  function enterScene() {
+    if (loading || current === 'scene') return pending;
+    pending = startFlight();
+    return pending;
+  }
+
+  async function startFlight() {
     loading = true;
     try {
       // Three.js and GSAP arrive in this chunk, after the page is already readable.
       const { startScene } = await import('../scene/index.js');
       teardown();
-      scene = startScene({
+      const started = startScene({
         env,
         startTier,
         pinTier,
@@ -49,6 +55,11 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
           onFrame?.(state);
         },
       });
+      scene = started;
+      // Shaders are compiled and buffers uploaded before the first visible frame.
+      await started.ready;
+      // The visitor may have switched to the plain page while this was warming up.
+      if (scene !== started) return;
       hud = mountHud(scene.stops);
       hud.setSector(scene.stops[0]);
       current = 'scene';

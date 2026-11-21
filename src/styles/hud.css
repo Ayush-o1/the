@@ -31,7 +31,8 @@ main,
   z-index: var(--z-chrome);
   height: 44px;
   padding: 0 calc(var(--gutter) + 12px);
-  background: linear-gradient(to top, rgba(10, 13, 18, 0.85), transparent);
+  background: rgba(10, 13, 18, 0.98);
+  border-top: 1px solid var(--line);
 }
 
 .hud-path__line {
@@ -94,7 +95,7 @@ html.scene .site-footer {
   inset: 0;
   z-index: var(--z-boot);
   display: grid;
-  align-content: center;
+  place-items: center;
   padding: var(--gutter);
   background: var(--ink);
   transition: opacity var(--t-ui) var(--ease-settle);
@@ -104,14 +105,48 @@ html.scene .site-footer {
   opacity: 0;
 }
 
-.boot__text {
-  max-width: 30rem;
-  margin: 0 auto;
+.boot__inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--s3);
+  width: min(22rem, 100%);
+  text-align: center;
+}
+
+.boot__name {
+  color: var(--bone);
+  font-family: var(--font-display);
+  font-size: 3.25rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.boot__role,
+.boot__note {
+  color: var(--dim);
+}
+
+.boot__bar {
   width: 100%;
-  color: var(--bone-2);
-  font-size: 0.875rem;
-  line-height: 1.8;
-  white-space: pre-wrap;
+  height: 1px;
+  margin-top: var(--s4);
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.boot__fill {
+  display: block;
+  height: 100%;
+  background: var(--bone);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-scene) var(--ease-settle);
+}
+
+.boot__skip {
+  justify-self: center;
+  margin-top: var(--s4);
 }
 
 /* ?debug overlay */
@@ -140,4 +175,14 @@ html.scene .art {
 html.scene .art::before,
 html.scene .art::after {
   display: none;
+}
+
+/* In flight each project gets room around it. The probe travels in the space between two
+   sections, so that space has to be tall enough for the travel to register. */
+html.scene .mission {
+  margin-block: 34vh;
+}
+
+html.scene .mission:first-of-type {
+  margin-top: var(--s8);
 }

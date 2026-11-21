@@ -1,10 +1,17 @@
 // The 3D flight. Loaded with a dynamic import after first paint, so the page is readable before
 // any of this code arrives. Everything here is an enhancement over the HTML.
-import { Scene, PerspectiveCamera, DirectionalLight, AmbientLight } from 'three';
+import { Scene, PerspectiveCamera, DirectionalLight, AmbientLight, Vector2, Vector3 } from 'three';
 import { gsap } from 'gsap';
 import { collectStops, measureStops } from '../core/sectors.js';
-import { stopScrolls, stopParam, nearestStop, jumpIntensity } from '../core/route-math.js';
+import {
+  stopScrolls,
+  stopParam,
+  nearestStop,
+  jumpIntensity,
+  wellStrength,
+} from '../core/route-math.js';
 import { damp } from '../core/damp.js';
+import { createFollower } from '../core/motion.js';
 import { TIERS, createTierMonitor } from '../core/tier.js';
 import { createRenderer } from './renderer.js';
 import { createStarfield } from './starfield.js';
@@ -15,8 +22,8 @@ import { createJump } from './jump.js';
 import { createCameraPath } from './camera-path.js';
 import { createPost } from './post.js';
 import { buildRoute } from './route.js';
-
-const FOLLOW_RATE = 6; // follow rate: 4 feels loose, 8 feels stiff
+import { warmUp } from './warmup.js';
+import { SUN_DIRECTION } from './worlds/util.js';
 
 export function startScene({ env, startTier, pinTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
@@ -27,8 +34,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   const scene = new Scene();
   const camera = new PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
 
-  const sun = new DirectionalLight(0xffe2b0, 2.4);
-  sun.position.set(30, 40, 20);
+  const sun = new DirectionalLight(0xffe6c4, 2.6);
+  sun.position.copy(SUN_DIRECTION).multiplyScalar(100);
   scene.add(sun, new AmbientLight(0x6a6f85, 1.1));
 
   const starfield = createStarfield();
@@ -52,6 +59,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let post = null;
 
   let scrolls = [];
+  const follower = createFollower(0);
   let param = 0;
   let steer = 0;
   let steerTarget = 0;
@@ -60,6 +68,10 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let fps = 60;
   let stopped = false;
   let firstFrame = true;
+  let warmMs = 0;
+  const holeScreen = new Vector3();
+  const lensCenter = new Vector2(0.5, 0.5);
+  const holeIndex = stops.findIndex((stop) => stop.id === 'blackwater');
 
   function sizePost() {
     post?.setSize(window.innerWidth, window.innerHeight, rendererBundle.pixelRatio);
@@ -70,7 +82,6 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     const settings = TIERS[name];
     rendererBundle.setDprCap(settings.dpr);
     starfield.setCount(settings.stars);
-    worlds.setTier(name);
     nebula.object.visible = name !== 'low';
     // The low tier skips post-processing and renders straight to the screen.
     if (settings.post && !post) post = createPost({ renderer, scene, camera });
@@ -89,6 +100,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     rendererBundle.resize();
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    // On a phone the text covers the screen, so the probe is smaller and sits low.
+    probe.object.scale.setScalar(camera.aspect <= 1.2 ? 0.6 : 0.85);
     sizePost();
     measure();
   }
@@ -108,6 +121,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
   // Start where the page already is, so a deep link does not begin with a flight from the pad.
   param = stopParam(scrolls, window.scrollY);
+  follower.jumpTo(param);
 
   function tick(time, deltaMs) {
     if (stopped || document.hidden) return;
@@ -117,7 +131,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
     const target = stopParam(scrolls, window.scrollY);
     const previous = param;
-    param = damp(param, target, FOLLOW_RATE, dt);
+    param = follower.step(target, dt);
     const previousSteer = steer;
     steer = damp(steer, steerTarget, 4, dt);
 
@@ -137,11 +151,18 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     nebula.update(time, camera.position);
     jump.update(jumpAmount, time, camera);
 
+    // The black hole bends the picture around it. Its screen position is where the lens is aimed.
+    const lens = holeIndex >= 0 ? wellStrength(param, holeIndex) : 0;
+    if (lens > 0) {
+      worlds.groupOf('blackwater').getWorldPosition(holeScreen).project(camera);
+      lensCenter.set(holeScreen.x * 0.5 + 0.5, holeScreen.y * 0.5 + 0.5);
+    }
+
     const workStart = performance.now();
     probe.update(time, thrust);
-    starfield.update(time, rendererBundle.pixelRatio, window.innerHeight);
+    starfield.update(time, rendererBundle.pixelRatio);
     if (post) {
-      post.setLens({ strength: 0, chroma: 0, time });
+      post.setLens({ center: lensCenter, strength: lens * 0.3, chroma: 0, time });
       post.render();
     } else {
       renderer.render(scene, camera);
@@ -166,12 +187,25 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     }
   }
 
-  gsap.ticker.add(tick);
-  // GSAP skips time after a slow frame by default, which would make the camera jump.
-  gsap.ticker.lagSmoothing(0);
+  // Every shader is compiled and every buffer uploaded before the first visible frame.
+  function renderOnce() {
+    if (post) post.render();
+    else renderer.render(scene, camera);
+  }
+  const ready = (async () => {
+    worlds.showAll();
+    camera.updateMatrixWorld();
+    warmMs = await warmUp({ renderer, scene, camera, render: renderOnce });
+    worlds.hideAll();
+    if (stopped) return;
+    gsap.ticker.add(tick);
+    // GSAP skips time after a slow frame by default, which would make the camera jump.
+    gsap.ticker.lagSmoothing(0);
+  })();
 
   return {
     stops,
+    ready,
     getStats() {
       const info = renderer.info;
       return {
@@ -182,6 +216,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
         geometries: info.memory.geometries,
         textures: info.memory.textures,
         programs: info.programs?.length ?? 0,
+        warmMs: Math.round(warmMs),
+        param,
         worlds: worlds.active.join(','),
       };
     },
