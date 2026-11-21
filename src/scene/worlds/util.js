@@ -4,12 +4,12 @@ import noise from '../../shaders/noise.glsl?raw';
 import light from '../../shaders/light.glsl?raw';
 import planetVertex from '../../shaders/planet.vert.glsl?raw';
 
-// The direction the light comes from. One sun for the whole route: from the right and above,
-// almost side-on to the camera. The worlds on the left of the screen are lit about 60 degrees off
-// the line of sight, so each shows a lit face toward the text and a dark limb; the two on the
-// right are crescents. The scene's key light, the reflections and every world shader use this
-// same vector.
-export const SUN_DIRECTION = new Vector3(0.78, 0.45, 0.05).normalize();
+// The direction the light comes from. One sun for the whole route: from the left, above and a
+// little behind the camera, about side-on. Most worlds sit on the left of the screen with their
+// project card on the right, so this lights the half that shows and leaves a dark limb toward the
+// card; Earth in the opening has a lit limb and the terminator crossing its far side. The scene's
+// key light, the reflections and every world shader use this same vector.
+export const SUN_DIRECTION = new Vector3(-0.75, 0.45, 0.45).normalize();
 
 // Where the cold fill comes from: Earth, below the route.
 export const FILL_DIRECTION = new Vector3(-0.2, -1, 0.25).normalize();

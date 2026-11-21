@@ -62,9 +62,10 @@ export function createEarth({ tier }) {
   group.add(air.mesh);
 
   // The planet's base orientation: which face of the Earth is toward the camera in the opening.
-  // Turned so the Indian Ocean and South India face the opening frame, near the terminator.
+  // Turned so Arabia, the Horn of Africa and India face the opening frame, with the terminator
+  // on the far right limb.
   const tilt = new Quaternion();
-  planet.rotation.set(2.1806, 0.2175, -2.5438);
+  planet.rotation.set(2.6249, -0.1966, -3.13);
   tilt.copy(planet.quaternion);
 
   const arrived = new Set();
