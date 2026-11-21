@@ -60,7 +60,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
       await started.ready;
       // The visitor may have switched to the plain page while this was warming up.
       if (scene !== started) return;
-      hud = mountHud(scene.stops);
+      hud = mountHud();
       hud.setSector(scene.stops[0]);
       current = 'scene';
       html.classList.remove('lite');

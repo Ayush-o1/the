@@ -21,72 +21,24 @@ main,
   z-index: var(--z-content);
 }
 
-/* Flight path along the bottom: a hairline with one tick per project and a marker for where you
-   are. The marker is the only place the signal colour appears in flight. */
-.hud-path {
+/* Flight progress: a thin line along the bottom edge of the header. It never covers content. */
+.hud-progress {
   position: fixed;
+  top: var(--header-h);
   left: 0;
   right: 0;
-  bottom: 0;
   z-index: var(--z-chrome);
-  height: 44px;
-  padding: 0 calc(var(--gutter) + 12px);
-  background: rgba(10, 13, 18, 0.98);
-  border-top: 1px solid var(--line);
-}
-
-.hud-path__line {
-  position: absolute;
-  left: calc(var(--gutter) + 12px);
-  right: calc(var(--gutter) + 12px);
-  top: 22px;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.hud-path__stop {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-}
-
-.hud-path__link {
-  position: absolute;
-  top: -22px;
-  left: -22px;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-}
-
-.hud-path__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--bone-2);
-  transition: transform var(--t-fast) var(--ease-settle);
-}
-
-.hud-path__link:hover .hud-path__dot {
-  transform: scale(1.6);
-}
-
-.hud-path__marker {
-  position: absolute;
-  left: calc(var(--gutter) + 12px);
-  top: 17px;
-  width: 11px;
-  height: 11px;
-  margin-left: -5px;
-  border-radius: 50%;
-  background: var(--signal);
+  height: 2px;
+  background: var(--line);
   pointer-events: none;
 }
 
-/* The path bar covers the bottom of the page, so leave room for it. */
-html.scene .site-footer {
-  padding-bottom: calc(var(--s8) + 44px);
+.hud-progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 /* Boot cover */

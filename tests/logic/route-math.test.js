@@ -6,6 +6,7 @@ import {
   nearestStop,
   jumpIntensity,
   wellStrength,
+  probePresence,
 } from '../../src/core/route-math.js';
 
 // Three sections, 800 px viewport. The title margin is 12% of the viewport (96 px).
@@ -111,4 +112,14 @@ test('wellStrength is 1 at the stop, 0 one stop away, and the same coming or goi
   assert.equal(wellStrength(3.5, 2), 0);
   assert.equal(wellStrength(1.4, 2), wellStrength(2.6, 2));
   assert.ok(wellStrength(1.5, 2) > 0 && wellStrength(1.5, 2) < 1);
+});
+
+test('the probe is absent at a project, present in the gaps, and the same going and coming', () => {
+  const projects = [2, 3];
+  assert.equal(probePresence(2, projects), 0);
+  assert.equal(probePresence(3.05, projects), 0);
+  assert.equal(probePresence(2.5, projects), 1);
+  assert.equal(probePresence(0, projects), 1);
+  assert.ok(Math.abs(probePresence(2.3, projects) - probePresence(1.7, projects)) < 1e-9);
+  assert.ok(probePresence(2.2, projects) > 0 && probePresence(2.2, projects) < 1);
 });

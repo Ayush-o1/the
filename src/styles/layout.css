@@ -40,9 +40,9 @@
   align-items: center;
   min-height: 44px;
   padding: 0 var(--s3);
-  color: var(--dim);
+  color: var(--bone-2);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   text-decoration: none;
 }
 
@@ -345,5 +345,13 @@ html.first .hero__status {
 @keyframes hero-fallback {
   to {
     opacity: 1;
+  }
+}
+
+/* On narrow screens the role line is a little smaller, so it fits on one line. */
+@media (max-width: 480px) {
+  .hero__eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
   }
 }

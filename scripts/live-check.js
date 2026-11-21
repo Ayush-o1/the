@@ -18,7 +18,6 @@ const browser = await chromium.launch({
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   await context.addInitScript(() => {
     localStorage.setItem('ak-visited', '1');
-    localStorage.setItem('ak-role', 'curious');
   });
   const page = await context.newPage();
   const errors = [];
@@ -26,7 +25,14 @@ const browser = await chromium.launch({
   page.on('console', (message) => message.type() === 'error' && errors.push(message.text()));
   const response = await page.goto(`${base}?lite=1`);
   check('page answers 200', response?.status() === 200, String(response?.status()));
-  check('h1 says Ayush Kumar', (await page.locator('h1').textContent())?.trim() === 'Ayush Kumar');
+  check(
+    'h1 says software engineer',
+    ((await page.locator('h1').textContent()) ?? '').includes('Software engineer'),
+  );
+  check(
+    'page title says software engineer',
+    (await page.title()) === 'Ayush Kumar | Software engineer',
+  );
   check('six missions present', (await page.locator('[data-mission]').count()) === 6);
   await page
     .locator('[data-sim="blackwater"] canvas, [data-sim="blackwater"] .bw__views')
@@ -56,7 +62,6 @@ const browser = await chromium.launch({
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   await context.addInitScript(() => {
     localStorage.setItem('ak-visited', '1');
-    localStorage.setItem('ak-role', 'curious');
   });
   const page = await context.newPage();
   const errors = [];
@@ -68,12 +73,12 @@ const browser = await chromium.launch({
     () => false,
   );
   check('flight starts', started);
-  check('HUD shows the sector', (await page.locator('.hud-sector').textContent())?.length > 0);
+  check('progress line is drawn', (await page.locator('.hud-progress__fill').count()) === 1);
   await page.evaluate(() => document.getElementById('europa').scrollIntoView());
   await page.waitForTimeout(3000);
   check(
-    'conjunction alert reads 4.2 km',
-    (await page.locator('.hud-alert').textContent())?.includes('4.2 km'),
+    'section is announced',
+    (await page.locator('p.visually-hidden[aria-live]').textContent())?.includes('Europa'),
   );
   check('no console errors in flight', errors.length === 0, errors.join(' | '));
   await context.close();

@@ -22,7 +22,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Ayush Kumar, software engineer, written over a sunlit planet."
+      content="I build software for the day something breaks. Ayush Kumar, software engineer, over the Earth with a probe in orbit."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Ayush Kumar | Software engineer" />
@@ -130,63 +130,93 @@
         >
           <div class="mission__art art art--argus" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 01 / Argus</p>
-            <h3 id="argus-title" class="dossier__callsign">Argus</h3>
-            <p><span class="chip chip--complete">Complete</span></p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 01 of 06 · Mission 01</p>
+              <h3 id="argus-title" class="dossier__callsign">Argus</h3>
+              <p class="dossier__objective">
+                Argus is a graph investigation tool over a made-up world. It has 70 real cities in
+                50 countries and no real people. An analyst follows links between people, accounts
+                and shipments, runs graph algorithms and opens cases.
+              </p>
+              <p class="dossier__status"><span class="chip chip--complete">Complete</span></p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">Python</li>
+                <li class="tag">FastAPI</li>
+                <li class="tag">Neo4j</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">Redis</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://github.com/Ayush-o1/Argus">Read the code</a>
+                <a href="https://argus-rosy-one.vercel.app">Open live demo</a>
+                <a href="https://github.com/Ayush-o1/Argus/blob/main/docs/architecture.md"
+                  >See the architecture</a
+                >
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              Argus is a graph investigation tool over a made-up world. It has 70 real cities in 50
-              countries and no real people. An analyst follows links between people, accounts and
-              shipments, runs graph algorithms and opens cases.
-            </p>
+            <section class="dossier__section">
+              <h4 id="argus-problem">The problem</h4>
+              <p class="dossier__lead">
+                An anomaly detector that cannot be checked is only an opinion, so Argus has to show
+                how often it is right and where it is blind.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>Runs PageRank, community detection and cycle detection on the graph in Neo4j.</li>
-              <li>
-                Raises alerts from named, versioned rules and keeps an append-only audit log that a
-                command can re-check.
-              </li>
-              <li>
-                Lands every imported record untouched first. Rejected records go to a dead-letter
-                queue with a reason.
-              </li>
-            </ul>
+            <section class="dossier__section">
+              <h4 id="argus-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>Hidden patterns.</strong> The anomaly detector flags an account only when
+                  an Isolation Forest and a z-score of 3 or more both agree. It never reads the
+                  generator's answer key.
+                </li>
+                <li>
+                  <strong>Marking its own homework.</strong> Precision and recall are published
+                  against ground truth the detectors never saw. Planted cases it cannot detect are
+                  listed with a recall of 0 and the reason.
+                </li>
+                <li>
+                  <strong>Silent data loss.</strong> A silent drop makes a gap look like a quiet
+                  world. So nothing is dropped without a trace.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>Hidden patterns.</strong> The anomaly detector flags an account only when an
-                Isolation Forest and a z-score of 3 or more both agree. It never reads the
-                generator's answer key.
-              </li>
-              <li>
-                <strong>Marking its own homework.</strong> Precision and recall are published
-                against ground truth the detectors never saw. Planted cases it cannot detect are
-                listed with a recall of 0 and the reason.
-              </li>
-              <li>
-                <strong>Silent data loss.</strong> A silent drop makes a gap look like a quiet
-                world. So nothing is dropped without a trace.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="argus">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <p>
-                  In the real run, a planted burst of 35 transactions inside six hours scored a
-                  z-score of about 37. The rule is simple: an account is flagged when its burst
-                  count sits 3 or more standard deviations above the rest and the Isolation Forest
-                  also calls it an outlier.
-                </p>
+            <section class="dossier__section">
+              <h4 id="argus-try">Try it</h4>
+              <p class="dossier__intro">
+                Inject an anomaly into one account and see whether the detector flags it. The data
+                is made up.
+              </p>
+              <div class="sim" data-sim="argus">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <p>
+                    In the real run, a planted burst of 35 transactions inside six hours scored a
+                    z-score of about 37. The rule is simple: an account is flagged when its burst
+                    count sits 3 or more standard deviations above the rest and the Isolation Forest
+                    also calls it an outlier.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>What it does, trade-offs and other decisions</summary>
+              <ul class="dossier__list recorder__does">
+                <li>
+                  Runs PageRank, community detection and cycle detection on the graph in Neo4j.
+                </li>
+                <li>
+                  Raises alerts from named, versioned rules and keeps an append-only audit log that
+                  a command can re-check.
+                </li>
+                <li>
+                  Lands every imported record untouched first. Rejected records go to a dead-letter
+                  queue with a reason.
+                </li>
+              </ul>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> Transactions are edge properties, not nodes. An account
@@ -207,21 +237,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">Python</li>
-              <li class="tag">FastAPI</li>
-              <li class="tag">Neo4j</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">Redis</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/Argus">Read the code</a>
-              <a href="https://argus-rosy-one.vercel.app">Open live demo</a>
-              <a href="https://github.com/Ayush-o1/Argus/blob/main/docs/architecture.md"
-                >See the architecture</a
-              >
-            </p>
           </div>
         </article>
 
@@ -243,6 +258,7 @@
                 an incident when one breaks, works it through a fixed lifecycle and decides which
                 incidents customers get to see.
               </p>
+              <p class="dossier__status"><span class="chip chip--active">Active</span></p>
               <ul class="tags" aria-label="Stack">
                 <li class="tag">Node.js</li>
                 <li class="tag">Express</li>
@@ -257,7 +273,7 @@
               </p>
             </header>
 
-            <section class="dossier__section" aria-labelledby="blackwater-problem">
+            <section class="dossier__section">
               <h4 id="blackwater-problem">The problem</h4>
               <p class="dossier__lead">
                 Two people can change one incident at the same moment, and a customer must never see
@@ -265,7 +281,7 @@
               </p>
             </section>
 
-            <section class="dossier__section" aria-labelledby="blackwater-decisions">
+            <section class="dossier__section">
               <h4 id="blackwater-decisions">What I decided</h4>
               <ol class="hazards decisions">
                 <li>
@@ -284,7 +300,7 @@
               </ol>
             </section>
 
-            <section class="dossier__section" aria-labelledby="blackwater-try">
+            <section class="dossier__section">
               <h4 id="blackwater-try">Try it</h4>
               <p class="dossier__intro">
                 Declare an incident, move it through its lifecycle and publish it. The moves allowed
@@ -361,60 +377,85 @@
         >
           <div class="mission__art art art--beetlejuice" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 03 / BeetleJuice</p>
-            <h3 id="beetlejuice-title" class="dossier__callsign">BeetleJuice</h3>
-            <p><span class="chip chip--active">Active</span></p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 03 of 06 · Mission 03</p>
+              <h3 id="beetlejuice-title" class="dossier__callsign">BeetleJuice</h3>
+              <p class="dossier__objective">
+                A merchant records payments. Its processor reports what it settled. The two rarely
+                agree. BeetleJuice compares the two exports, explains every difference and sends
+                each exception through maker-checker approval. It uses synthetic data only.
+              </p>
+              <p class="dossier__status"><span class="chip chip--active">Active</span></p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">Node.js</li>
+                <li class="tag">Express</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">Plain SQL</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://github.com/Ayush-o1/BeetleJuice">Read the code</a>
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              A merchant records payments. Its processor reports what it settled. The two rarely
-              agree. BeetleJuice compares the two exports, explains every difference and sends each
-              exception through maker-checker approval. It uses synthetic data only.
-            </p>
+            <section class="dossier__section">
+              <h4 id="beetlejuice-problem">The problem</h4>
+              <p class="dossier__lead">
+                A payment and its settlement rarely agree. Every difference needs one explanation
+                and a second person's approval.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>
-                Checks both CSV exports strictly and lists every rejected row with its reason.
-              </li>
-              <li>
-                Applies its rules in a fixed order, so every record ends with exactly one explained
-                outcome.
-              </li>
-              <li>Lets an analyst propose a fix. A different supervisor approves or rejects it.</li>
-            </ul>
+            <section class="dossier__section">
+              <h4 id="beetlejuice-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>A reference that is not unique.</strong> A payment and its refund can
+                  share one. When both sides have leftovers that do not line up, every record
+                  involved becomes AMBIGUOUS_REFERENCE. Nothing is paired by guesswork.
+                </li>
+                <li>
+                  <strong>Late is not missing.</strong> A settlement window and an as-of date
+                  decide. Results never change in place. A later run looks again.
+                </li>
+                <li>
+                  <strong>Approving your own fix.</strong> The service refuses it, and database
+                  triggers refuse it again.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>A reference that is not unique.</strong> A payment and its refund can share
-                one. When both sides have leftovers that do not line up, every record involved
-                becomes AMBIGUOUS_REFERENCE. Nothing is paired by guesswork.
-              </li>
-              <li>
-                <strong>Late is not missing.</strong> A settlement window and an as-of date decide.
-                Results never change in place. A later run looks again.
-              </li>
-              <li>
-                <strong>Approving your own fix.</strong> The service refuses it, and database
-                triggers refuse it again.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="beetlejuice">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <p>
-                  Example from the rules: the ledger says ₹1,200.00 and the settlement says
-                  ₹1,250.00. The outcome is AMOUNT_MISMATCH with a difference of +₹50.00. The
-                  analyst who proposes the fix cannot approve it. A different supervisor has to.
-                </p>
+            <section class="dossier__section">
+              <h4 id="beetlejuice-try">Try it</h4>
+              <p class="dossier__intro">
+                Reconcile the ledger against the settlement, then propose a fix and try to approve
+                it as the wrong person.
+              </p>
+              <div class="sim" data-sim="beetlejuice">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <p>
+                    Example from the rules: the ledger says ₹1,200.00 and the settlement says
+                    ₹1,250.00. The outcome is AMOUNT_MISMATCH with a difference of +₹50.00. The
+                    analyst who proposes the fix cannot approve it. A different supervisor has to.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>What it does, trade-offs and other decisions</summary>
+              <ul class="dossier__list recorder__does">
+                <li>
+                  Checks both CSV exports strictly and lists every rejected row with its reason.
+                </li>
+                <li>
+                  Applies its rules in a fixed order, so every record ends with exactly one
+                  explained outcome.
+                </li>
+                <li>
+                  Lets an analyst propose a fix. A different supervisor approves or rejects it.
+                </li>
+              </ul>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> Money is whole paise everywhere. Fees are exact
@@ -434,16 +475,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">Node.js</li>
-              <li class="tag">Express</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">Plain SQL</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/BeetleJuice">Read the code</a>
-            </p>
           </div>
         </article>
       </section>
@@ -468,65 +499,93 @@
         >
           <div class="mission__art art art--theredarmy" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 04 / theRedArmy</p>
-            <h3 id="theredarmy-title" class="dossier__callsign">theRedArmy</h3>
-            <p>
-              <span class="chip chip--active">Active</span>
-              <span class="tag">Team project</span>
-            </p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 04 of 06 · Mission 04</p>
+              <h3 id="theredarmy-title" class="dossier__callsign">theRedArmy</h3>
+              <p class="dossier__objective">
+                theRedArmy tests LLM prompts the way you test code. Write the test cases once, run
+                every new prompt version against them and see which cases broke. A CI pipeline can
+                call it and fail the build.
+              </p>
+              <p class="dossier__status">
+                <span class="chip chip--active">Active</span> <span class="tag">Team project</span>
+              </p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">Node.js</li>
+                <li class="tag">Express</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">Prisma</li>
+                <li class="tag">Redis</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://github.com/Ayush-o1/theRedArmy">Read the code</a>
+                <a href="https://github.com/Ayush-o1/theRedArmy/blob/main/docs/architecture.md"
+                  >See the architecture</a
+                >
+                <a href="https://github.com/Ayush-o1/theRedArmy/graphs/contributors"
+                  >Contributors</a
+                >
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              theRedArmy tests LLM prompts the way you test code. Write the test cases once, run
-              every new prompt version against them and see which cases broke. A CI pipeline can
-              call it and fail the build.
-            </p>
+            <section class="dossier__section">
+              <h4 id="theredarmy-problem">The problem</h4>
+              <p class="dossier__lead">
+                A prompt change can quietly break a case that used to pass, and nobody notices until
+                a customer does.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>Saves prompts as immutable versions and runs each one against a test suite.</li>
-              <li>
-                Turns a run into one job per test case in a PostgreSQL queue, worked by separate
-                worker processes.
-              </li>
-              <li>
-                Gates a CI build. With a baseline, a case that already failed is tolerated and a
-                case that used to pass and now fails stops the build.
-              </li>
-            </ul>
+            <section class="dossier__section">
+              <h4 id="theredarmy-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>Two workers, one job.</strong> Jobs are claimed with
+                  <code>FOR UPDATE SKIP LOCKED</code> and leased. A late write from a dead worker is
+                  rejected.
+                </li>
+                <li>
+                  <strong>Rate limits and flaky calls.</strong> A shared Redis token bucket limits
+                  each provider. Transient errors retry with backoff and jitter. Permanent errors do
+                  not.
+                </li>
+                <li>
+                  <strong>Silent regressions.</strong> A run is compared with its baseline, case by
+                  case: regressed, fixed, still failing, added or removed.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>Two workers, one job.</strong> Jobs are claimed with
-                <code>FOR UPDATE SKIP LOCKED</code> and leased. A late write from a dead worker is
-                rejected.
-              </li>
-              <li>
-                <strong>Rate limits and flaky calls.</strong> A shared Redis token bucket limits
-                each provider. Transient errors retry with backoff and jitter. Permanent errors do
-                not.
-              </li>
-              <li>
-                <strong>Silent regressions.</strong> A run is compared with its baseline, case by
-                case: regressed, fixed, still failing, added or removed.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="theredarmy">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <p>
-                  The seeded demo has a support-reply prompt. Version 1 quotes the order number and
-                  passes all 8 cases. Version 2 was shortened to save tokens and dropped the order
-                  number. Seven cases regress and one still passes, so the gate fails.
-                </p>
+            <section class="dossier__section">
+              <h4 id="theredarmy-try">Try it</h4>
+              <p class="dossier__intro">
+                Edit the prompt, save a version, run the suite and see which cases broke.
+              </p>
+              <div class="sim" data-sim="theredarmy">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <p>
+                    The seeded demo has a support-reply prompt. Version 1 quotes the order number
+                    and passes all 8 cases. Version 2 was shortened to save tokens and dropped the
+                    order number. Seven cases regress and one still passes, so the gate fails.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>What it does, trade-offs and other decisions</summary>
+              <ul class="dossier__list recorder__does">
+                <li>Saves prompts as immutable versions and runs each one against a test suite.</li>
+                <li>
+                  Turns a run into one job per test case in a PostgreSQL queue, worked by separate
+                  worker processes.
+                </li>
+                <li>
+                  Gates a CI build. With a baseline, a case that already failed is tolerated and a
+                  case that used to pass and now fails stops the build.
+                </li>
+              </ul>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> The <code>run_cases</code> table is the queue. Starting
@@ -547,21 +606,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">Node.js</li>
-              <li class="tag">Express</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">Prisma</li>
-              <li class="tag">Redis</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/theRedArmy">Read the code</a>
-              <a href="https://github.com/Ayush-o1/theRedArmy/blob/main/docs/architecture.md"
-                >See the architecture</a
-              >
-              <a href="https://github.com/Ayush-o1/theRedArmy/graphs/contributors">Contributors</a>
-            </p>
           </div>
         </article>
 
@@ -575,96 +619,122 @@
         >
           <div class="mission__art art art--deadletter" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 05 / deadLetter</p>
-            <h3 id="deadletter-title" class="dossier__callsign">deadLetter</h3>
-            <p><span class="chip chip--active">Active</span></p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 05 of 06 · Mission 05</p>
+              <h3 id="deadletter-title" class="dossier__callsign">deadLetter</h3>
+              <p class="dossier__objective">
+                deadLetter is a firewall between an AI agent and its tools. The agent may read
+                untrusted text, such as an email, but that text cannot choose which tool runs or
+                where private data goes. It is a local prototype with fake tools, built on the CaMeL
+                design from a research paper.
+              </p>
+              <p class="dossier__status"><span class="chip chip--active">Active</span></p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">Node.js</li>
+                <li class="tag">Express</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">Prisma</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://github.com/Ayush-o1/deadLetter">Read the code</a>
+                <a href="https://github.com/Ayush-o1/deadLetter/blob/main/docs/ARCHITECTURE.md"
+                  >See the architecture</a
+                >
+                <a href="https://arxiv.org/abs/2503.18813">Read the paper</a>
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              deadLetter is a firewall between an AI agent and its tools. The agent may read
-              untrusted text, such as an email, but that text cannot choose which tool runs or where
-              private data goes. It is a local prototype with fake tools, built on the CaMeL design
-              from a research paper.
-            </p>
+            <section class="dossier__section">
+              <h4 id="deadletter-problem">The problem</h4>
+              <p class="dossier__lead">
+                An agent that reads an email must not let that email choose which tool runs or where
+                private data goes.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>
-                Splits the agent in parts: a planner that sees only your request, a model with no
-                tools that reads untrusted text, and an interpreter that tracks where every value
-                came from.
-              </li>
-              <li>Checks every tool call against those labels and answers allow, ask or deny.</li>
-              <li>
-                Runs 20 prepared scenarios, 11 attacks and 9 normal tasks, against three defences.
-              </li>
-            </ul>
+            <section class="dossier__section">
+              <h4 id="deadletter-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>Prompt injection.</strong> It does not guess whether text is malicious. It
+                  asks where a value came from and whether that source may drive this action.
+                </li>
+                <li>
+                  <strong>Private data leaving.</strong> If untrusted text picks the destination and
+                  private data goes with it, the call is denied. Nobody can override a deny.
+                </li>
+                <li>
+                  <strong>Grading itself kindly.</strong> The results use mock models and say so.
+                  One attack still gets through, a misleading summary sent to an allowed recipient,
+                  and the project lists it.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>Prompt injection.</strong> It does not guess whether text is malicious. It
-                asks where a value came from and whether that source may drive this action.
-              </li>
-              <li>
-                <strong>Private data leaving.</strong> If untrusted text picks the destination and
-                private data goes with it, the call is denied. Nobody can override a deny.
-              </li>
-              <li>
-                <strong>Grading itself kindly.</strong> The results use mock models and say so. One
-                attack still gets through, a misleading summary sent to an allowed recipient, and
-                the project lists it.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="deadletter">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <table class="sim__table">
-                  <caption>
-                    The policy matrix for a tool call that sends data somewhere
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Destination</th>
-                      <th scope="col">Data</th>
-                      <th scope="col">Decision</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Named by the user</td>
-                      <td>Anything</td>
-                      <td>Allow</td>
-                    </tr>
-                    <tr>
-                      <td>Trusted, not named, may not read it</td>
-                      <td>Private</td>
-                      <td>Ask</td>
-                    </tr>
-                    <tr>
-                      <td>Trusted</td>
-                      <td>Public</td>
-                      <td>Allow</td>
-                    </tr>
-                    <tr>
-                      <td>Untrusted</td>
-                      <td>Public</td>
-                      <td>Ask</td>
-                    </tr>
-                    <tr>
-                      <td>Untrusted</td>
-                      <td>Private</td>
-                      <td>Deny</td>
-                    </tr>
-                  </tbody>
-                </table>
+            <section class="dossier__section">
+              <h4 id="deadletter-try">Try it</h4>
+              <p class="dossier__intro">
+                Run five attacks against three defences and see what gets through.
+              </p>
+              <div class="sim" data-sim="deadletter">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <table class="sim__table">
+                    <caption>
+                      The policy matrix for a tool call that sends data somewhere
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Destination</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Decision</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Named by the user</td>
+                        <td>Anything</td>
+                        <td>Allow</td>
+                      </tr>
+                      <tr>
+                        <td>Trusted, not named, may not read it</td>
+                        <td>Private</td>
+                        <td>Ask</td>
+                      </tr>
+                      <tr>
+                        <td>Trusted</td>
+                        <td>Public</td>
+                        <td>Allow</td>
+                      </tr>
+                      <tr>
+                        <td>Untrusted</td>
+                        <td>Public</td>
+                        <td>Ask</td>
+                      </tr>
+                      <tr>
+                        <td>Untrusted</td>
+                        <td>Private</td>
+                        <td>Deny</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>What it does, trade-offs and other decisions</summary>
+              <ul class="dossier__list recorder__does">
+                <li>
+                  Splits the agent in parts: a planner that sees only your request, a model with no
+                  tools that reads untrusted text, and an interpreter that tracks where every value
+                  came from.
+                </li>
+                <li>Checks every tool call against those labels and answers allow, ask or deny.</li>
+                <li>
+                  Runs 20 prepared scenarios, 11 attacks and 9 normal tasks, against three defences.
+                </li>
+              </ul>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> Plans are JSON checked by a strict schema. Nothing is
@@ -685,20 +755,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">Node.js</li>
-              <li class="tag">Express</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">Prisma</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/deadLetter">Read the code</a>
-              <a href="https://github.com/Ayush-o1/deadLetter/blob/main/docs/ARCHITECTURE.md"
-                >See the architecture</a
-              >
-              <a href="https://arxiv.org/abs/2503.18813">Read the paper</a>
-            </p>
           </div>
         </article>
 
@@ -712,63 +768,89 @@
         >
           <div class="mission__art art art--europa" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 06 / Europa</p>
-            <h3 id="europa-title" class="dossier__callsign">Europa</h3>
-            <p><span class="chip chip--complete">Complete</span></p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 06 of 06 · Mission 06</p>
+              <h3 id="europa-title" class="dossier__callsign">Europa</h3>
+              <p class="dossier__objective">
+                Europa is a workbench for satellite close approaches. It reads public conjunction
+                reports, tracks how each predicted miss distance changes between updates, ranks what
+                to review first and keeps every review action in a hash-chained log.
+              </p>
+              <p class="dossier__status"><span class="chip chip--complete">Complete</span></p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">JavaScript</li>
+                <li class="tag">Node.js</li>
+                <li class="tag">Express</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">satellite.js</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://github.com/Ayush-o1/Europa">Read the code</a>
+                <a href="https://github.com/Ayush-o1/Europa/blob/main/docs/architecture.md"
+                  >See the architecture</a
+                >
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              Europa is a workbench for satellite close approaches. It reads public conjunction
-              reports, tracks how each predicted miss distance changes between updates, ranks what
-              to review first and keeps every review action in a hash-chained log.
-            </p>
+            <section class="dossier__section">
+              <h4 id="europa-problem">The problem</h4>
+              <p class="dossier__lead">
+                Predicted miss distances change with every update, and a review log is only worth
+                keeping if nobody can quietly rewrite it.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>
-                Recognises the same pair of satellites across reports, even when the order of the
-                two swaps.
-              </li>
-              <li>
-                Scores review priority from 0 to 100 from miss distance, time to closest approach, a
-                probability bound and the age of the data.
-              </li>
-              <li>
-                Records each review action with a required reason. Every entry holds the hash of the
-                one before it.
-              </li>
-            </ul>
+            <section class="dossier__section">
+              <h4 id="europa-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>Same pair, different order.</strong> A pair gets one key built from the
+                  smaller and larger catalog number, so A against B and B against A are one event.
+                </li>
+                <li>
+                  <strong>Reports are snapshots.</strong> Predictions are matched over time. A miss
+                  distance that shrinks by 20% or more flags the event for another review.
+                </li>
+                <li>
+                  <strong>Tampered records.</strong> Database triggers block updates and deletes on
+                  the log. A verifier walks the chain from the first entry to the last.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>Same pair, different order.</strong> A pair gets one key built from the
-                smaller and larger catalog number, so A against B and B against A are one event.
-              </li>
-              <li>
-                <strong>Reports are snapshots.</strong> Predictions are matched over time. A miss
-                distance that shrinks by 20% or more flags the event for another review.
-              </li>
-              <li>
-                <strong>Tampered records.</strong> Database triggers block updates and deletes on
-                the log. A verifier walks the chain from the first entry to the last.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="europa">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <p>
-                  Each log entry is hashed with SHA-256 over its sequence number, action, actor,
-                  payload, the previous hash and the time. Change any field in an old entry and its
-                  hash no longer matches. So does every entry after it.
-                </p>
+            <section class="dossier__section">
+              <h4 id="europa-try">Try it</h4>
+              <p class="dossier__intro">
+                Edit one line of the log and verify the chain. It fails at exactly that entry.
+              </p>
+              <div class="sim" data-sim="europa">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <p>
+                    Each log entry is hashed with SHA-256 over its sequence number, action, actor,
+                    payload, the previous hash and the time. Change any field in an old entry and
+                    its hash no longer matches. So does every entry after it.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>What it does, trade-offs and other decisions</summary>
+              <ul class="dossier__list recorder__does">
+                <li>
+                  Recognises the same pair of satellites across reports, even when the order of the
+                  two swaps.
+                </li>
+                <li>
+                  Scores review priority from 0 to 100 from miss distance, time to closest approach,
+                  a probability bound and the age of the data.
+                </li>
+                <li>
+                  Records each review action with a required reason. Every entry holds the hash of
+                  the one before it.
+                </li>
+              </ul>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> The priority score is a review heuristic and not a
@@ -784,20 +866,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">JavaScript</li>
-              <li class="tag">Node.js</li>
-              <li class="tag">Express</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">satellite.js</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/Europa">Read the code</a>
-              <a href="https://github.com/Ayush-o1/Europa/blob/main/docs/architecture.md"
-                >See the architecture</a
-              >
-            </p>
           </div>
         </article>
       </section>

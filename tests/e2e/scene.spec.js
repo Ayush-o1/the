@@ -6,7 +6,8 @@ import { markVisited } from './helpers.js';
 test.skip(({ browserName }) => browserName !== 'chromium', 'scene tests run in Chromium');
 
 async function waitForScene(page) {
-  await page.waitForSelector('html.scene', { timeout: 20_000 });
+  // The software renderer in CI draws every world once before the first frame, which takes a while.
+  await page.waitForSelector('html.scene', { timeout: 90_000 });
 }
 
 async function scrollToSection(page, id) {
@@ -21,6 +22,8 @@ async function scrollToSection(page, id) {
 
 test.describe('with a returning visitor', () => {
   test.beforeEach(async ({ page }) => {
+    // Three times the usual time: the flight draws every world before it starts.
+    test.slow();
     await markVisited(page);
   });
 
@@ -58,11 +61,23 @@ test.describe('with a returning visitor', () => {
     );
   });
 
-  test('flight path dots are links and moving to one focuses its heading', async ({ page }) => {
+  test('the progress line fills as the flight goes on and the menu links reach a project', async ({
+    page,
+  }) => {
     await page.goto('/');
     await waitForScene(page);
-    await expect(page.locator('.hud-path__link')).toHaveCount(6);
-    await page.locator('.hud-path__link').nth(1).click();
+    const fill = page.locator('.hud-progress__fill');
+    await expect(fill).toHaveCount(1);
+    const start = await fill.evaluate((el) => el.style.transform);
+    await scrollToSection(page, 'europa');
+    await expect
+      .poll(async () => fill.evaluate((el) => parseFloat(el.style.transform.slice(7))), {
+        timeout: 45_000,
+      })
+      .toBeGreaterThan(0.5);
+    expect(start).toContain('scaleX');
+    await page.keyboard.press('m');
+    await page.locator('#menu').getByRole('link', { name: 'BlackWater' }).click();
     await expect(page.locator('#blackwater-title')).toBeFocused();
   });
 
@@ -77,7 +92,7 @@ test.describe('with a returning visitor', () => {
     await expect(page.locator('html')).toHaveClass(/lite/);
     await expect(toggle).toHaveText('Start the flight');
     await expect(page.locator('canvas.scene-canvas')).toHaveCount(0);
-    await expect(page.locator('.hud-path')).toHaveCount(0);
+    await expect(page.locator('.hud-progress')).toHaveCount(0);
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
     await toggle.click();
     await waitForScene(page);
@@ -152,7 +167,7 @@ test.describe('with a returning visitor', () => {
         await page.waitForTimeout(500);
         peak = Math.max(peak, (await read()).geometries);
       }
-      await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
+      await expect.poll(async () => (await read()).worlds, { timeout: 60_000 }).toBe('earth');
     }
 
     // The first flight uploads things that are created lazily (the jump tunnel, for example). On a
@@ -220,7 +235,9 @@ test.describe('with a returning visitor', () => {
   ]) {
     test(`axe finds no violations in flight mode at ${size.width}px`, async ({ page }) => {
       await page.setViewportSize(size);
-      await page.goto('/');
+      // The low tier draws straight to the screen with no post-processing. Axe checks the page, not
+      // the picture, and the software renderer in CI takes over a minute per frame at 1920 px.
+      await page.goto('/?tier=low');
       await waitForScene(page);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes[0].html}`)).toEqual([]);

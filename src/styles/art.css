@@ -3,8 +3,6 @@
 .art {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--ink);
 }
 
 .art::before,
