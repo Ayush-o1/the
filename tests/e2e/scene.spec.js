@@ -230,7 +230,9 @@ test.describe('with a returning visitor', () => {
   ]) {
     test(`axe finds no violations in flight mode at ${size.width}px`, async ({ page }) => {
       await page.setViewportSize(size);
-      await page.goto('/');
+      // The low tier draws straight to the screen with no post-processing. Axe checks the page, not
+      // the picture, and the software renderer in CI takes over a minute per frame at 1920 px.
+      await page.goto('/?tier=low');
       await waitForScene(page);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes[0].html}`)).toEqual([]);
