@@ -78,8 +78,10 @@ export function dishGeometry(radius, focal, thickness) {
 
 // own(resource) records each texture and material so its owner can dispose of them.
 export function createHardwareMaterials(anisotropy, own) {
-  const foil = own(foilNormalMap(256, 10));
-  foil.repeat.set(2, 2);
+  // 128 px with 5 facets across, repeated 4 times: the same facet size as 256 px at 2 repeats,
+  // for a quarter of the work at start.
+  const foil = own(foilNormalMap(128, 5));
+  foil.repeat.set(4, 4);
   const seams = own(foilSeamMap(anisotropy));
   const material = (options) => own(new MeshStandardMaterial(options));
   const gold = material({

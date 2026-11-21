@@ -169,6 +169,14 @@ export function createWorldManager({ scene, stops, tier }) {
         await yieldToMain();
       }
     },
+    // Shows or hides every world at once, for compiling all their shaders together in warm-up.
+    setAllVisible(visible) {
+      for (const entry of entries) {
+        entry.fade.value = visible ? 1 : 0;
+        applyFade(entry);
+        if (visible) place(entry, false);
+      }
+    },
     // A world's definition, for the ?debug framing scripts.
     debugEntry(id) {
       return entries.find((entry) => entry.id === id) ?? null;

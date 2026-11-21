@@ -58,31 +58,37 @@ export function createLighting({ renderer, scene }) {
   fill.position.copy(FILL_DIRECTION).multiplyScalar(100);
   scene.add(key, fill, key.target);
 
-  const skyScene = new Scene();
-  const skyGeometry = new SphereGeometry(10, 64, 32);
-  const skyMaterial = new ShaderMaterial({
-    vertexShader: SKY_VERTEX,
-    fragmentShader: SKY_FRAGMENT,
-    uniforms: { uSunDir: { value: SUN_DIRECTION }, uFillDir: { value: FILL_DIRECTION } },
-    side: BackSide,
-    depthWrite: false,
-  });
-  skyScene.add(new Mesh(skyGeometry, skyMaterial));
-  const pmrem = new PMREMGenerator(renderer);
-  const target = pmrem.fromScene(skyScene, 0, 0.1, 100);
-  pmrem.dispose();
-  skyGeometry.dispose();
-  skyMaterial.dispose();
-
-  scene.environment = target.texture;
-  scene.environmentIntensity = 1;
+  let target = null;
+  // Builds the reflection map. Called during the warm-up, in its own task, so the scene's
+  // synchronous start stays short.
+  function buildEnvironment() {
+    if (target) return;
+    const skyScene = new Scene();
+    const skyGeometry = new SphereGeometry(10, 64, 32);
+    const skyMaterial = new ShaderMaterial({
+      vertexShader: SKY_VERTEX,
+      fragmentShader: SKY_FRAGMENT,
+      uniforms: { uSunDir: { value: SUN_DIRECTION }, uFillDir: { value: FILL_DIRECTION } },
+      side: BackSide,
+      depthWrite: false,
+    });
+    skyScene.add(new Mesh(skyGeometry, skyMaterial));
+    const pmrem = new PMREMGenerator(renderer);
+    target = pmrem.fromScene(skyScene, 0, 0.1, 100);
+    pmrem.dispose();
+    skyGeometry.dispose();
+    skyMaterial.dispose();
+    scene.environment = target.texture;
+    scene.environmentIntensity = 1;
+  }
 
   return {
     key,
     fill,
+    buildEnvironment,
     dispose() {
       scene.environment = null;
-      target.dispose();
+      target?.dispose();
       key.dispose();
       fill.dispose();
     },

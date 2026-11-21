@@ -21,6 +21,15 @@ export default defineConfig({
       // Software GL flags so headless Chromium can run WebGL. See docs/DECISIONS.md D16.
       use: {
         ...devices['Desktop Chrome'],
+        // SwiftShader is a software renderer, which the site would send to the plain page. The
+        // flight tests need the flight, so this project starts with the saved choice a visitor
+        // makes with the "Start the flight" toggle.
+        storageState: {
+          cookies: [],
+          origins: [
+            { origin: 'http://localhost:4173', localStorage: [{ name: 'ak-lite', value: '0' }] },
+          ],
+        },
         launchOptions: {
           args: [
             '--use-gl=angle',

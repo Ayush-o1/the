@@ -248,8 +248,22 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     if (post) post.render();
     else renderer.render(scene, camera);
   }
-  const ready = (async () => {
-    warmMs = await warmUp({ renderer, scene, camera, worlds, render: renderOnce });
+  // ready resolves when the warm-up is done, so the boot cover lifts and the hero text shows
+  // without waiting for the planet maps. The flight's first frame waits for them (below).
+  let markReady;
+  const ready = new Promise((resolve) => {
+    markReady = resolve;
+  });
+  (async () => {
+    warmMs = await warmUp({
+      renderer,
+      scene,
+      camera,
+      worlds,
+      render: renderOnce,
+      before: [lighting.buildEnvironment],
+    });
+    markReady();
     if (stopped) return;
     // The planet maps. Uploading one to the GPU takes a frame or more, so the flight waits up to
     // MAP_WAIT_MS for them before its first frame (behind the boot cover on a first visit; the
@@ -272,7 +286,10 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     gsap.ticker.add(tick);
     // GSAP skips time after a slow frame by default, which would make the camera jump.
     gsap.ticker.lagSmoothing(0);
-  })();
+  })().catch((error) => {
+    console.warn('Flight warm-up failed:', error);
+    markReady();
+  });
 
   return {
     stops,

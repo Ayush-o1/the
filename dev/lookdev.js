@@ -75,6 +75,7 @@ renderer.shadowMap.type = PCFShadowMap;
 const scene = new Scene();
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 4000);
 const lighting = createLighting({ renderer, scene });
+lighting.buildEnvironment();
 lighting.key.castShadow = true;
 lighting.key.shadow.mapSize.set(2048, 2048);
 Object.assign(lighting.key.shadow.camera, {
