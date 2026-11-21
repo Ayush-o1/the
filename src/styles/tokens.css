@@ -1,71 +1,65 @@
-/* Design tokens. Every colour, size and space in the site comes from here. */
+/* Design tokens. Every colour, size, space, layer and motion value in the site comes from here.
+   src/core/motion.js reads the motion tokens back, so CSS and JS share one set of numbers. */
 
-/* Fonts are self-hosted and limited to Latin. swap shows text at once in a fallback face. */
+/* Fonts are self-hosted and cut to Latin by scripts/subset-fonts.sh. swap shows text at once in a
+   fallback face. Fraunces is fixed at its display optical size, so it is only for large type. */
 @font-face {
-  font-family: 'Instrument Serif';
+  font-family: 'Fraunces';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 300 400;
   font-display: swap;
-  src: url('../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2')
-    format('woff2');
+  src: url('../fonts/fraunces-roman.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Instrument Serif';
+  font-family: 'Fraunces';
   font-style: italic;
-  font-weight: 400;
+  font-weight: 300;
   font-display: swap;
-  src: url('../../node_modules/@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2')
-    format('woff2');
+  src: url('../fonts/fraunces-italic.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'IBM Plex Sans';
+  font-family: 'Hanken Grotesk';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 600;
   font-display: swap;
-  src: url('../../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2')
-    format('woff2');
+  src: url('../fonts/hanken-grotesk.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'IBM Plex Sans';
+  font-family: 'Geist Mono';
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400 500;
   font-display: swap;
-  src: url('../../node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2')
-    format('woff2');
-}
-@font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2')
-    format('woff2');
+  src: url('../fonts/geist-mono.woff2') format('woff2');
 }
 
 :root {
-  /* Colour. Amber is the one accent. Red is for hazards only. Teal is for "OK" only. */
-  --void: #06070a;
-  --panel: #0d1017;
-  --star: #ede7da;
-  --dim: #9a978d;
-  --amber: #ffb454;
-  --alert: #ff5a3c;
-  --ok: #7fd1b9;
-  --line: rgba(237, 231, 218, 0.18);
+  /* Colour. Signal is the one accent: status, the current section, the one active control. */
+  --ink: #0a0d12;
+  --ink-2: #10151d;
+  --ink-3: #171d27;
+  --bone: #ece6d8;
+  --bone-2: #cfcabd;
+  --dim: #a39f94;
+  --signal: #ff6a3d;
+  --cold: #86b6c8;
+  --ok: #8fd1a6;
+  --line: rgba(236, 230, 216, 0.14);
+  --line-strong: rgba(236, 230, 216, 0.32);
 
-  /* Type */
-  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* Type. Scale ratio 1.333 from a 17px body. */
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --text-display: clamp(3rem, 9vw, 9rem);
-  --text-h2: clamp(2rem, 5vw, 4rem);
-  --text-h3: clamp(1.75rem, 3.4vw, 2.75rem);
+  --text-display: clamp(2.75rem, 7.2vw, 7rem);
+  --text-h2: clamp(2.5rem, 5.6vw, 4.5rem);
+  --text-h3: 1.875rem;
+  --text-lede: 1.4rem;
   --text-body: 1.0625rem;
-  --text-hud: 0.75rem;
+  --text-label: 0.75rem;
   --measure: 62ch;
 
-  /* Space scale: 4, 8, 12, 16, 24, 32, 48, 72, 112 */
+  /* Space: 4, 8, 12, 16, 24, 32, 48, 72, 112 */
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;
@@ -77,13 +71,40 @@
   --s9: 112px;
 
   --gutter: 20px;
-  --chamfer: 8px;
-  --chamfer-panel: 20px;
-  --header-h: 56px;
+  --header-h: 60px;
+  --radius: 2px;
+
+  /* Layers */
+  --z-canvas: 0;
+  --z-content: 10;
+  --z-chrome: 20;
+  --z-dialog: 30;
+  --z-toast: 40;
+  --z-boot: 50;
+
+  /* Motion. Three easings, four durations, one stagger. Nothing else is used. */
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-linear: linear;
+  --t-fast: 120ms;
+  --t-ui: 280ms;
+  --t-reveal: 640ms;
+  --t-scene: 1100ms;
+  --stagger: 60ms;
 }
 
 @media (min-width: 900px) {
   :root {
-    --gutter: 24px;
+    --gutter: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-ui: 0ms;
+    --t-reveal: 0ms;
+    --t-scene: 0ms;
+    --stagger: 0ms;
   }
 }

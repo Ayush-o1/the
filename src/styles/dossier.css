@@ -93,7 +93,7 @@
   top: 0.78em;
   width: 10px;
   height: 1px;
-  background: var(--amber);
+  background: var(--signal);
 }
 
 .hazards {
@@ -115,15 +115,15 @@
   left: 0;
   top: 0.2em;
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   letter-spacing: 0.12em;
-  color: var(--alert);
+  color: var(--signal);
 }
 
 code {
   font-family: var(--font-mono);
   font-size: 0.875em;
-  color: var(--star);
+  color: var(--bone);
   padding: 0 var(--s1);
   border: 1px solid var(--line);
 }
@@ -167,7 +167,7 @@ code {
 
 .sim__table thead th {
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -193,10 +193,10 @@ code {
   min-height: 44px;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--amber);
+  color: var(--signal);
   list-style: none;
 }
 

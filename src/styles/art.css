@@ -4,7 +4,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--line);
-  background: var(--void);
+  background: var(--ink);
 }
 
 .art::before,
@@ -95,8 +95,8 @@
 .art--beetlejuice::after {
   inset: 0;
   background:
-    radial-gradient(circle at 12% 20%, var(--star) 0 1px, transparent 2px),
-    radial-gradient(circle at 88% 78%, var(--star) 0 1px, transparent 2px);
+    radial-gradient(circle at 12% 20%, var(--bone) 0 1px, transparent 2px),
+    radial-gradient(circle at 88% 78%, var(--bone) 0 1px, transparent 2px);
 }
 
 /* theRedArmy: a rust-red planet with a pale polar cap. */
@@ -120,11 +120,11 @@
   width: 14%;
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
-  border: 1px solid var(--star);
-  background: var(--panel);
+  border: 1px solid var(--bone);
+  background: var(--ink-2);
   box-shadow:
-    -64px 0 0 -2px var(--panel),
-    64px 0 0 -2px var(--panel),
+    -64px 0 0 -2px var(--ink-2),
+    64px 0 0 -2px var(--ink-2),
     -64px 0 0 -1px var(--dim),
     64px 0 0 -1px var(--dim);
 }
@@ -135,7 +135,13 @@
   width: 76%;
   height: 1px;
   transform: translate(-50%, -50%);
-  background: linear-gradient(90deg, transparent, var(--amber) 20%, var(--amber) 80%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--signal) 20%,
+    var(--signal) 80%,
+    transparent
+  );
   opacity: 0.55;
 }
 

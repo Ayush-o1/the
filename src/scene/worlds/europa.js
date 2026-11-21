@@ -21,11 +21,10 @@ const MOON_RADIUS = 7;
 const JUPITER_RADIUS = 60;
 const JUPITER_POSITION = [30, 22, -110];
 
-// Hazard 5, conjunction warning. A piece of debris crosses Europa's orbit on a straight track.
-// Position and velocity are relative to the moon. The HUD's miss distance is computed from these
-// numbers with lib/orbit.js, so the readout is what the geometry gives.
+// A piece of debris crosses Europa's orbit on a straight track. Position and velocity are
+// relative to the moon.
 export const DEBRIS = { position: [-18, 11.6, 3], velocity: [1, 0, 0] };
-// The debris travels this many units across the whole hazard (local progress -0.5 to 0.5).
+// The debris travels this many units across the whole pass (local progress -0.5 to 0.5).
 const TRACK_LENGTH = 36;
 
 function orbitArc(moon, jupiter) {

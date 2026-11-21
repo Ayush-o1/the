@@ -21,8 +21,8 @@ test('every section renders and the console is clean', async ({ page }) => {
   page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()));
   page.on('pageerror', (err) => errors.push(err.message));
   await page.goto('/?lite=1');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ayush Kumar');
-  for (const id of ['launch', 'belt', 'missions', 'fleet', 'cargo', 'crew', 'contact']) {
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Software engineer');
+  for (const id of ['launch', 'projects', 'fleet', 'more', 'about', 'education', 'contact']) {
     await expect(page.locator(`#${id}`)).toBeAttached();
   }
   for (const id of MISSIONS) await expect(page.locator(`#${id} .dossier__callsign`)).toBeVisible();
@@ -79,30 +79,8 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
     await expect(page.locator('#europa .hazards li')).toHaveCount(3);
     await expect(page.locator('#contact-form')).toBeVisible();
-    await expect(page.getByRole('button', { name: /briefing/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Menu' })).toHaveCount(0);
   });
-});
-
-test('briefing opens with B, lists three missions, closes with Escape and returns focus', async ({
-  page,
-}) => {
-  await page.goto('/?lite=1');
-  const button = page.locator('header [data-open-dialog="briefing"]');
-  await button.focus();
-  await page.keyboard.press('b');
-  const dialog = page.locator('#briefing');
-  await expect(dialog).toBeVisible();
-  await expect(dialog.locator('[data-briefing-missions] li')).toHaveCount(3);
-  await expect(dialog.locator('[data-briefing-links] a').first()).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(dialog).toBeHidden();
-  await expect(button).toBeFocused();
-});
-
-test('typing b in the message box does not open the briefing', async ({ page }) => {
-  await page.goto('/?lite=1');
-  await page.locator('#cf-message').fill('b');
-  await expect(page.locator('#briefing')).toBeHidden();
 });
 
 test('contact form falls back to a mailto link', async ({ page }) => {

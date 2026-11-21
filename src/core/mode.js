@@ -3,7 +3,6 @@
 // the canvas is gone, the HUD is gone, html.lite is set and the content is untouched.
 import { writeSetting } from './store.js';
 import { setModeToggleLabel, mountHud } from '../ui/hud.js';
-import { readCopy } from '../ui/copy.js';
 
 export function createModeController({ env, startTier, pinTier, onFrame }) {
   const html = document.documentElement;
@@ -36,7 +35,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
     if (loading || current === 'scene') return;
     loading = true;
     try {
-      // Three.js, GSAP and Lenis arrive in this chunk, after the page is already readable.
+      // Three.js and GSAP arrive in this chunk, after the page is already readable.
       const { startScene } = await import('../scene/index.js');
       teardown();
       scene = startScene({
@@ -50,19 +49,18 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
           onFrame?.(state);
         },
       });
-      hud = mountHud(scene.stops, readCopy());
+      hud = mountHud(scene.stops);
       hud.setSector(scene.stops[0]);
       current = 'scene';
       html.classList.remove('lite');
       delete html.dataset.liteReason;
       setModeToggleLabel('scene');
-      // Text reveals and the hull decode. Optional polish: a failure here changes nothing else.
+      // Text reveals. Optional polish: a failure here changes nothing else.
       if (!env.reducedMotion) {
         import('../ui/motion.js')
           .then((motion) => {
             if (current !== 'scene') return;
             stopMotion = motion.initReveals();
-            setTimeout(motion.decodeHull, 400);
           })
           .catch((error) => console.warn('Motion polish failed to load:', error));
       }
@@ -91,8 +89,6 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
     get current() {
       return current;
     },
-    // True if there is a probe to turn. In lite mode there is not.
-    barrelRoll: () => scene?.barrelRoll() ?? false,
     getStats: () => scene?.getStats() ?? null,
   };
 }
