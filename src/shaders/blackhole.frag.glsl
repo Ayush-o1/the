@@ -54,6 +54,7 @@ void main() {
 
   vec3 light = vec3(0.0);
   float alpha = 0.0;
+  bool escaped = false;
   vec3 h = cross(pos, dir);
   float h2 = dot(h, h);
   for (int i = 0; i < STEPS; i++) {
@@ -62,7 +63,10 @@ void main() {
       alpha = 1.0;
       break;
     }
-    if (r > start * 1.05 && dot(pos, dir) > 0.0) break;
+    if (r > start * 1.05 && dot(pos, dir) > 0.0) {
+      escaped = true;
+      break;
+    }
     float dt = clamp(0.09 * r * r / (1.0 + r), 0.03, 1.2);
     // The photon orbit equation in Cartesian form: acceleration -1.5 h^2 x / r^5.
     vec3 accel = -1.5 * h2 * pos / pow(r, 5.0);
@@ -94,6 +98,9 @@ void main() {
     pos = next;
     dir = nextDir;
   }
+  // A ray still close to the hole when the steps run out is spiralling in: it is part of the
+  // shadow, so it is opaque black (whatever disk light it picked up stays in front).
+  if (!escaped && alpha < 0.98 && length(pos) < start) alpha = 1.0;
   // Premultiplied output: the shadow is opaque black, open sky is clear.
   gl_FragColor = vec4(light, alpha) * uFade;
   #include <tonemapping_fragment>

@@ -52,11 +52,11 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         pinTier,
         onContextLost: () => enterLite('graphics context lost'),
         onSector: (stop) => hud?.setSector(stop),
-        // Everything on the page that moves with the flight reads this one smoothed progress,
-        // once per frame, before the frame is drawn: the progress line and the heading reveals.
+        // The page's moving parts update in the flight's own frame, before it is drawn: the
+        // progress line reads the same smoothed progress as the camera.
         onFrame: (state) => {
           hud?.update(state);
-          reveals?.update(state.param);
+          reveals?.update();
           onFrame?.(state);
         },
       });
@@ -76,7 +76,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         import('../ui/motion.js')
           .then((motion) => {
             if (current !== 'scene') return;
-            reveals = motion.initReveals(scene.stops);
+            reveals = motion.initReveals();
             stopMotion = () => reveals.stop();
           })
           .catch((error) => console.warn('Motion polish failed to load:', error));

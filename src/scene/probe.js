@@ -166,7 +166,7 @@ export function createProbe({ anisotropy = 4 } = {}) {
   const panelLength = 1.05;
   const panelWidth = 0.78;
   const thickness = 0.032;
-  const cant = 0.12;
+  const cant = 0.5;
   for (const s of [-1, 1]) {
     const root = 0.92;
     b.rod(aluminium, [s * 0.5, 0.0, 0.3], [s * root, 0, 0.05], 0.016);

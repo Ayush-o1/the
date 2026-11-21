@@ -72,7 +72,7 @@ void main() {
 
   // Ocean glint: broad and soft with a brighter core, only on water and only in daylight.
   vec3 h = normalize(sun + v);
-  float spec = pow(max(dot(n, h), 0.0), 140.0) * 0.18 + pow(max(dot(n, h), 0.0), 2400.0) * 1.6;
+  float spec = pow(max(dot(n, h), 0.0), 140.0) * 0.18 + pow(max(dot(n, h), 0.0), 2400.0) * 0.9;
   float fresnel = 0.04 + 0.96 * pow(1.0 - max(dot(n, v), 0.0), 5.0);
   color += vec3(1.0, 0.9, 0.75) * spec * water * smoothstep(0.0, 0.15, ndl) * (1.0 - shadow) * (0.6 + fresnel);
 

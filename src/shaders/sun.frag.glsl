@@ -33,15 +33,15 @@ void main() {
   vec3 p = normalize(vObjPos);
   float slow = uTime * 0.03;
   // The cells drift and deform with a slow warp.
-  vec3 warped = p * 2.6 + (vec3(fbm(p * 2.0 + slow), fbm(p * 2.0 - slow + 7.0), fbm(p * 2.0 + 3.0)) - 0.5) * 0.9;
+  vec3 warped = p * 1.7 + (vec3(fbm(p * 2.0 + slow), fbm(p * 2.0 - slow + 7.0), fbm(p * 2.0 + 3.0)) - 0.5) * 0.9;
   float big = 1.0 - smoothstep(0.15, 0.95, cells(warped));
   float small = 1.0 - smoothstep(0.1, 0.9, cells(warped * 3.2 + 11.0));
-  float heat = clamp(big * 0.75 + small * 0.3 + (fbm(p * 7.0 + slow) - 0.5) * 0.3, 0.0, 1.0);
+  float heat = clamp(0.35 + big * 0.45 + small * 0.15 + (fbm(p * 7.0 + slow) - 0.5) * 0.25, 0.0, 1.0);
 
   float mu = max(dot(normalize(vWorldNormal), normalize(vViewDir)), 0.0);
   // Limb darkening, strong for a cool giant.
   float limb = 1.0 - 0.93 * (1.0 - pow(mu, 0.6));
-  vec3 lanes = vec3(0.2, 0.025, 0.01);
+  vec3 lanes = vec3(0.45, 0.07, 0.02);
   vec3 body = vec3(1.0, 0.27, 0.06);
   vec3 hot = vec3(1.0, 0.55, 0.22);
   vec3 color = mix(lanes, body, smoothstep(0.1, 0.6, heat));

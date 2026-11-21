@@ -197,6 +197,7 @@ form.addEventListener('input', apply);
 
 const start = performance.now();
 function frame(now) {
+  window.__frameCount = (window.__frameCount || 0) + 1;
   const time = (now - start) / 1000;
   const { spin, sil } = apply();
   if (current) {

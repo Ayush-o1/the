@@ -98,6 +98,9 @@ export function createArgus({ tier }) {
   const ring = new Mesh(new RingGeometry(inner, outer, 256, 1), ringMaterial);
   ring.rotation.x = Math.PI / 2 - 0.28;
   ring.rotation.z = -0.25;
+  // Drawn after the planet: the planet writes depth, so the far arc is hidden behind it and the
+  // near arc shows in front.
+  ring.renderOrder = 1;
   group.add(ring);
   // The planet spins about the ring's axis, so its bands run parallel to the ring.
   ring.updateMatrix();

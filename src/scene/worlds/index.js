@@ -55,7 +55,7 @@ const DEFINITIONS = [
     stop: 'launch',
     create: createEarth,
     at: [33.16, -49.48, -96.07],
-    atPortrait: [9.11, -68.95, -71.86],
+    atPortrait: [6.5, -44.2, -17.07],
     near: 2.2,
   },
   { id: 'argus', stop: 'argus', create: createArgus, offset: [-19, 1, 46], near: 0.85 },

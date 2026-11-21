@@ -52,11 +52,11 @@ export function createEarth({ tier }) {
 
   const air = createAtmosphere({
     radius: EARTH_RADIUS,
-    thickness: EARTH_RADIUS * 0.022,
+    thickness: EARTH_RADIUS * 0.032,
     day: 0x4f86ff,
     sunset: 0xff7a3a,
     airglow: 0x0a2a16,
-    strength: 1.2,
+    strength: 1.5,
     segments: 128,
   });
   group.add(air.mesh);
@@ -116,7 +116,7 @@ export function createEarth({ tier }) {
 
 export function createHome() {
   const group = new Group();
-  const glow = createGlow({ color: 0xa9c4ff, size: 34, intensity: 0.9 });
+  const glow = createGlow({ color: 0xa9c4ff, size: 18, intensity: 0.6 });
   group.add(glow.mesh);
   return {
     group,

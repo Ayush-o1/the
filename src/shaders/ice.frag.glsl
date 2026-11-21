@@ -9,7 +9,7 @@ varying vec2 vUv;
 
 void main() {
   vec3 p = normalize(vObjPos);
-  vec3 ice = vec3(0.93, 0.9, 0.84);
+  vec3 ice = vec3(0.95, 0.94, 0.91);
   vec3 ridge = vec3(0.55, 0.4, 0.3);
   // Drawn: a few long great-circle ridges and soft mottling.
   float mottle = fbm(p * 4.0);
@@ -27,7 +27,7 @@ void main() {
     // The mosaic is low in contrast: stretch it, and keep the drawn ridges faintly on top so the
     // long lineae still read at this size.
     // Most of the map sits between 0.24 and 0.47 once decoded to linear.
-    vec3 mapped = mix(ridge * 0.7, ice, smoothstep(0.2, 0.44, m));
+    vec3 mapped = mix(mix(ridge, ice, 0.55), ice, smoothstep(0.16, 0.4, m));
     mapped = mix(mapped, ridge, lines * 0.5);
     albedo = mix(drawn, mapped, uMaps);
   }
