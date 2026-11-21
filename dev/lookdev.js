@@ -107,6 +107,8 @@ function build(name) {
     current.dispose();
   }
   const spec = ASSETS[name];
+  // Set first: the map loader checks it to know whether this asset is still the one on show.
+  currentName = name;
   window.__ready = true;
   if (name === 'probe') {
     const probe = createProbe({ anisotropy: renderer.capabilities.getMaxAnisotropy() });
@@ -146,7 +148,6 @@ function build(name) {
     }
   });
   scene.add(current.group);
-  currentName = name;
 }
 
 const silhouette = new MeshBasicMaterial({ color: 0x000000 });

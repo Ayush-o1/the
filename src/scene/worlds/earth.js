@@ -64,7 +64,7 @@ export function createEarth({ tier }) {
   // The planet's base orientation: which face of the Earth is toward the camera in the opening.
   // Turned so the Indian Ocean and South India face the opening frame, near the terminator.
   const tilt = new Quaternion();
-  planet.rotation.set(2.238, 0.7185, -2.2834);
+  planet.rotation.set(2.1806, 0.2175, -2.5438);
   tilt.copy(planet.quaternion);
 
   const arrived = new Set();

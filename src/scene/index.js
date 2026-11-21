@@ -10,6 +10,7 @@ import {
   jumpIntensity,
   wellStrength,
   probePresence,
+  smoothstep,
 } from '../core/route-math.js';
 import { damp } from '../core/damp.js';
 import { createFollower } from '../core/motion.js';
@@ -30,7 +31,13 @@ import { loadMaps, mapsAllowed } from './maps.js';
 import { exposureAt } from '../core/route-math.js';
 
 // Exposure per stop. The red star and the disk are bright; the outer planets are dimmer.
-const EXPOSURE = { blackwater: 0.92, beetlejuice: 0.8, theredarmy: 1.08, europa: 1.05 };
+const EXPOSURE = {
+  launch: 1.2,
+  blackwater: 0.92,
+  beetlejuice: 0.8,
+  theredarmy: 1.08,
+  europa: 1.05,
+};
 
 export function startScene({ env, startTier, pinTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
@@ -88,9 +95,11 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let fps = 60;
   let stopped = false;
   let firstFrame = true;
-  let probeScale = 0.5;
-  // Every section after the hero is read, so the probe is out of frame at all of them.
+  let probeScale = 0.72;
+  // Every section after the hero is read, so the probe is out of frame at all of them. After the
+  // last project the sections are long text (About, Education, Contact), so it stays away.
   const projectStops = stops.flatMap((stop, index) => (index > 0 ? [index] : []));
+  const lastProject = stops.findIndex((stop) => stop.id === 'europa');
   let warmMs = 0;
   const holeScreen = new Vector3();
   const lensCenter = new Vector2(0.5, 0.5);
@@ -125,7 +134,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     // On a phone the text covers the screen, so the probe is smaller and sits low.
-    probeScale = camera.aspect <= 1.2 ? 0.38 : 0.5;
+    probeScale = camera.aspect <= 1.2 ? 0.42 : 0.72;
     sizePost();
     measure();
   }
@@ -172,7 +181,11 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
     // The probe steps out of frame while a section is being read.
-    const presence = probePresence(param, projectStops);
+    // On a phone the text fills the screen, so the probe only shows in the opening frame.
+    const portrait = camera.aspect <= 1.2;
+    let presence = probePresence(param, projectStops);
+    if (lastProject >= 0) presence *= 1 - smoothstep((param - lastProject) / 0.15);
+    if (portrait) presence *= 1 - smoothstep((param - 0.08) / 0.22);
     probe.object.visible = presence > 0.01;
     probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
     worlds.update(param, time, camera, dt);
@@ -196,8 +209,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     lighting.key.position.copy(probe.object.position).addScaledVector(SUN_DIRECTION, 20);
     starfield.update(time, rendererBundle.pixelRatio);
     if (post) {
-      // A faint fringe toward the frame edges at all times, stronger inside the gravity well.
-      post.setLens({ center: lensCenter, strength: lens * 0.3, chroma: 0.22 + lens * 0.5, time });
+      // A colour fringe only inside the gravity well, where the light really is bent.
+      post.setLens({ center: lensCenter, strength: lens * 0.15, chroma: lens * 0.4, time });
       post.render();
     } else {
       renderer.render(scene, camera);

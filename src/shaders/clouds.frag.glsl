@@ -17,6 +17,10 @@ void main() {
   float procedural = smoothstep(0.56, 0.8, fbm(p * 9.0 + vec3(0.0, 0.0, 7.0)));
   float mapped = uMaps > 0.0 ? smoothstep(0.12, 0.75, texture2D(uClouds, vUv).r) : 0.0;
   float cover = mix(procedural * 0.8, mapped, uMaps);
+  // The map is 2048 px around the globe, coarser than the screen up close: fine noise breaks
+  // each texel into smaller puffs and gaps, strongest at the cloud edges.
+  float detail = fbm(p * 140.0 + vec3(0.0, uTime * 0.002, 0.0));
+  cover = clamp(cover + (detail - 0.5) * 0.55 * cover * (1.0 - cover) * 4.0 * 0.5, 0.0, 1.0);
 
   float light = softLambert(n, 0.1);
   // Low sun reddens the light that reaches the cloud tops.

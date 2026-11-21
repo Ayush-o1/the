@@ -50,42 +50,49 @@ export function stepFade(value, target, dt) {
 }
 
 const DEFINITIONS = [
-  { id: 'earth', stop: 'launch', create: createEarth, at: [23.86, -31.96, -22.59], near: 2.2 },
-  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.8 },
+  {
+    id: 'earth',
+    stop: 'launch',
+    create: createEarth,
+    at: [12.47, -38.88, -22.28],
+    atPortrait: [8.7, -46.6, -17.07],
+    near: 2.2,
+  },
+  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.85 },
   {
     id: 'blackwater',
     stop: 'blackwater',
     create: createBlackWater,
     offset: [24, 4, 52],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'beetlejuice',
     stop: 'beetlejuice',
     create: createBeetleJuice,
     offset: [-34, 2, 56],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'theredarmy',
     stop: 'theredarmy',
     create: createMars,
     offset: [-24, 0, 36],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'deadletter',
     stop: 'deadletter',
     create: createRelay,
     offset: [22, 6, 40],
-    near: 1.6,
+    near: 0.85,
   },
   {
     id: 'europa',
     stop: 'europa',
     create: createEuropa,
     offset: [-26, -2, 40],
-    near: 1.6,
+    near: 0.85,
   },
   { id: 'home', stop: 'contact', create: createHome, at: [0, 6, -1050], near: 1.25 },
 ];
@@ -121,7 +128,8 @@ export function createWorldManager({ scene, stops, tier }) {
   function place(entry, portrait) {
     const { group } = entry.instance;
     if (entry.at) {
-      group.position.set(...entry.at);
+      // On a phone the text fills the top of the screen, so a fixed world can sit lower.
+      group.position.set(...(portrait && entry.atPortrait ? entry.atPortrait : entry.at));
       return;
     }
     const [x, y, ahead] = entry.offset;
