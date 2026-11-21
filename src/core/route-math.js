@@ -3,7 +3,7 @@
 // Each section of the page is a "stop". The probe stays at a stop for as long as that section is
 // on screen, and travels to the next one in the space between them.
 
-function smoothstep(x) {
+export function smoothstep(x) {
   const t = Math.min(1, Math.max(0, x));
   return t * t * (3 - 2 * t);
 }
@@ -63,6 +63,15 @@ export function jumpIntensity(param, jumps) {
     }
   }
   return 0;
+}
+
+// How present the probe is, 0 to 1, given its progress and the stops that are projects. It is 0
+// while a project is being read, so the probe never sits behind a dossier, and 1 in the gaps
+// between projects and at the start and end. A pure function of progress.
+export function probePresence(param, projectStops) {
+  let nearest = Infinity;
+  for (const index of projectStops) nearest = Math.min(nearest, Math.abs(param - index));
+  return smoothstep((nearest - 0.12) / 0.23);
 }
 
 // How strongly gravity bends the picture around a stop, 0 to 1. It is a pure function of progress,

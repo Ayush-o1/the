@@ -9,6 +9,7 @@ import {
   nearestStop,
   jumpIntensity,
   wellStrength,
+  probePresence,
 } from '../core/route-math.js';
 import { damp } from '../core/damp.js';
 import { createFollower } from '../core/motion.js';
@@ -68,6 +69,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let fps = 60;
   let stopped = false;
   let firstFrame = true;
+  let probeScale = 0.85;
+  const projectStops = stops.flatMap((stop, index) => (stop.isMission ? [index] : []));
   let warmMs = 0;
   const holeScreen = new Vector3();
   const lensCenter = new Vector2(0.5, 0.5);
@@ -101,7 +104,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     // On a phone the text covers the screen, so the probe is smaller and sits low.
-    probe.object.scale.setScalar(camera.aspect <= 1.2 ? 0.6 : 0.85);
+    probeScale = camera.aspect <= 1.2 ? 0.6 : 0.85;
     sizePost();
     measure();
   }
@@ -147,6 +150,10 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     }
 
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
+    // The probe steps out of frame while a project is being read.
+    const presence = probePresence(param, projectStops);
+    probe.object.visible = presence > 0.01;
+    probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
     worlds.update(param, time, camera);
     nebula.update(time, camera.position);
     jump.update(jumpAmount, time, camera);
