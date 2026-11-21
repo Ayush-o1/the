@@ -1,6 +1,7 @@
-// The flight's on-screen furniture: a thin path along the bottom with one tick per project and a
-// marker for where you are, and a polite live region that names the current section for screen
-// readers. Both are built from the page's own sections (data-sector), so nothing is written twice.
+// The flight's on-screen furniture: a thin progress line under the header, and a polite live region
+// that names the current section for screen readers. The line sits at the top edge so it never
+// covers the text being read. It is decorative: the Menu lists every place as a link. The section
+// names come from the page's own sections (data-sector), so nothing is written twice.
 import { $ } from '../lib/dom.js';
 
 function element(tag, className) {
@@ -16,7 +17,7 @@ export function setModeToggleLabel(mode) {
   if (label) label.textContent = mode === 'scene' ? 'Skip the flight' : 'Start the flight';
 }
 
-export function mountHud(stops) {
+export function mountHud() {
   const parts = [];
   const add = (node) => {
     document.body.append(node);
@@ -24,25 +25,10 @@ export function mountHud(stops) {
     return node;
   };
 
-  const path = add(element('nav', 'hud-path'));
-  path.setAttribute('aria-label', 'Flight path');
-  const line = element('ol', 'hud-path__line');
-  path.append(line);
-  const lastIndex = Math.max(1, stops.length - 1);
-  stops.forEach((stop, index) => {
-    if (!stop.isMission) return;
-    const item = element('li', 'hud-path__stop');
-    item.style.left = `${(index / lastIndex) * 100}%`;
-    const link = element('a', 'hud-path__link');
-    link.href = `#${stop.id}`;
-    link.setAttribute('aria-label', `Go to ${stop.name}`);
-    link.append(element('span', 'hud-path__dot'));
-    item.append(link);
-    line.append(item);
-  });
-  const marker = element('span', 'hud-path__marker');
-  marker.setAttribute('aria-hidden', 'true');
-  path.append(marker);
+  const progress = add(element('div', 'hud-progress'));
+  progress.setAttribute('aria-hidden', 'true');
+  const fill = element('span', 'hud-progress__fill');
+  progress.append(fill);
 
   const live = add(element('p', 'visually-hidden'));
   live.setAttribute('aria-live', 'polite');
@@ -54,7 +40,7 @@ export function mountHud(stops) {
     },
     // Called every frame.
     update({ param, stops: count }) {
-      marker.style.left = `${(param / Math.max(1, count - 1)) * 100}%`;
+      fill.style.transform = `scaleX(${param / Math.max(1, count - 1)})`;
     },
     destroy() {
       for (const node of parts) node.remove();

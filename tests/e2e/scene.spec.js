@@ -58,11 +58,21 @@ test.describe('with a returning visitor', () => {
     );
   });
 
-  test('flight path dots are links and moving to one focuses its heading', async ({ page }) => {
+  test('the progress line fills as the flight goes on and the menu links reach a project', async ({
+    page,
+  }) => {
     await page.goto('/');
     await waitForScene(page);
-    await expect(page.locator('.hud-path__link')).toHaveCount(6);
-    await page.locator('.hud-path__link').nth(1).click();
+    const fill = page.locator('.hud-progress__fill');
+    await expect(fill).toHaveCount(1);
+    const start = await fill.evaluate((el) => el.style.transform);
+    await scrollToSection(page, 'europa');
+    await expect
+      .poll(async () => fill.evaluate((el) => parseFloat(el.style.transform.slice(7))))
+      .toBeGreaterThan(0.5);
+    expect(start).toContain('scaleX');
+    await page.keyboard.press('m');
+    await page.locator('#menu').getByRole('link', { name: 'BlackWater' }).click();
     await expect(page.locator('#blackwater-title')).toBeFocused();
   });
 
@@ -77,7 +87,7 @@ test.describe('with a returning visitor', () => {
     await expect(page.locator('html')).toHaveClass(/lite/);
     await expect(toggle).toHaveText('Start the flight');
     await expect(page.locator('canvas.scene-canvas')).toHaveCount(0);
-    await expect(page.locator('.hud-path')).toHaveCount(0);
+    await expect(page.locator('.hud-progress')).toHaveCount(0);
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
     await toggle.click();
     await waitForScene(page);

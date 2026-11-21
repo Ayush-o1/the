@@ -70,7 +70,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   let stopped = false;
   let firstFrame = true;
   let probeScale = 0.85;
-  const projectStops = stops.flatMap((stop, index) => (stop.isMission ? [index] : []));
+  // Every section after the hero is read, so the probe is out of frame at all of them.
+  const projectStops = stops.flatMap((stop, index) => (index > 0 ? [index] : []));
   let warmMs = 0;
   const holeScreen = new Vector3();
   const lensCenter = new Vector2(0.5, 0.5);
@@ -150,7 +151,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     }
 
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
-    // The probe steps out of frame while a project is being read.
+    // The probe steps out of frame while a section is being read.
     const presence = probePresence(param, projectStops);
     probe.object.visible = presence > 0.01;
     probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
