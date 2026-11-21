@@ -1,5 +1,6 @@
-// Creates each world when the probe gets near and disposes it when the probe is far,
-// so only one or two worlds exist at a time and flying back and forth does not leak.
+// Builds every world once, before the first frame, so no shader is compiled while the visitor is
+// scrolling. A world is shown when the probe is near and hidden when it is far. Nothing is created
+// or destroyed during the flight, so flying back and forth cannot leak.
 import { WAYPOINTS } from '../route.js';
 import { createEarth, createHome } from './earth.js';
 import { createArgus } from './argus.js';
@@ -13,16 +14,20 @@ import { createEuropa } from './europa.js';
 // at: a fixed position. offset: [x, y, ahead] from the stop's waypoint. Each offset puts the
 // world on the side of the screen where the dossier panel is not (left for most, right for the
 // flipped panels), which is what "per-world camera framing" means here.
-// near and far: how many stops away the world appears and disappears. Far is larger than near so a
-// world does not flicker in and out at the boundary.
+// near and far: how many stops before the world it is shown and hidden. Far is larger than near so
+// a world does not flicker at the boundary. After: how far past the stop it stays. Once the probe
+// has gone by, the world is behind the camera, so it must not hang in front of the next one.
+// How far past its stop a world stays visible, in stops.
+const AFTER = 0.85;
+
 const DEFINITIONS = [
-  { id: 'earth', stop: 'launch', create: createEarth, at: [0, -94, 20], near: 2.2, far: 2.8 },
-  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 1.25, far: 1.9 },
+  { id: 'earth', stop: 'launch', create: createEarth, at: [55, -70, -25], near: 2.2, far: 2.8 },
+  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.8, far: 1.1 },
   {
     id: 'blackwater',
     stop: 'blackwater',
     create: createBlackWater,
-    offset: [24, 0, 48],
+    offset: [24, 4, 52],
     near: 1.6,
     far: 2.6,
   },
@@ -68,7 +73,11 @@ export function createWorldManager({ scene, stops, tier }) {
     instance: null,
   })).filter((entry) => entry.index >= 0);
 
-  let currentTier = tier;
+  for (const entry of entries) {
+    entry.instance = entry.create({ tier });
+    entry.instance.group.visible = false;
+    scene.add(entry.instance.group);
+  }
 
   function place(entry, portrait) {
     const { group } = entry.instance;
@@ -82,44 +91,44 @@ export function createWorldManager({ scene, stops, tier }) {
     group.position.set(wx + (portrait ? x * 0.3 : x), wy + y + (portrait ? 9 : 0), wz - ahead);
   }
 
-  function remove(entry) {
-    scene.remove(entry.instance.group);
-    entry.instance.dispose();
-    entry.instance = null;
-  }
-
   return {
     update(param, time, camera) {
       const portrait = camera.aspect <= 1.2;
       for (const entry of entries) {
-        const distance = Math.abs(param - entry.index);
-        if (!entry.instance && distance < entry.near) {
-          entry.instance = entry.create({ tier: currentTier });
-          scene.add(entry.instance.group);
-        } else if (entry.instance && distance > entry.far) {
-          remove(entry);
-        }
-        if (entry.instance) {
+        const offset = param - entry.index; // negative before the stop, positive after
+        const { group } = entry.instance;
+        const inRange = offset > -entry.near && offset < AFTER;
+        const outOfRange = offset < -entry.far || offset > AFTER + 0.1;
+        if (!group.visible && inRange) group.visible = true;
+        else if (group.visible && outOfRange) group.visible = false;
+        if (group.visible) {
           place(entry, portrait);
           entry.instance.update(time, camera, param - entry.index);
         }
       }
     },
-    // A new tier changes geometry detail, so live worlds are rebuilt on the next frame.
-    setTier(nextTier) {
-      if (nextTier === currentTier) return;
-      currentTier = nextTier;
-      for (const entry of entries) if (entry.instance) remove(entry);
+    // Shows every world for one frame, so the renderer compiles and uploads everything up front.
+    showAll() {
+      for (const entry of entries) {
+        place(entry, false);
+        entry.instance.group.visible = true;
+      }
     },
-    // The group of a world that currently exists, or null. Used to aim the lens pass at the black hole.
+    hideAll() {
+      for (const entry of entries) entry.instance.group.visible = false;
+    },
+    // The group of a world, or null. Used to aim the lens pass at the black hole.
     groupOf(id) {
       return entries.find((entry) => entry.id === id)?.instance?.group ?? null;
     },
     get active() {
-      return entries.filter((entry) => entry.instance).map((entry) => entry.id);
+      return entries.filter((entry) => entry.instance.group.visible).map((entry) => entry.id);
     },
     dispose() {
-      for (const entry of entries) if (entry.instance) remove(entry);
+      for (const entry of entries) {
+        scene.remove(entry.instance.group);
+        entry.instance.dispose();
+      }
     },
   };
 }

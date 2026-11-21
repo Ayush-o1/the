@@ -51,6 +51,12 @@
     <!-- Adds .js before first paint so controls that need JavaScript do not flash in and out. -->
     <script>
       document.documentElement.classList.add('js');
+      // First visit: the hero text waits for the boot cover. main.js clears this class.
+      try {
+        if (!localStorage.getItem('ak-visited')) document.documentElement.classList.add('first');
+      } catch {
+        // Storage can be blocked. The hero is then simply shown at once.
+      }
     </script>
     <link rel="stylesheet" href="/src/styles/main.css" />
   </head>
@@ -229,85 +235,99 @@
         >
           <div class="mission__art art art--blackwater" aria-hidden="true"></div>
           <div class="dossier panel">
-            <p class="dossier__designation mono">Mission 02 / BlackWater</p>
-            <h3 id="blackwater-title" class="dossier__callsign">BlackWater</h3>
-            <p><span class="chip chip--active">Active</span></p>
+            <header class="dossier__head">
+              <p class="dossier__designation mono">Project 02 of 06 · Mission 02</p>
+              <h3 id="blackwater-title" class="dossier__callsign">BlackWater</h3>
+              <p class="dossier__objective">
+                Incident management with a public status page. A team lists its services, declares
+                an incident when one breaks, works it through a fixed lifecycle and decides which
+                incidents customers get to see.
+              </p>
+              <ul class="tags" aria-label="Stack">
+                <li class="tag">Node.js</li>
+                <li class="tag">Express</li>
+                <li class="tag">PostgreSQL</li>
+                <li class="tag">Prisma</li>
+                <li class="tag">Socket.IO</li>
+                <li class="tag">Vanilla JS</li>
+              </ul>
+              <p class="dossier__links">
+                <a href="https://blackwater-app.onrender.com">Open live demo</a>
+                <a href="https://github.com/Ayush-o1/BlackWater">Read the code</a>
+              </p>
+            </header>
 
-            <h4>Objective</h4>
-            <p class="dossier__objective">
-              BlackWater is incident management with a public status page. A team lists its
-              services, declares an incident when one breaks and works it through a fixed lifecycle.
-              It also decides which incidents customers get to see.
-            </p>
+            <section class="dossier__section" aria-labelledby="blackwater-problem">
+              <h4 id="blackwater-problem">The problem</h4>
+              <p class="dossier__lead">
+                Two people can change one incident at the same moment, and a customer must never see
+                an incident the team kept private.
+              </p>
+            </section>
 
-            <h4>What it does</h4>
-            <ul class="dossier__list">
-              <li>
-                Moves an incident through TRIGGERED, ACKNOWLEDGED, RESOLVED and CLOSED. A closed
-                incident is final.
-              </li>
-              <li>Works out each service's health from its open incidents. Nobody types it in.</li>
-              <li>
-                Shows visitors only the incidents a team has published, and refreshes open pages
-                over Socket.IO.
-              </li>
-            </ul>
+            <section class="dossier__section" aria-labelledby="blackwater-decisions">
+              <h4 id="blackwater-decisions">What I decided</h4>
+              <ol class="hazards decisions">
+                <li>
+                  <strong>Two people, one incident.</strong> Every change locks the incident row,
+                  checks the lifecycle table and writes its audit entry in one transaction.
+                </li>
+                <li>
+                  <strong>Health that disagrees with the incidents.</strong> Health is never stored.
+                  It is calculated each time it is read, and the worst open incident wins.
+                </li>
+                <li>
+                  <strong>A private incident on a public page.</strong> The public page reads an
+                  allow-list of fields and only published incidents. Every query is filtered by
+                  organization.
+                </li>
+              </ol>
+            </section>
 
-            <h4>Decisions</h4>
-            <ol class="hazards">
-              <li>
-                <strong>Two people, one incident.</strong> Every change locks the incident row,
-                checks the lifecycle table and writes its audit entry in one transaction.
-              </li>
-              <li>
-                <strong>Health that disagrees with the incidents.</strong> Health is never stored.
-                It is calculated each time it is read, and the worst open incident wins.
-              </li>
-              <li>
-                <strong>A private incident on a public page.</strong> The public page reads an
-                allow-list of fields and only published incidents. Every query is filtered by
-                organization.
-              </li>
-            </ol>
-
-            <h4>Simulation</h4>
-            <div class="sim" data-sim="blackwater">
-              <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
-              <div class="sim__static">
-                <table class="sim__table">
-                  <caption>
-                    Allowed lifecycle moves, from the lookup table in the code
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">From</th>
-                      <th scope="col">May move to</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">TRIGGERED</th>
-                      <td>ACKNOWLEDGED, RESOLVED</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">ACKNOWLEDGED</th>
-                      <td>RESOLVED, TRIGGERED</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">RESOLVED</th>
-                      <td>TRIGGERED (reopen), CLOSED</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">CLOSED</th>
-                      <td>Nothing</td>
-                    </tr>
-                  </tbody>
-                </table>
+            <section class="dossier__section" aria-labelledby="blackwater-try">
+              <h4 id="blackwater-try">Try it</h4>
+              <p class="dossier__intro">
+                Declare an incident, move it through its lifecycle and publish it. The moves allowed
+                come from the lookup table in the code.
+              </p>
+              <div class="sim" data-sim="blackwater">
+                <p class="sim__label mono">Simulation. Synthetic data. Not the live app.</p>
+                <div class="sim__static">
+                  <table class="sim__table">
+                    <caption>
+                      Allowed lifecycle moves, from the lookup table in the code
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">From</th>
+                        <th scope="col">May move to</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">TRIGGERED</th>
+                        <td>ACKNOWLEDGED, RESOLVED</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">ACKNOWLEDGED</th>
+                        <td>RESOLVED, TRIGGERED</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">RESOLVED</th>
+                        <td>TRIGGERED (reopen), CLOSED</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">CLOSED</th>
+                        <td>Nothing</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+            </section>
 
             <details class="recorder" data-recorder>
-              <summary>Flight recorder</summary>
+              <summary>Trade-offs and other decisions</summary>
               <ul class="dossier__list">
                 <li>
                   <strong>Decision.</strong> The lifecycle is a lookup table checked inside the
@@ -328,19 +348,6 @@
                 </li>
               </ul>
             </details>
-
-            <ul class="tags" aria-label="Stack">
-              <li class="tag">Node.js</li>
-              <li class="tag">Express</li>
-              <li class="tag">PostgreSQL</li>
-              <li class="tag">Prisma</li>
-              <li class="tag">Socket.IO</li>
-              <li class="tag">Vanilla JS</li>
-            </ul>
-            <p class="dossier__links">
-              <a href="https://github.com/Ayush-o1/BlackWater">Read the code</a>
-              <a href="https://blackwater-app.onrender.com">Open live demo</a>
-            </p>
           </div>
         </article>
 

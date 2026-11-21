@@ -17,6 +17,7 @@ export function mountDebug(getStats, getMode) {
         `geometries ${stats.geometries}`,
         `textures ${stats.textures}`,
         `programs ${stats.programs}`,
+        `warm ${stats.warmMs} ms`,
         `worlds ${stats.worlds || 'none'}`,
       );
     }

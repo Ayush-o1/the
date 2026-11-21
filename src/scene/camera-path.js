@@ -37,8 +37,9 @@ export function createCameraPath(curve, camera, probe) {
         .addScaledVector(right, steer * MAX_LATERAL * 0.4 + shift);
       camera.position.y += 3;
       target.copy(position).addScaledVector(tangent, 14).addScaledVector(right, shift);
-      // On a phone, look a little higher so the probe sits low in the frame, under the text.
-      if (camera.aspect <= 1.2) target.y += 3;
+      // Look a little higher so the probe sits low in the frame: far enough down to stay clear of
+      // the world beside it on a wide screen, and under the text on a phone.
+      target.y += camera.aspect <= 1.2 ? 3 : 1.8;
       camera.lookAt(target);
     },
   };
