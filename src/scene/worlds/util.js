@@ -1,19 +1,31 @@
 // Helpers shared by the world modules.
 import { ShaderMaterial, Vector3 } from 'three';
 import noise from '../../shaders/noise.glsl?raw';
+import light from '../../shaders/light.glsl?raw';
 import planetVertex from '../../shaders/planet.vert.glsl?raw';
 
-// The direction the light comes from. One sun for the whole route: from the upper left, in front
-// of the camera, so every world has its lit side toward the text and its shadow away from it.
-// The scene's directional light and every world shader use this same vector.
-export const SUN_DIRECTION = new Vector3(-30, 36, 26).normalize();
+// The direction the light comes from. One sun for the whole route: from the upper right and a
+// little in front of the camera. The worlds on the left of the screen show a lit face toward the
+// text with a terminator on their far side; Earth in the opening shows dusk crossing its disc.
+// The scene's key light, the reflections and every world shader use this same vector.
+export const SUN_DIRECTION = new Vector3(0.6, 0.5, 0.45).normalize();
 
-// Builds a ShaderMaterial. The fragment source gets the shared noise functions in front of it.
+// Where the cold fill comes from: Earth, below the route.
+export const FILL_DIRECTION = new Vector3(-0.2, -1, 0.25).normalize();
+
+// Builds a ShaderMaterial. The fragment source gets the shared noise and light code in front of
+// it. Every material gets the shared sun direction and a fade uniform; the world manager swaps in
+// one fade value per world.
 export function shaderMaterial({ vertex = planetVertex, fragment, uniforms = {}, ...options }) {
   return new ShaderMaterial({
     vertexShader: vertex,
-    fragmentShader: `${noise}\n${fragment}`,
-    uniforms: { uTime: { value: 0 }, ...uniforms },
+    fragmentShader: `${noise}\n${light}\n${fragment}`,
+    uniforms: {
+      uTime: { value: 0 },
+      uSunDir: { value: SUN_DIRECTION },
+      uFade: { value: 1 },
+      ...uniforms,
+    },
     ...options,
   });
 }

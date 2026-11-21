@@ -101,5 +101,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
       return current;
     },
     getStats: () => scene?.getStats() ?? null,
+    // Scene internals, for the ?debug measurement and framing scripts only.
+    getTune: () => scene?.tune ?? null,
   };
 }

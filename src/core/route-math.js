@@ -8,6 +8,22 @@ export function smoothstep(x) {
   return t * t * (3 - 2 * t);
 }
 
+// Like smoothstep, but its second derivative is also zero at both ends, so a motion that starts
+// or stops with it has no jump in acceleration.
+export function smootherstep(x) {
+  const t = Math.min(1, Math.max(0, x));
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+// The exposure at this progress: each stop has its own, blended smoothly between neighbours.
+export function exposureAt(param, exposures) {
+  if (exposures.length === 0) return 1;
+  const last = exposures.length - 1;
+  const i = Math.min(last, Math.max(0, Math.floor(param)));
+  const next = Math.min(last, i + 1);
+  return exposures[i] + (exposures[next] - exposures[i]) * smootherstep(param - i);
+}
+
 // How far below the top of the viewport a section's title sits when the probe is "at" the stop.
 const TITLE_MARGIN = 0.12;
 

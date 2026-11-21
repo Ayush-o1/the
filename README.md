@@ -31,6 +31,18 @@ The numbers below were measured on a local build, with Lighthouse 12 on a Mac GP
 First contentful paint is 0.4 s on a simulated fast mobile network. The first load is 23 KB, all
 JavaScript is 203 KB gzipped and the three font files are 52 KB.
 
+## Planet imagery
+
+The planet maps are public imagery, used under each source's terms, with credit to NASA:
+
+- Earth: NASA Earth Observatory, Blue Marble: Next Generation (day), Earth at Night 2016 (night
+  lights) and The Blue Marble 2002 (clouds).
+- Mars: USGS Astrogeology, Mars Viking Global Color Mosaic.
+- Europa: USGS Astrogeology, Europa Voyager-Galileo SSI Global Mosaic.
+- Jupiter: NASA/JPL/Space Science Institute, PIA07782 (Cassini).
+
+`scripts/make-textures.py` makes the WebP files in `src/assets/tex/` from those sources.
+
 ## Run it
 
 ```sh

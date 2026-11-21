@@ -1,6 +1,5 @@
 // Banded gas giant. Latitude drives the bands, noise bends them and adds fine streaks.
 uniform float uTime;
-uniform vec3 uSunDir;
 uniform vec3 uColA;
 uniform vec3 uColB;
 uniform vec3 uColC;
@@ -21,5 +20,7 @@ void main() {
   float diffuse = max(dot(n, normalize(uSunDir)), 0.0);
   float rim = pow(1.0 - max(dot(n, normalize(vViewDir)), 0.0), 3.0);
   vec3 lit = color * (0.07 + 0.93 * diffuse) + rim * 0.14 * uColB * diffuse;
-  gl_FragColor = vec4(lit, 1.0);
+  gl_FragColor = vec4(lit, uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

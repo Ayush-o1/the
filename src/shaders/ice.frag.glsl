@@ -1,5 +1,4 @@
 // Europa: pale ice with long brown cracks. Cracks are the thin lines where noise crosses 0.5.
-uniform vec3 uSunDir;
 varying vec3 vObjPos;
 varying vec3 vWorldNormal;
 varying vec3 vViewDir;
@@ -16,5 +15,7 @@ void main() {
 
   vec3 n = normalize(vWorldNormal);
   float diffuse = max(dot(n, normalize(uSunDir)), 0.0);
-  gl_FragColor = vec4(color * (0.05 + 0.95 * diffuse), 1.0);
+  gl_FragColor = vec4(color * (0.05 + 0.95 * diffuse), uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

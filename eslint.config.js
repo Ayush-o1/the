@@ -7,7 +7,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['src/**/*.js'],
+    files: ['src/**/*.js', 'dev/**/*.js'],
     languageOptions: { ecmaVersion: 2024, sourceType: 'module', globals: globals.browser },
   },
   {

@@ -11,5 +11,7 @@ void main() {
   float streak = pow(max(1.0 - abs(c.y) * 14.0, 0.0), 3.0) * max(1.0 - abs(c.x) * 2.0, 0.0)
                + pow(max(1.0 - abs(c.x) * 14.0, 0.0), 3.0) * max(1.0 - abs(c.y) * 2.0, 0.0);
   float alpha = (halo + streak * uStreaks) * uIntensity;
-  gl_FragColor = vec4(uColor * alpha, alpha);
+  gl_FragColor = vec4(uColor * alpha, alpha) * uFade;
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

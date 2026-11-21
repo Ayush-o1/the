@@ -1,5 +1,4 @@
 // Mars-like planet: rust terrain from noise, darker plains, pale polar caps, thin dusty rim.
-uniform vec3 uSunDir;
 varying vec3 vObjPos;
 varying vec3 vWorldNormal;
 varying vec3 vViewDir;
@@ -17,5 +16,7 @@ void main() {
   float diffuse = max(dot(n, normalize(uSunDir)), 0.0);
   float rim = pow(1.0 - max(dot(n, normalize(vViewDir)), 0.0), 3.5);
   vec3 lit = color * (0.06 + 0.94 * diffuse) + vec3(0.9, 0.55, 0.3) * rim * 0.35 * diffuse;
-  gl_FragColor = vec4(lit, 1.0);
+  gl_FragColor = vec4(lit, uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

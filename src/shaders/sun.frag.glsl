@@ -14,5 +14,7 @@ void main() {
   color = mix(color, vec3(1.0, 0.82, 0.5), pow(heat, 4.0));
   float facing = max(dot(normalize(vWorldNormal), normalize(vViewDir)), 0.0);
   color *= 0.5 + 0.7 * pow(facing, 0.6);
-  gl_FragColor = vec4(color, 1.0);
+  gl_FragColor = vec4(color, uFade);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

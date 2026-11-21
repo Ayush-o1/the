@@ -16,4 +16,6 @@ void main() {
   vec3 color = mix(vec3(1.0, 0.55, 0.2), vec3(1.0, 0.9, 0.7), body);
   float alpha = body * uAmount * 0.55;
   gl_FragColor = vec4(color * alpha, alpha);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

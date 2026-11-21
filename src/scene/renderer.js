@@ -1,5 +1,5 @@
 // The WebGL renderer and its canvas. Sizing, pixel ratio and context loss live here.
-import { WebGLRenderer, NeutralToneMapping, Color } from 'three';
+import { WebGLRenderer, ACESFilmicToneMapping, Color } from 'three';
 
 export function createRenderer({ onContextLost }) {
   const renderer = new WebGLRenderer({
@@ -11,8 +11,9 @@ export function createRenderer({ onContextLost }) {
   // With post-processing there are several passes per frame. Counting them all (a manual reset in
   // the loop) gives honest draw call and triangle numbers for the ?debug overlay.
   renderer.info.autoReset = false;
-  // Khronos PBR Neutral: it compresses highlights without washing out saturated colour.
-  renderer.toneMapping = NeutralToneMapping;
+  // ACES Filmic, chosen over AgX and Khronos Neutral by comparing stills (.build/LOOKDEV.md):
+  // it keeps space black and the limb and disk saturated, where AgX lifts and greys the darks.
+  renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
 
   const canvas = renderer.domElement;
