@@ -38,14 +38,14 @@ def save(image, name, quality, **options):
 # transparent pixels. The Blue Marble base map paints every ocean the same dark navy, so the
 # Earth shader finds water from the colour itself (blue clearly leads and the pixel is dark).
 # The oceans are flattened to that navy here, which also makes the file smaller.
-day = load('world.200404.3x5400x2700.jpg').resize((4096, 2048), Image.LANCZOS)
+day = load('world.200404.3x5400x2700.jpg').resize((2048, 1024), Image.LANCZOS)
 rgb = np.asarray(day).astype(np.float32)
 r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
 water = (b > r * 1.25) & (b > g * 1.05) & ((r + g + b) / 3 < 70)
 mask = np.asarray(Image.fromarray((water * 255).astype(np.uint8)).filter(ImageFilter.MedianFilter(5)))
 navy = np.array([8, 14, 42], dtype=np.float32)
 rgb[mask > 127] = navy
-save(Image.fromarray(rgb.astype(np.uint8)), 'earth-day.webp', 74)
+save(Image.fromarray(rgb.astype(np.uint8)), 'earth-day.webp', 82)
 
 # Night lights, as brightness only.
 night = load('BlackMarble_2016_01deg_gray.jpg', 'L').resize((2048, 1024), Image.LANCZOS)

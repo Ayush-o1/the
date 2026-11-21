@@ -115,11 +115,13 @@ export function createEuropa({ tier }) {
   return {
     group,
     maps: tier === 'low' ? [] : ['europa', 'jupiter'],
-    setMap(name, texture) {
+    setMap(name, texture, instant = false) {
       if (name === 'europa') moonMaterial.uniforms.uMap.value = texture;
       if (name === 'jupiter') jupiterMaterial.uniforms.uMap.value = texture;
       arrived.add(name);
-      if (arrived.size === 2) fadeStart = -1;
+      if (arrived.size < 2) return;
+      if (instant) moonMaterial.uniforms.uMaps.value = jupiterMaterial.uniforms.uMaps.value = 1;
+      else fadeStart = -1;
     },
     update(time, camera, local) {
       if (fadeStart === -1) fadeStart = time;

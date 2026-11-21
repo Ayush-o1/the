@@ -33,9 +33,10 @@ export function createMars({ tier }) {
   return {
     group,
     maps: tier === 'low' ? [] : ['mars'],
-    setMap(name, texture) {
+    setMap(name, texture, instant = false) {
       material.uniforms.uMap.value = texture;
-      fadeStart = -1;
+      if (instant) material.uniforms.uMaps.value = 1;
+      else fadeStart = -1;
     },
     update(time) {
       if (fadeStart === -1) fadeStart = time;

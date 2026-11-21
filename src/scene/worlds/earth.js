@@ -74,7 +74,8 @@ export function createEarth({ tier }) {
   return {
     group,
     maps: tier === 'low' ? [] : ['earthDay', 'earthNight', 'earthClouds'],
-    setMap(name, texture) {
+    // instant: the map arrived before the first frame, so it shows at once instead of fading in.
+    setMap(name, texture, instant = false) {
       if (name === 'earthDay') ground.uniforms.uDay.value = texture;
       if (name === 'earthNight') ground.uniforms.uNight.value = texture;
       if (name === 'earthClouds') {
@@ -82,7 +83,9 @@ export function createEarth({ tier }) {
         cloudMaterial.uniforms.uClouds.value = texture;
       }
       arrived.add(name);
-      if (arrived.size === 3) fadeStart = -1;
+      if (arrived.size < 3) return;
+      if (instant) ground.uniforms.uMaps.value = cloudMaterial.uniforms.uMaps.value = 1;
+      else fadeStart = -1;
     },
     // Sets the base orientation (for tuning the hero framing).
     setTilt(x, y, z) {

@@ -39,6 +39,9 @@ const EXPOSURE = {
   europa: 1.05,
 };
 
+// How long the flight waits for the planet maps before its first frame.
+const MAP_WAIT_MS = 1200;
+
 export function startScene({ env, startTier, pinTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
   const curve = buildRoute(stops.map((stop) => stop.id));
@@ -248,20 +251,27 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   const ready = (async () => {
     warmMs = await warmUp({ renderer, scene, camera, worlds, render: renderOnce });
     if (stopped) return;
+    // The planet maps. Uploading one to the GPU takes a frame or more, so the flight waits up to
+    // MAP_WAIT_MS for them before its first frame (behind the boot cover on a first visit; the
+    // page itself is already readable). Maps that arrive in time show at once; a map that arrives
+    // later, on a slow connection, uploads then and its world cross-fades to it.
+    if (mapsAllowed(tier)) {
+      let flying = false;
+      const requests = worlds.mapRequests();
+      const byName = new Map(requests.map((request) => [request.name, request.world]));
+      const loading = loadMaps({
+        renderer,
+        names: [...byName.keys()],
+        onMap: (name, texture) => byName.get(name).setMap(name, texture, !flying),
+        isStopped: () => stopped,
+      });
+      await Promise.race([loading, new Promise((done) => setTimeout(done, MAP_WAIT_MS))]);
+      flying = true;
+      if (stopped) return;
+    }
     gsap.ticker.add(tick);
     // GSAP skips time after a slow frame by default, which would make the camera jump.
     gsap.ticker.lagSmoothing(0);
-    // The planet maps load after the flight has started. Each world cross-fades to its map.
-    if (mapsAllowed(tier)) {
-      const requests = worlds.mapRequests();
-      const byName = new Map(requests.map((request) => [request.name, request.world]));
-      loadMaps({
-        renderer,
-        names: [...byName.keys()],
-        onMap: (name, texture) => byName.get(name).setMap(name, texture),
-        isStopped: () => stopped,
-      });
-    }
   })();
 
   return {
