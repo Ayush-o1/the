@@ -14,22 +14,21 @@ import { createEuropa } from './europa.js';
 // at: a fixed position. offset: [x, y, ahead] from the stop's waypoint. Each offset puts the
 // world on the side of the screen where the dossier panel is not (left for most, right for the
 // flipped panels), which is what "per-world camera framing" means here.
-// near and far: how many stops before the world it is shown and hidden. Far is larger than near so
-// a world does not flicker at the boundary. After: how far past the stop it stays. Once the probe
-// has gone by, the world is behind the camera, so it must not hang in front of the next one.
+// near: how many stops before its own stop the world is shown. AFTER: how far past the stop it
+// stays. Once the probe has gone by, the world is behind the camera, so it must not hang in front
+// of the next one.
 // How far past its stop a world stays visible, in stops.
 const AFTER = 0.85;
 
 const DEFINITIONS = [
-  { id: 'earth', stop: 'launch', create: createEarth, at: [55, -70, -25], near: 2.2, far: 2.8 },
-  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.8, far: 1.1 },
+  { id: 'earth', stop: 'launch', create: createEarth, at: [55, -70, -25], near: 2.2 },
+  { id: 'argus', stop: 'argus', create: createArgus, offset: [-23, 1, 42], near: 0.8 },
   {
     id: 'blackwater',
     stop: 'blackwater',
     create: createBlackWater,
     offset: [24, 4, 52],
     near: 1.6,
-    far: 2.6,
   },
   {
     id: 'beetlejuice',
@@ -37,7 +36,6 @@ const DEFINITIONS = [
     create: createBeetleJuice,
     offset: [-34, 2, 56],
     near: 1.6,
-    far: 2.6,
   },
   {
     id: 'theredarmy',
@@ -45,7 +43,6 @@ const DEFINITIONS = [
     create: createMars,
     offset: [-24, 0, 36],
     near: 1.6,
-    far: 2.6,
   },
   {
     id: 'deadletter',
@@ -53,7 +50,6 @@ const DEFINITIONS = [
     create: createRelay,
     offset: [22, 6, 40],
     near: 1.6,
-    far: 2.6,
   },
   {
     id: 'europa',
@@ -61,9 +57,8 @@ const DEFINITIONS = [
     create: createEuropa,
     offset: [-26, -2, 40],
     near: 1.6,
-    far: 2.6,
   },
-  { id: 'home', stop: 'contact', create: createHome, at: [0, 6, -1050], near: 1.25, far: 1.9 },
+  { id: 'home', stop: 'contact', create: createHome, at: [0, 6, -1050], near: 1.25 },
 ];
 
 export function createWorldManager({ scene, stops, tier }) {
@@ -97,10 +92,8 @@ export function createWorldManager({ scene, stops, tier }) {
       for (const entry of entries) {
         const offset = param - entry.index; // negative before the stop, positive after
         const { group } = entry.instance;
-        const inRange = offset > -entry.near && offset < AFTER;
-        const outOfRange = offset < -entry.far || offset > AFTER + 0.1;
-        if (!group.visible && inRange) group.visible = true;
-        else if (group.visible && outOfRange) group.visible = false;
+        // A pure function of progress, so flying forward and scrubbing back show the same worlds.
+        group.visible = offset > -entry.near && offset < AFTER;
         if (group.visible) {
           place(entry, portrait);
           entry.instance.update(time, camera, param - entry.index);

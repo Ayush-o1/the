@@ -18,6 +18,19 @@ html {
   color-scheme: dark;
 }
 
+/* On large screens everything sized in rem grows, so the page does not shrink into the middle. */
+@media (min-width: 1920px) {
+  html {
+    font-size: 112.5%;
+  }
+}
+
+@media (min-width: 2400px) {
+  html {
+    font-size: 125%;
+  }
+}
+
 /* The page background is set on <html>. Body stays transparent so the star layer and the
    canvas, which sit behind the content, show through. */
 body {

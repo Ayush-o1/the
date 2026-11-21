@@ -152,9 +152,7 @@ test.describe('with a returning visitor', () => {
         await page.waitForTimeout(500);
         peak = Math.max(peak, (await read()).geometries);
       }
-      await expect
-        .poll(async () => (await read()).worlds, { timeout: 15_000 })
-        .toBe('earth,argus,blackwater');
+      await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
     }
 
     // The first flight uploads things that are created lazily (the jump tunnel, for example). On a

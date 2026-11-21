@@ -100,6 +100,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     rendererBundle.resize();
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    // On a phone the text covers the screen, so the probe is smaller and sits low.
+    probe.object.scale.setScalar(camera.aspect <= 1.2 ? 0.6 : 0.85);
     sizePost();
     measure();
   }
@@ -215,6 +217,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
         textures: info.memory.textures,
         programs: info.programs?.length ?? 0,
         warmMs: Math.round(warmMs),
+        param,
         worlds: worlds.active.join(','),
       };
     },

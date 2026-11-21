@@ -9,7 +9,7 @@
   gap: var(--s5);
   min-height: var(--header-h);
   padding: 0 var(--gutter);
-  background: rgba(10, 13, 18, 0.9);
+  background: var(--ink);
   border-bottom: 1px solid var(--line);
 }
 
@@ -79,7 +79,7 @@
 main > section {
   position: relative;
   padding: var(--s8) var(--gutter);
-  max-width: 1320px;
+  max-width: 82.5rem;
   margin: 0 auto;
 }
 
@@ -107,7 +107,7 @@ main > .hero {
   gap: var(--s5);
   max-width: none;
   min-height: calc(100svh - var(--header-h));
-  padding-inline: max(var(--gutter), calc((100vw - 1320px) / 2 + var(--gutter)));
+  padding-inline: max(var(--gutter), calc((100vw - 82.5rem) / 2 + var(--gutter)));
   overflow: hidden;
   isolation: isolate;
 }
@@ -140,6 +140,7 @@ main > .hero {
 
 .hero__lede {
   max-width: 26em;
+  text-wrap: balance;
   font-size: var(--text-lede);
   line-height: 1.5;
 }
@@ -154,9 +155,9 @@ main > .hero {
   display: flex;
   align-items: center;
   gap: var(--s3);
-  color: var(--dim);
+  color: var(--bone-2);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
 .status-dot {

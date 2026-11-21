@@ -82,7 +82,11 @@ window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',
   if (event.matches) modes.enterLite('reduced motion');
 });
 
-if (env.debug) mountDebug(modes.getStats, () => modes.current);
+if (env.debug) {
+  mountDebug(modes.getStats, () => modes.current);
+  // A hook for the measurement scripts: they read the flight's progress every frame.
+  window.__ak = { stats: modes.getStats };
+}
 
 // First visit: the boot cover runs while the flight warms up, then the hero is revealed.
 function showHeroAtOnce() {

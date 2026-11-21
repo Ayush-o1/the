@@ -1,4 +1,4 @@
-// The probe, built from basic shapes: a faceted bus in gold foil, a high-gain dish that points back
+// The probe, built from basic shapes: a round bus in gold foil, a high-gain dish that points back
 // toward home, two long solar arrays on booms, an antenna and an engine bell. The nose points along
 // +z, the direction Object3D.lookAt aims. No model files.
 import {
@@ -51,15 +51,26 @@ export function createProbe() {
   const panel = own(
     shaderMaterial({
       fragment: panelFragment,
-      uniforms: { uSunDir: { value: SUN_DIRECTION }, uCells: { value: new Vector2(9, 3.4) } },
+      uniforms: { uSunDir: { value: SUN_DIRECTION }, uCells: { value: new Vector2(10, 4) } },
       side: DoubleSide,
     }),
   );
 
-  // Bus: an eight-sided prism lying along the flight direction.
+  // Bus: a drum lying along the flight direction, with two bands of white insulation.
   group.add(
-    part(own(new CylinderGeometry(0.55, 0.55, 1.15, 8)), foil, [0, 0, 0], [Math.PI / 2, 0, 0]),
+    part(own(new CylinderGeometry(0.55, 0.55, 1.15, 24)), foil, [0, 0, 0], [Math.PI / 2, 0, 0]),
   );
+  for (const z of [-0.3, 0.3]) {
+    group.add(
+      part(
+        own(new CylinderGeometry(0.565, 0.565, 0.07, 24)),
+        white,
+        [0, 0, z],
+        [Math.PI / 2, 0, 0],
+      ),
+    );
+  }
+
   // Dish: a shallow bowl, open toward the back and up, toward home. The cap's pole is its back, so
   // it is turned until the pole points forward and down.
   group.add(
@@ -76,14 +87,14 @@ export function createProbe() {
   for (const side of [-1, 1]) {
     group.add(
       part(
-        own(new CylinderGeometry(0.025, 0.025, 0.9, 6)),
+        own(new CylinderGeometry(0.045, 0.045, 0.9, 8)),
         dark,
         [side * 0.95, 0, 0],
         [0, 0, Math.PI / 2],
       ),
     );
     group.add(
-      part(own(new PlaneGeometry(2.6, 0.95)), panel, [side * 2.75, 0, 0], [-Math.PI / 2, 0, 0]),
+      part(own(new PlaneGeometry(2.8, 1.15)), panel, [side * 2.75, 0, 0], [-Math.PI / 2, 0, 0]),
     );
   }
 
