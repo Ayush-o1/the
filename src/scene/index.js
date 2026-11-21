@@ -19,7 +19,7 @@ import { createHazards } from './hazards/index.js';
 import { buildRoute } from './route.js';
 
 const ROLL_SECONDS = 1.2;
-const FOLLOW_RATE = 6; // docs/PLAN.md 5.2: tune between 4 and 8
+const FOLLOW_RATE = 6; // follow rate: 4 feels loose, 8 feels stiff
 // A click on one of these, or inside one, belongs to the page and never breaks a rock.
 const INTERACTIVE =
   'a, button, input, textarea, select, summary, dialog, form, header, nav, label, details, .panel';

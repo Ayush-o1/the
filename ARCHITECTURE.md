@@ -38,17 +38,17 @@ Each has pure logic that mirrors a rule from the real project (the file header n
 
 ## Why these choices
 
-| Choice | Reason |
-|---|---|
-| Vanilla JS, ES modules | Every file can be read and explained. No framework to learn. |
-| WebGLRenderer, not WebGPU | Works on nearly every device. |
-| No image, texture or model files | Everything is shaders, geometry and canvas. Small, no licences. |
-| Pure logic split from DOM | Rules are testable and the UI stays thin. |
-| Lazy scene and simulations | First load stays small. Three.js arrives after the page is readable. |
+| Choice                           | Reason                                                               |
+| -------------------------------- | -------------------------------------------------------------------- |
+| Vanilla JS, ES modules           | Every file can be read and explained. No framework to learn.         |
+| WebGLRenderer, not WebGPU        | Works on nearly every device.                                        |
+| No image, texture or model files | Everything is shaders, geometry and canvas. Small, no licences.      |
+| Pure logic split from DOM        | Rules are testable and the UI stays thin.                            |
+| Lazy scene and simulations       | First load stays small. Three.js arrives after the page is readable. |
 
 ## Tests
 
 - `npm test`: logic tests with the Node test runner (`tests/logic/`).
-- `npm run test:e2e`: Playwright in Chromium and WebKit (`tests/e2e/`). The flight tests need WebGL, so Chromium runs with software-GL flags (see `docs/DECISIONS.md` D16). WebKit runs the plain-page tests.
+- `npm run test:e2e`: Playwright in Chromium and WebKit (`tests/e2e/`). The flight tests need WebGL, so Chromium runs with software-GL flags. WebKit runs the plain-page tests.
 - `npm run budgets`: fails if the built site exceeds the size budgets.
 - `npm run check`: lint, format check, build, logic tests and budgets.

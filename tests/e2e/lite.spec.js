@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 const MISSIONS = ['argus', 'blackwater', 'beetlejuice', 'theredarmy', 'deadletter', 'europa'];
-// The five viewports from docs/PLAN.md section 10.
+// The five viewports every page is checked at.
 const SIZES = [
   { width: 360, height: 740 },
   { width: 390, height: 844 },
