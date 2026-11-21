@@ -273,3 +273,16 @@ code {
 .decisions li::before {
   content: counter(hazard);
 }
+
+.dossier__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+
+.recorder .recorder__does {
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--line);
+}
