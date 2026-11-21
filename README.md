@@ -29,7 +29,7 @@ I build backend systems, and most of my projects are about what happens when som
 
 More in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Numbers (measured, see `docs/DECISIONS.md`)
+## Numbers (measured on a local build)
 
 - First load (HTML, CSS and boot script): about 26 KB gzip. The 3D scene (Three.js, about 190 KB gzip) loads after the page is readable.
 - Lighthouse on a local build: desktop 99 performance and 100 for accessibility, best practices and SEO. Mobile (flight mode) 82 performance, 100 for the rest.

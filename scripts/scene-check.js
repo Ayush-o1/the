@@ -4,7 +4,7 @@
 import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 
-// Software rendering flags that make WebGL work in headless Chromium. See docs/DECISIONS.md D16.
+// Software rendering flags that make WebGL work in headless Chromium.
 const SOFTWARE_FLAGS = [
   '--use-gl=angle',
   '--use-angle=swiftshader',

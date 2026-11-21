@@ -13,3 +13,7 @@ shots/
 BUILD_PROMPT.md
 RESEARCH_PROMPT.md
 /PLAN.md
+
+# Working notes, not part of the site
+.build/
+shots*/

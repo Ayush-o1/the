@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Voice rules from docs/PLAN.md section 7.1. The fourteen Belt phrases exist to mock these words,
+// Voice rules for site copy. The fourteen Belt phrases exist to mock these words,
 // so the Belt list in index.html is the only place they may appear.
 const BANNED = [
   'passionate',

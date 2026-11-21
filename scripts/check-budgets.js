@@ -1,4 +1,4 @@
-// Fails when the built site goes over the size budgets in docs/PLAN.md section 8.5.
+// Fails when the built site goes over the size budgets set in BUDGET below.
 // "First load" means what index.html pulls in before anything lazy: its HTML, its stylesheets
 // and the scripts it loads or preloads. Everything else in dist/ is lazy or on demand.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
