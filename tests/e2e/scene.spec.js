@@ -184,22 +184,49 @@ test.describe('with a returning visitor', () => {
     expect(peak).toBeLessThan(60);
   });
 
-  test('the flight downloads no images, textures or model files', async ({ page }) => {
+  // The only image files the flight fetches are the six planet maps (NASA and USGS imagery), and
+  // only on tiers that use them. No models, no HDR environments, nothing else.
+  const MAPS = ['earth-day', 'earth-night', 'earth-clouds', 'mars', 'europa', 'jupiter'];
+  function watchDownloads(page) {
     const downloaded = [];
     page.on('request', (request) => {
-      if (['image', 'media'].includes(request.resourceType())) downloaded.push(request.url());
-      if (/\.(png|jpe?g|webp|gif|ktx2?|glb|gltf|hdr|exr)(\?|$)/i.test(request.url())) {
-        downloaded.push(request.url());
+      const url = request.url();
+      if (url.endsWith('favicon.svg')) return;
+      if (
+        ['image', 'media'].includes(request.resourceType()) ||
+        /\.(png|jpe?g|webp|gif|ktx2?|glb|gltf|hdr|exr)(\?|$)/i.test(url)
+      ) {
+        downloaded.push(url);
       }
     });
-    await page.goto('/');
+    return downloaded;
+  }
+
+  test('the flight downloads only the six planet maps, and no model files', async ({ page }) => {
+    const downloaded = watchDownloads(page);
+    await page.goto('/?tier=high');
     await waitForScene(page);
     for (const id of ['argus', 'blackwater', 'europa', 'contact']) {
       await scrollToSection(page, id);
       await page.waitForTimeout(300);
     }
-    // The favicon is an SVG and is not counted as a texture.
-    expect(downloaded.filter((url) => !url.endsWith('favicon.svg'))).toEqual([]);
+    const names = downloaded.map((url) =>
+      url
+        .split('/')
+        .pop()
+        .replace(/-[\w-]{8}\.webp$/, ''),
+    );
+    expect(downloaded.every((url) => /\.webp(\?|$)/.test(url))).toBe(true);
+    expect([...new Set(names)].sort()).toEqual([...MAPS].sort());
+  });
+
+  test('the low tier downloads no images at all', async ({ page }) => {
+    const downloaded = watchDownloads(page);
+    await page.goto('/?tier=low');
+    await waitForScene(page);
+    await scrollToSection(page, 'europa');
+    await page.waitForTimeout(500);
+    expect(downloaded).toEqual([]);
   });
 
   for (const tier of ['low', 'high']) {

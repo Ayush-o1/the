@@ -17,6 +17,8 @@ src/ui/               DOM behaviour: dialogs, flight path, boot cover, reveals, 
 src/sims/             six simulations: one pure logic file and one DOM file each
 src/scene/            the 3D flight, loaded lazily with import()
 src/shaders/          GLSL files, imported with ?raw
+src/assets/tex/       planet maps (WebP), built by scripts/make-textures.py, loaded lazily
+dev/                  look-dev page for single assets; development only, never built
 src/fonts/            three subset font files, built by scripts/subset-fonts.sh
 ```
 
@@ -26,15 +28,19 @@ src/fonts/            three subset font files, built by scripts/subset-fonts.sh
 
 ### Motion
 
-Scroll is native: the wheel, touch, keys and the scrollbar all move the page as the browser does. Exactly one thing smooths it, the camera. `core/motion.js` follows the scroll position with a critically damped spring (half-life 0.35 s). The spring keeps its own velocity, so a change of scroll direction slows and turns the camera and never snaps it, and it cannot overshoot. All durations, easings and the stagger are CSS custom properties in `styles/tokens.css`; JavaScript reads them from there.
+Scroll is native: the wheel, touch, keys and the scrollbar all move the page as the browser does. Exactly one thing smooths it, the camera. `core/motion.js` follows the scroll position with a critically damped spring (half-life 0.25 s). The spring keeps its own velocity, so a change of scroll direction slows and turns the camera and never snaps it, and it cannot overshoot. Everything on the page that moves with the flight (the progress line, the heading reveals) reads the same smoothed progress in the same frame, before it is drawn. Travel between sections uses smootherstep, so acceleration is continuous where a section starts and ends. All durations, easings and the stagger are CSS custom properties in `styles/tokens.css`; JavaScript reads them from there.
 
 ### The scene
 
 - `route.js` has one waypoint per section id. `core/route-math.js` turns the scroll position into a position along that route. The probe stays at a stop while its section is on screen and travels in the space between sections.
 - Every world is built once, before the first frame. `warmup.js` compiles all shaders and uploads all buffers behind the boot cover, so no shader is compiled while the visitor scrolls. A world is shown when the probe is near it and hidden once it has gone by, a pure function of progress.
 - The camera never snaps. Progress follows the scroll through the spring above.
-- `post.js` runs a sanitise pass, bloom, and a final pass in linear light: gravitational lensing near the black hole, one colour grade, a faint vignette and grain. Tone mapping is the Khronos PBR Neutral operator. The low tier skips all of it.
-- One sun direction (`worlds/util.js`) is used by the directional light and by every planet shader.
+- Worlds fade in and out over 0.5 s; whether one should show is a pure function of progress.
+- `post.js` runs a sanitise pass, bloom on highlights only, a lens pass (gravitational lensing and a colour fringe near the black hole, one colour grade, vignette, grain), then ACES tone mapping with a dither so dark gradients do not band. The scene renders into a 4x multisampled target. The low tier skips all of it.
+- `lighting.js`: one sun direction (`worlds/util.js`) for the key light, the reflections and every world shader, a weak cold fill from Earth, and a reflection map made with PMREM from a small procedural sky.
+- `probe.js` and `worlds/relay.js` are built in code from `hardware.js`: parts merged per material, foil, cells and plates made as textures at load (`probe-textures.js`).
+- `maps.js` loads the planet maps (NASA and USGS imagery, see README) after the warm-up, decoded off the main thread and uploaded before the first frame when they arrive in time. Every mapped world has a procedural surface as its fallback, used on the low tier, with Save-Data and on slow connections.
+- The black hole (`shaders/blackhole.frag.glsl`) is traced per pixel: rays bend around it, so the far side of the disk shows over the shadow.
 - Tiers (`core/tier.js`) start at mid and move on measured frame work. `?tier=` pins one for tests.
 
 ### Simulations
@@ -48,7 +54,7 @@ Each has pure logic that mirrors a rule from the real project (the file header n
 | Vanilla JS, ES modules     | Every file can be read and explained. No framework to learn.                 |
 | WebGLRenderer, not WebGPU  | Works on nearly every device.                                                |
 | Native scroll              | Works the same for wheel, touch, keyboard and scrollbar. No second smoother. |
-| No image or model files    | Everything is shaders, geometry and canvas. Small, no licences.              |
+| Few image files, no models | Geometry, shaders and canvas, plus six public planet maps loaded lazily.     |
 | Pure logic split from DOM  | Rules are testable and the UI stays thin.                                    |
 | Lazy scene and simulations | First load stays small. Three.js arrives after the page is readable.         |
 | Subset fonts               | Three files, 53 KB in total. Fraunces is fixed at its display size.          |
@@ -57,5 +63,6 @@ Each has pure logic that mirrors a rule from the real project (the file header n
 
 - `npm test`: logic tests with the Node test runner (`tests/logic/`), including checks on the built page for the title, social tags, JSON-LD and where education details may appear, and a contrast check of every colour token pair.
 - `npm run test:e2e`: Playwright in Chromium and WebKit (`tests/e2e/`). The flight tests need WebGL, so Chromium runs with software-GL flags. WebKit runs the plain-page tests.
-- `npm run budgets`: fails if the built site exceeds the size budgets.
+- `npm run budgets`: fails if the built site exceeds the size budgets (the planet maps have their own).
+- `dev/lookdev.html` (with `npm run dev`): one asset at a time with a turntable, a light control, lit and unlit, a silhouette mode and a tone-mapping switch. A test keeps it out of `dist/`.
 - `npm run check`: lint, format check, build, logic tests and budgets.

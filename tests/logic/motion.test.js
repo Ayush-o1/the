@@ -49,7 +49,10 @@ test('when the target reverses, the position stays continuous and the speed chan
   const pull = (omega ** 2 * 10 + 2 * omega * ((10 * omega) / Math.E)) * dt;
   for (let i = 1; i < positions.length; i += 1) {
     // A critically damped spring released toward a step of 10 peaks at 10 * omega / e in speed.
-    assert.ok(Math.abs(positions[i] - positions[i - 1]) <= (10 * omegaFor(CAMERA_HALF_LIFE) * dt) / Math.E + 1e-9);
+    assert.ok(
+      Math.abs(positions[i] - positions[i - 1]) <=
+        (10 * omegaFor(CAMERA_HALF_LIFE) * dt) / Math.E + 1e-9,
+    );
     assert.ok(Math.abs(speeds[i] - speeds[i - 1]) <= pull + 1e-9, `jump at frame ${i}`);
   }
   // At the reversal frame the speed is still forward, and it comes back through zero.

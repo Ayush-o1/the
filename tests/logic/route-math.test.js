@@ -131,7 +131,8 @@ test('crossing a section boundary has no jump in acceleration (smootherstep trav
     { from: 1500, to: 2000 },
   ];
   const h = 1;
-  const accel = (y) => stopParam(ranges, y + h) - 2 * stopParam(ranges, y) + stopParam(ranges, y - h);
+  const accel = (y) =>
+    stopParam(ranges, y + h) - 2 * stopParam(ranges, y) + stopParam(ranges, y - h);
   // Just inside the gap at both ends the curvature is tiny, as it is just outside (zero).
   const scale = 1 / (1000 * 1000);
   assert.ok(Math.abs(accel(501)) < 0.01 * scale * 6);
