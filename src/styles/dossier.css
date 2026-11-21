@@ -93,7 +93,7 @@
   top: 0.78em;
   width: 10px;
   height: 1px;
-  background: var(--amber);
+  background: var(--signal);
 }
 
 .hazards {
@@ -115,15 +115,15 @@
   left: 0;
   top: 0.2em;
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  letter-spacing: 0.12em;
-  color: var(--alert);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  color: var(--signal);
 }
 
 code {
   font-family: var(--font-mono);
   font-size: 0.875em;
-  color: var(--star);
+  color: var(--bone);
   padding: 0 var(--s1);
   border: 1px solid var(--line);
 }
@@ -134,7 +134,9 @@ code {
   display: grid;
   gap: var(--s3);
   padding: var(--s4);
-  border: 1px dashed var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink-3);
 }
 
 .sim__label {
@@ -167,7 +169,7 @@ code {
 
 .sim__table thead th {
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -193,10 +195,10 @@ code {
   min-height: 44px;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
+  font-size: var(--text-label);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--amber);
+  color: var(--signal);
   list-style: none;
 }
 
@@ -228,4 +230,59 @@ code {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+
+/* Dossier layout: a head, then sections that each lead with a small label. */
+.dossier__head {
+  display: grid;
+  gap: var(--s3);
+}
+
+.dossier__head .dossier__callsign {
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+}
+
+.dossier__objective {
+  color: var(--bone-2);
+  font-size: 1.125rem;
+}
+
+.dossier__section {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s6);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+}
+
+.dossier__lead {
+  max-width: 28em;
+  color: var(--bone);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.dossier__intro {
+  color: var(--dim);
+}
+
+/* Decisions are numbered with a plain 1, 2, 3 in the mono face. */
+.decisions li::before {
+  content: counter(hazard);
+}
+
+.dossier__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+
+.recorder .recorder__does {
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--line);
 }

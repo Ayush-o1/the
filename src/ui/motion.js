@@ -1,19 +1,16 @@
-// Motion polish for the flight. Only loaded when the 3D scene runs, never in Lite mode, and never
-// under reduced motion. Two small effects:
-//   text reveals: a heading's lines slide up out of a mask, 0.9 s, once per heading
-//   decode:       the hull gauge scrambles into its first value, once
+// Text reveals for the flight: a heading's lines slide up out of a mask, once per heading.
+// Only loaded when the 3D scene runs, never in Lite mode, and never under reduced motion.
 // Start-state hiding happens here, after the scene is confirmed to work, so the HTML is always
-// readable on its own (plan 8.2 rule 2).
+// readable on its own.
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
-import { $, $$ } from '../lib/dom.js';
+import { $$ } from '../lib/dom.js';
 
-gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+gsap.registerPlugin(SplitText);
 
-const REVEAL_SECONDS = 0.9;
+const REVEAL_SECONDS = 0.64;
 const STAGGER_SECONDS = 0.06;
-// The page's own h1 is left alone: it is the first thing read and the largest paint.
+// The hero title is left alone: it is the first thing read and the largest paint.
 const HEADINGS = '#main h2, .dossier__callsign';
 
 function inViewNow(el) {
@@ -37,7 +34,7 @@ export function initReveals() {
           {
             yPercent: 0,
             duration: REVEAL_SECONDS,
-            ease: 'power3.out',
+            ease: 'expo.out',
             stagger: STAGGER_SECONDS,
             onComplete: () => split.revert(),
           },
@@ -67,12 +64,18 @@ export function initReveals() {
   };
 }
 
-// Scrambles the hull gauge into its first value. Called once, after the HUD has written it.
-export function decodeHull() {
-  const hull = $('.hud-hull');
-  if (!hull || !hull.textContent) return;
-  gsap.to(hull, {
-    duration: 0.9,
-    scrambleText: { text: hull.textContent, chars: '0123456789', speed: 0.6 },
+// The hero sequence: eyebrow, the three title rows, the lede, the buttons, the status line. One
+// settle ease, one stagger. It runs once, after the boot cover, and ends in under 1.2 seconds.
+export function revealHero() {
+  const parts = $$('.hero__eyebrow, .hero__row, .hero__lede, .hero__actions, .hero__status');
+  gsap.set(parts, { opacity: 0, y: 28 });
+  document.documentElement.classList.remove('first');
+  gsap.to(parts, {
+    opacity: 1,
+    y: 0,
+    duration: REVEAL_SECONDS,
+    ease: 'expo.out',
+    stagger: STAGGER_SECONDS,
+    clearProps: 'all',
   });
 }

@@ -1,4 +1,4 @@
-// A very faint warm haze painted on a huge inside-out sphere. It follows the camera, so it never
+// A very faint cool haze painted on a huge inside-out sphere. It follows the camera, so it never
 // gets closer, and it is drawn first so everything else covers it.
 import { Mesh, SphereGeometry, BackSide } from 'three';
 import { shaderMaterial } from './worlds/util.js';

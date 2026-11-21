@@ -5,15 +5,16 @@ import { CatmullRomCurve3, Vector3 } from 'three';
 
 export const WAYPOINTS = {
   launch: [0, 0, 0],
-  belt: [6, 1, -70],
+
   argus: [-4, 2, -160],
   blackwater: [8, -2, -270],
   beetlejuice: [-6, 3, -380],
   theredarmy: [4, -1, -470],
   deadletter: [-5, 2, -550],
   europa: [6, 0, -630],
-  cargo: [0, -2, -690],
-  crew: [-3, 1, -740],
+  more: [0, -2, -690],
+  about: [-3, 1, -740],
+  education: [2, 0, -780],
   contact: [0, 0, -820],
 };
 

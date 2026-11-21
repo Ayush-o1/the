@@ -1,4 +1,4 @@
-// Earth below the launch pad, and the small blue dot that is home at the end of the route.
+// Earth at the start of the route, and the small blue dot that is home at the end of it.
 import {
   Group,
   Mesh,
@@ -18,18 +18,21 @@ export function createEarth({ tier }) {
   const group = new Group();
   const segments = tier === 'low' ? [48, 32] : [96, 64];
   const material = shaderMaterial({ fragment, uniforms: { uSunDir: { value: SUN_DIRECTION } } });
-  group.add(new Mesh(new SphereGeometry(90, ...segments), material));
-  // A thin warm atmosphere, seen as a glowing rim along the top of the planet.
+  const planet = new Mesh(new SphereGeometry(90, ...segments), material);
+  // Tilted so the visible cap is mid-latitude land and ocean, not the white of the pole.
+  planet.rotation.set(1.05, 0.6, 0);
+  group.add(planet);
+  // A thin atmosphere. It is blue, the one cold colour against the warm light.
   const air = new ShaderMaterial({
     vertexShader: shellVertex,
     fragmentShader: shellFragment,
-    uniforms: { uColor: { value: new Color(0xe0a860) } },
+    uniforms: { uColor: { value: new Color(0x6fa4ff) }, uSunDir: { value: SUN_DIRECTION } },
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
     side: BackSide,
   });
-  group.add(new Mesh(new SphereGeometry(90 * 1.025, 64, 48), air));
+  group.add(new Mesh(new SphereGeometry(90 * 1.03, 64, 48), air));
   return {
     group,
     update(time) {

@@ -3,7 +3,6 @@
 //   ambient: two slightly detuned oscillators through a low-pass filter that a slow wave sweeps
 //   thrust:  filtered noise whose volume follows how fast the page is scrolling
 //   tick:    a 20 ms click for buttons
-//   alarm:   two short tones, played once per hazard
 const MASTER_GAIN = 0.15;
 
 export function createAudio() {
@@ -86,11 +85,6 @@ export function createAudio() {
     },
     tick() {
       if (enabled) beep(1200, 0, 0.02, 0.2);
-    },
-    alarm() {
-      if (!enabled) return;
-      beep(880, 0, 0.12, 0.25);
-      beep(660, 0.16, 0.12, 0.25);
     },
   };
 }

@@ -19,9 +19,7 @@ export function anyDialogOpen() {
 }
 
 export function initDialogs() {
-  for (const dialog of $$('dialog.panel')) {
-    // The role chooser is a question, not a menu: only its own buttons close it.
-    if (dialog.id === 'role') continue;
+  for (const dialog of $$('dialog.dialog')) {
     dialog.addEventListener('click', (event) => {
       const clickedBackdrop = event.target === dialog;
       const clickedLink = event.target instanceof Element && event.target.closest('a[href^="#"]');

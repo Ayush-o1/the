@@ -1,214 +1,104 @@
-/* HUD, canvas, boot sequence, role chooser and debug overlay. Only used when scripts run. */
+/* Canvas, flight path, boot cover and debug overlay. Only used when scripts run. */
 
 .scene-canvas {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: var(--z-canvas);
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 600ms ease;
+  transition: opacity var(--t-scene) var(--ease-settle);
 }
 
 .scene-canvas.on {
   opacity: 1;
 }
 
-/* Header extras: sector name and mission clock. */
-.hud-sector {
-  color: var(--amber);
-  white-space: nowrap;
+/* Content sits above the canvas. */
+main,
+.site-footer {
+  position: relative;
+  z-index: var(--z-content);
 }
 
-.hud-clock {
-  margin-left: auto;
-  color: var(--dim);
-  white-space: nowrap;
-}
-
-html.scene .site-header nav {
-  margin-left: 0;
-}
-
-/* The header is transparent over the scene so the flight stays visible behind it. */
-html.scene .site-header {
-  background: rgba(6, 7, 10, 0.92);
-}
-
-@media (max-width: 599px) {
-  html.js .site-header nav {
-    display: none;
-  }
-  .hud-clock {
-    display: none;
-  }
-  .hud-sector {
-    margin-left: auto;
-  }
-}
-
-/* Corner brackets */
-.hud-frame {
+/* Flight progress: a thin line along the bottom edge of the header. It never covers content. */
+.hud-progress {
   position: fixed;
-  inset: calc(var(--header-h) + 8px) 12px 48px;
-  z-index: 15;
-  pointer-events: none;
-}
-
-.hud-frame span {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border: 1px solid var(--line);
-}
-
-.hud-frame .hud-frame__tl {
-  top: 0;
-  left: 0;
-  border-right: 0;
-  border-bottom: 0;
-}
-.hud-frame .hud-frame__tr {
-  top: 0;
-  right: 0;
-  border-left: 0;
-  border-bottom: 0;
-}
-.hud-frame .hud-frame__bl {
-  bottom: 0;
-  left: 0;
-  border-right: 0;
-  border-top: 0;
-}
-.hud-frame .hud-frame__br {
-  bottom: 0;
-  right: 0;
-  border-left: 0;
-  border-top: 0;
-}
-
-/* Flight path along the bottom */
-.hud-path {
-  position: fixed;
+  top: var(--header-h);
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 20;
-  height: 44px;
-  padding: 0 calc(var(--gutter) + 12px);
-  background: linear-gradient(to top, rgba(6, 7, 10, 0.8), transparent);
-}
-
-.hud-path__line {
-  position: absolute;
-  left: calc(var(--gutter) + 12px);
-  right: calc(var(--gutter) + 12px);
-  top: 22px;
-  height: 1px;
+  z-index: var(--z-chrome);
+  height: 2px;
   background: var(--line);
-}
-
-.hud-path__stop {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-}
-
-.hud-path__link {
-  position: absolute;
-  top: -22px;
-  left: -22px;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-}
-
-.hud-path__dot {
-  width: 9px;
-  height: 9px;
-  border: 1px solid var(--star);
-  border-radius: 50%;
-  background: var(--void);
-}
-
-.hud-path__link:hover .hud-path__dot {
-  background: var(--amber);
-  border-color: var(--amber);
-}
-
-.hud-path__marker {
-  position: absolute;
-  left: calc(var(--gutter) + 12px);
-  top: 17px;
-  width: 11px;
-  height: 11px;
-  margin-left: -5px;
-  background: var(--amber);
-  transform: rotate(45deg);
   pointer-events: none;
 }
 
-/* The path bar covers the bottom of the page, so leave room for it. */
-html.scene .site-footer {
-  padding-bottom: calc(var(--s8) + 44px);
+.hud-progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
-/* Boot sequence */
+/* Boot cover */
 .boot {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: var(--z-boot);
   display: grid;
-  align-content: center;
+  place-items: center;
   padding: var(--gutter);
-  background: var(--void);
-  transition: opacity 180ms;
+  background: var(--ink);
+  transition: opacity var(--t-ui) var(--ease-settle);
 }
 
 .boot--out {
   opacity: 0;
 }
 
-.boot__text {
-  max-width: 30rem;
-  margin: 0 auto;
-  width: 100%;
-  color: var(--amber);
-  font-size: 0.875rem;
-  line-height: 1.8;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  white-space: pre-wrap;
-}
-
-/* Role chooser */
-.role {
-  padding: var(--s6);
-  max-width: 34rem;
-}
-
-.role > * + * {
-  margin-top: var(--s4);
-}
-
-.role h2 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-}
-
-.role__options {
+.boot__inner {
   display: grid;
+  justify-items: center;
   gap: var(--s3);
+  width: min(22rem, 100%);
+  text-align: center;
 }
 
-.role__options .btn {
-  justify-content: flex-start;
-  text-align: left;
+.boot__name {
+  color: var(--bone);
+  font-family: var(--font-display);
+  font-size: 3.25rem;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-/* Programmatic focus on a heading after navigation should not draw a ring. */
-[tabindex='-1']:focus {
-  outline: none;
+.boot__role,
+.boot__note {
+  color: var(--dim);
+}
+
+.boot__bar {
+  width: 100%;
+  height: 1px;
+  margin-top: var(--s4);
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.boot__fill {
+  display: block;
+  height: 100%;
+  background: var(--bone);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-scene) var(--ease-settle);
+}
+
+.boot__skip {
+  justify-self: center;
+  margin-top: var(--s4);
 }
 
 /* ?debug overlay */
@@ -219,77 +109,32 @@ html.scene .site-footer {
   z-index: 300;
   margin: 0;
   padding: var(--s2) var(--s3);
-  background: rgba(6, 7, 10, 0.85);
+  background: rgba(10, 13, 18, 0.88);
   border: 1px solid var(--line);
   color: var(--ok);
   font-size: 0.6875rem;
   line-height: 1.5;
-  letter-spacing: 0.04em;
-  text-transform: none;
   pointer-events: none;
 }
 
-/* In flight mode the real 3D worlds replace the CSS pictures and the CSS horizon.
-   The pictures keep their grid space so the layout does not move. */
+/* In flight mode the real 3D worlds replace the CSS pictures. The pictures keep their grid space
+   so the layout does not move. */
 html.scene .art {
   background: transparent;
   border-color: transparent;
 }
 
 html.scene .art::before,
-html.scene .art::after,
-html.scene .hero__horizon {
+html.scene .art::after {
   display: none;
 }
 
-/* Hull gauge and hazard alerts */
-.hud-hull {
-  color: var(--dim);
-  white-space: nowrap;
+/* In flight each project gets room around it. The probe travels in the space between two
+   sections, so that space has to be tall enough for the travel to register. */
+html.scene .mission {
+  margin-block: 34vh;
 }
 
-.hud-alert {
-  position: fixed;
-  top: calc(var(--header-h) + var(--s3));
-  left: 50%;
-  z-index: 25;
-  max-width: calc(100vw - 2 * var(--gutter));
-  margin: 0;
-  padding: var(--s2) var(--s4);
-  transform: translateX(-50%);
-  background: rgba(13, 16, 23, 0.92);
-  border: 1px solid var(--alert);
-  color: var(--alert);
-  font-size: var(--text-hud);
-  text-align: center;
-  pointer-events: none;
-}
-
-.hud-alert[data-level='info'] {
-  border-color: var(--line);
-  color: var(--star);
-}
-
-.hud-alert[data-key='arrived'] {
-  text-transform: none;
-  letter-spacing: 0.04em;
-}
-
-.hud-alert[hidden] {
-  display: none;
-}
-
-/* While the hostile signal is near, the HUD dims in steps, at most about twice a second. */
-html.hud-glitch .hud-sector,
-html.hud-glitch .hud-clock,
-html.hud-glitch .hud-hull,
-html.hud-glitch .hud-frame,
-html.hud-glitch .hud-path {
-  opacity: 0.4;
-}
-
-@media (max-width: 899px) {
-  .hud-hull {
-    display: none;
-  }
+html.scene .mission:first-of-type {
+  margin-top: var(--s8);
 }

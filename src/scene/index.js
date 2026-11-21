@@ -1,11 +1,18 @@
 // The 3D flight. Loaded with a dynamic import after first paint, so the page is readable before
 // any of this code arrives. Everything here is an enhancement over the HTML.
-import { Scene, PerspectiveCamera, DirectionalLight, AmbientLight } from 'three';
+import { Scene, PerspectiveCamera, DirectionalLight, AmbientLight, Vector2, Vector3 } from 'three';
 import { gsap } from 'gsap';
-import { createScroll } from '../core/scroll.js';
 import { collectStops, measureStops } from '../core/sectors.js';
-import { stopScrolls, stopParam, nearestStop, jumpIntensity } from '../core/route-math.js';
+import {
+  stopScrolls,
+  stopParam,
+  nearestStop,
+  jumpIntensity,
+  wellStrength,
+  probePresence,
+} from '../core/route-math.js';
 import { damp } from '../core/damp.js';
+import { createFollower } from '../core/motion.js';
 import { TIERS, createTierMonitor } from '../core/tier.js';
 import { createRenderer } from './renderer.js';
 import { createStarfield } from './starfield.js';
@@ -15,14 +22,9 @@ import { createNebula } from './nebula.js';
 import { createJump } from './jump.js';
 import { createCameraPath } from './camera-path.js';
 import { createPost } from './post.js';
-import { createHazards } from './hazards/index.js';
 import { buildRoute } from './route.js';
-
-const ROLL_SECONDS = 1.2;
-const FOLLOW_RATE = 6; // follow rate: 4 feels loose, 8 feels stiff
-// A click on one of these, or inside one, belongs to the page and never breaks a rock.
-const INTERACTIVE =
-  'a, button, input, textarea, select, summary, dialog, form, header, nav, label, details, .panel';
+import { warmUp } from './warmup.js';
+import { SUN_DIRECTION } from './worlds/util.js';
 
 export function startScene({ env, startTier, pinTier, onContextLost, onSector, onFrame }) {
   const stops = collectStops();
@@ -33,8 +35,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   const scene = new Scene();
   const camera = new PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
 
-  const sun = new DirectionalLight(0xffe2b0, 2.4);
-  sun.position.set(30, 40, 20);
+  const sun = new DirectionalLight(0xffe6c4, 2.6);
+  sun.position.copy(SUN_DIRECTION).multiplyScalar(100);
   scene.add(sun, new AmbientLight(0x6a6f85, 1.1));
 
   const starfield = createStarfield();
@@ -44,15 +46,6 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
   const probe = createProbe();
   scene.add(nebula.object, starfield.object, jump.object, probe.object);
   const rig = createCameraPath(curve, camera, probe.object);
-  const hazards = createHazards({
-    scene,
-    curve,
-    stops,
-    canvas,
-    worlds,
-    tier: startTier,
-    reducedMotion: env.reducedMotion,
-  });
 
   // J1 runs from Argus to BlackWater and J2 from BlackWater to BeetleJuice.
   const jumps = [
@@ -62,22 +55,27 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     .map(([a, b]) => [a, b].map((id) => stops.findIndex((stop) => stop.id === id)))
     .filter(([a, b]) => a >= 0 && b >= 0);
 
-  const scroll = createScroll();
   const tierMonitor = createTierMonitor(startTier);
   let tier = startTier;
   let post = null;
 
   let scrolls = [];
+  const follower = createFollower(0);
   let param = 0;
   let steer = 0;
   let steerTarget = 0;
   let thrust = 0;
   let sectorIndex = -1;
   let fps = 60;
-  let lastTime = 0;
-  let rollStart = -1;
   let stopped = false;
   let firstFrame = true;
+  let probeScale = 0.85;
+  // Every section after the hero is read, so the probe is out of frame at all of them.
+  const projectStops = stops.flatMap((stop, index) => (index > 0 ? [index] : []));
+  let warmMs = 0;
+  const holeScreen = new Vector3();
+  const lensCenter = new Vector2(0.5, 0.5);
+  const holeIndex = stops.findIndex((stop) => stop.id === 'blackwater');
 
   function sizePost() {
     post?.setSize(window.innerWidth, window.innerHeight, rendererBundle.pixelRatio);
@@ -88,8 +86,6 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     const settings = TIERS[name];
     rendererBundle.setDprCap(settings.dpr);
     starfield.setCount(settings.stars);
-    worlds.setTier(name);
-    hazards.setTier(name);
     nebula.object.visible = name !== 'low';
     // The low tier skips post-processing and renders straight to the screen.
     if (settings.post && !post) post = createPost({ renderer, scene, camera });
@@ -108,6 +104,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     rendererBundle.resize();
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    // On a phone the text covers the screen, so the probe is smaller and sits low.
+    probeScale = camera.aspect <= 1.2 ? 0.6 : 0.85;
     sizePost();
     measure();
   }
@@ -118,40 +116,26 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     steerTarget = (event.clientX / window.innerWidth) * 2 - 1;
   }
 
-  // The canvas sits behind the page, so clicks never reach it. A click on bare page background
-  // is cast into the scene to see if it hit a rock in the Belt.
-  function onPointerDown(event) {
-    if (event.button !== 0 || !(event.target instanceof Element)) return;
-    if (event.target.closest(INTERACTIVE)) return;
-    if (!['HTML', 'BODY', 'MAIN', 'SECTION'].includes(event.target.tagName)) return;
-    const ndc = {
-      x: (event.clientX / window.innerWidth) * 2 - 1,
-      y: -(event.clientY / window.innerHeight) * 2 + 1,
-    };
-    hazards.pick(ndc, camera, lastTime);
-  }
-
   const resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(document.body);
   window.addEventListener('pointermove', onPointerMove, { passive: true });
-  window.addEventListener('pointerdown', onPointerDown);
   applyTier(startTier);
   resize();
   document.body.prepend(canvas);
 
   // Start where the page already is, so a deep link does not begin with a flight from the pad.
   param = stopParam(scrolls, window.scrollY);
+  follower.jumpTo(param);
 
   function tick(time, deltaMs) {
     if (stopped || document.hidden) return;
     const dt = Math.min(deltaMs / 1000, 0.1);
     if (dt <= 0) return;
-    lastTime = time;
     renderer.info.reset();
 
     const target = stopParam(scrolls, window.scrollY);
     const previous = param;
-    param = damp(param, target, FOLLOW_RATE, dt);
+    param = follower.step(target, dt);
     const previousSteer = steer;
     steer = damp(steer, steerTarget, 4, dt);
 
@@ -166,23 +150,27 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
       camera.updateProjectionMatrix();
     }
 
-    // Hazards come first: drift changes where the probe sits.
-    const hazard = hazards.update({ param, time, camera, rig, probe: probe.object });
-    rig.update(param, stops.length, steer, (steer - previousSteer) / dt, hazard.driftUnits);
-    if (rollStart >= 0) {
-      const t = (time - rollStart) / ROLL_SECONDS;
-      if (t >= 1) rollStart = -1;
-      else probe.object.rotateZ(t * t * (3 - 2 * t) * Math.PI * 2);
-    }
+    rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
+    // The probe steps out of frame while a section is being read.
+    const presence = probePresence(param, projectStops);
+    probe.object.visible = presence > 0.01;
+    probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
     worlds.update(param, time, camera);
     nebula.update(time, camera.position);
     jump.update(jumpAmount, time, camera);
 
+    // The black hole bends the picture around it. Its screen position is where the lens is aimed.
+    const lens = holeIndex >= 0 ? wellStrength(param, holeIndex) : 0;
+    if (lens > 0) {
+      worlds.groupOf('blackwater').getWorldPosition(holeScreen).project(camera);
+      lensCenter.set(holeScreen.x * 0.5 + 0.5, holeScreen.y * 0.5 + 0.5);
+    }
+
     const workStart = performance.now();
     probe.update(time, thrust);
-    starfield.update(time, rendererBundle.pixelRatio, window.innerHeight);
+    starfield.update(time, rendererBundle.pixelRatio);
     if (post) {
-      post.setLens({ ...hazard.lens, time });
+      post.setLens({ center: lensCenter, strength: lens * 0.3, chroma: 0, time });
       post.render();
     } else {
       renderer.render(scene, camera);
@@ -198,14 +186,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
       sectorIndex = nearest;
       onSector(stops[nearest], nearest);
     }
-    onFrame({
-      param,
-      stops: stops.length,
-      dt,
-      hazard: hazard.state,
-      values: hazard.values,
-      thrust,
-    });
+    onFrame({ param, stops: stops.length, dt, thrust });
 
     if (firstFrame) {
       firstFrame = false;
@@ -214,16 +195,22 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     }
   }
 
-  gsap.ticker.add(tick);
+  // Every shader is compiled and every buffer uploaded before the first visible frame.
+  function renderOnce() {
+    if (post) post.render();
+    else renderer.render(scene, camera);
+  }
+  const ready = (async () => {
+    warmMs = await warmUp({ renderer, scene, camera, worlds, render: renderOnce });
+    if (stopped) return;
+    gsap.ticker.add(tick);
+    // GSAP skips time after a slow frame by default, which would make the camera jump.
+    gsap.ticker.lagSmoothing(0);
+  })();
 
   return {
     stops,
-    // The Konami code. One full turn of the probe. Skipped under reduced motion.
-    barrelRoll() {
-      if (env.reducedMotion) return false;
-      rollStart = lastTime;
-      return true;
-    },
+    ready,
     getStats() {
       const info = renderer.info;
       return {
@@ -234,6 +221,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
         geometries: info.memory.geometries,
         textures: info.memory.textures,
         programs: info.programs?.length ?? 0,
+        warmMs: Math.round(warmMs),
+        param,
         worlds: worlds.active.join(','),
       };
     },
@@ -242,10 +231,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
       gsap.ticker.remove(tick);
       resizeObserver.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerdown', onPointerDown);
-      scroll.destroy();
       post?.dispose();
-      hazards.dispose();
       starfield.dispose();
       worlds.dispose();
       nebula.dispose();

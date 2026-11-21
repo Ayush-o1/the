@@ -1,5 +1,5 @@
 // The WebGL renderer and its canvas. Sizing, pixel ratio and context loss live here.
-import { WebGLRenderer, ACESFilmicToneMapping, Color } from 'three';
+import { WebGLRenderer, NeutralToneMapping, Color } from 'three';
 
 export function createRenderer({ onContextLost }) {
   const renderer = new WebGLRenderer({
@@ -7,12 +7,13 @@ export function createRenderer({ onContextLost }) {
     powerPreference: 'high-performance',
     alpha: false,
   });
-  renderer.setClearColor(new Color(0x06070a), 1);
+  renderer.setClearColor(new Color(0x0a0d12), 1);
   // With post-processing there are several passes per frame. Counting them all (a manual reset in
   // the loop) gives honest draw call and triangle numbers for the ?debug overlay.
   renderer.info.autoReset = false;
-  renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  // Khronos PBR Neutral: it compresses highlights without washing out saturated colour.
+  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
 
   const canvas = renderer.domElement;
   canvas.className = 'scene-canvas';

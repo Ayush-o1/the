@@ -3,23 +3,27 @@
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: var(--z-chrome);
   display: flex;
   align-items: center;
-  gap: var(--s4);
+  gap: var(--s5);
   min-height: var(--header-h);
   padding: 0 var(--gutter);
-  background: rgba(6, 7, 10, 0.94);
+  background: var(--ink);
   border-bottom: 1px solid var(--line);
 }
 
 .site-header__brand {
   display: inline-flex;
-  white-space: nowrap;
   align-items: center;
   min-height: 44px;
-  color: var(--star);
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .site-header nav {
@@ -35,17 +39,15 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 var(--s2);
-  color: var(--star);
+  padding: 0 var(--s3);
+  color: var(--bone-2);
   font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-size: 0.875rem;
   text-decoration: none;
 }
 
 .site-header__nav a:hover {
-  color: var(--amber);
+  color: var(--bone);
 }
 
 .site-header__tools {
@@ -54,52 +56,30 @@
 }
 
 .site-header .btn {
-  padding: var(--s2) var(--s4);
+  padding-inline: var(--s3);
+  font-size: 0.8125rem;
+  white-space: nowrap;
 }
 
-/* When space runs short the four tool buttons shrink to their key letter. The label stays in the
-   page for screen readers (it is clipped, not removed), so each button keeps its name. */
-@media (max-width: 1199px) {
-  .site-header__tools {
-    gap: var(--s1);
-  }
-
-  .site-header .btn {
-    min-width: 44px;
-    padding-inline: var(--s2);
-  }
-
-  .site-header .btn__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .site-header .btn kbd {
-    border: 0;
-    font-size: 0.875rem;
-    opacity: 1;
-  }
-}
-
-@media (max-width: 599px) {
-  .site-header__nav a {
-    padding: 0 var(--s1);
-    letter-spacing: 0.06em;
-  }
-
+/* On narrow screens the four links give way to the Menu button, which lists the same places. */
+@media (max-width: 899px) {
   .site-header {
-    gap: var(--s1);
+    gap: var(--s3);
+  }
+
+  .site-header__nav {
+    display: none;
+  }
+
+  .site-header__tools {
+    margin-left: auto;
   }
 }
 
 main > section {
   position: relative;
   padding: var(--s8) var(--gutter);
-  max-width: 1320px;
+  max-width: 82.5rem;
   margin: 0 auto;
 }
 
@@ -111,7 +91,7 @@ main > section {
 
 .section-kicker {
   margin-bottom: var(--s3);
-  color: var(--dim);
+  color: var(--signal);
 }
 
 .section-intro {
@@ -119,116 +99,111 @@ main > section {
   color: var(--dim);
 }
 
-/* S0 Launch. Full width so the horizon is not cut by the 1320px content column. */
+/* Launch. Full width: the planet behind it is not held to the content column. */
 main > .hero {
-  --horizon-width: 150vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: var(--s5);
   max-width: none;
   min-height: calc(100svh - var(--header-h));
-  padding-inline: max(var(--gutter), calc((100vw - 1320px) / 2 + var(--gutter)));
+  padding-inline: max(var(--gutter), calc((100vw - 82.5rem) / 2 + var(--gutter)));
   overflow: hidden;
   isolation: isolate;
 }
 
-.hero__eyebrow {
-  color: var(--dim);
+.hero__title {
+  display: grid;
+  gap: var(--s5);
 }
 
-.hero__name {
-  font-size: var(--text-display);
-  line-height: 0.92;
+.hero__eyebrow {
+  color: var(--signal);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .hero__line {
-  max-width: 36ch;
-  font-size: clamp(1.125rem, 2vw, 1.5rem);
-  line-height: 1.45;
+  font-size: var(--text-display);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+}
+
+.hero__row {
+  display: block;
+}
+
+.hero__line em {
+  font-style: italic;
+}
+
+.hero__lede {
+  max-width: 26em;
+  text-wrap: balance;
+  font-size: var(--text-lede);
+  line-height: 1.5;
 }
 
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s3);
-  margin-top: var(--s3);
 }
 
-/* Earth below: a large dark disc, mostly off screen, with a thin warm rim.
-   Only its top 140px shows, under the buttons. */
-.hero__horizon {
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  bottom: calc(-1 * var(--horizon-width) + 140px);
-  width: var(--horizon-width);
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 0%, #1b1710 0%, var(--panel) 12%, var(--void) 40%);
-  box-shadow:
-    0 -1px 0 0 rgba(255, 180, 84, 0.55),
-    0 -18px 60px -10px rgba(255, 180, 84, 0.18);
-}
-
-/* S1 The Belt */
-.belt__rocks {
+.hero__status {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: var(--s3);
-  margin-top: var(--s6);
-  max-width: 62rem;
-}
-
-.belt__rocks li {
-  padding: var(--s2) var(--s4);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--dim);
+  color: var(--bone-2);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  text-decoration: line-through;
-  text-decoration-color: var(--alert);
-  text-decoration-thickness: 1px;
+  font-size: 0.875rem;
 }
 
-/* Cargo hold */
-.cargo__list {
-  display: grid;
-  gap: var(--s3);
-  margin-top: var(--s5);
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal);
 }
 
-.cargo__list:empty {
-  display: none;
-}
-
-/* Crew file */
-.crew__grid {
+/* About and Education */
+.about__grid {
   display: grid;
   gap: var(--s7);
   margin-top: var(--s6);
 }
 
-.crew__text {
+.about__text {
   display: grid;
   gap: var(--s4);
+  font-size: var(--text-lede);
+  line-height: 1.5;
 }
 
-.crew__skills {
+.about__skills {
   display: grid;
   gap: var(--s5);
   align-content: start;
 }
 
-.crew__skills dt {
-  color: var(--dim);
+.about__skills dt {
   margin-bottom: var(--s1);
+  color: var(--cold);
+}
+
+.education__line {
+  margin-top: var(--s5);
+  font-size: var(--text-lede);
+  line-height: 1.5;
+}
+
+.education__cgpa {
+  margin-top: var(--s3);
 }
 
 @media (min-width: 900px) {
-  .crew__grid {
+  .about__grid {
     grid-template-columns: 7fr 5fr;
     gap: var(--s8);
   }
@@ -283,70 +258,100 @@ main > .hero {
   font-size: 0.9375rem;
 }
 
-/* Briefing dialog */
-.briefing {
+/* Summary and Menu dialogs */
+.dialog {
   padding: var(--s6);
 }
 
-.briefing > * + * {
+.dialog > * + * {
   margin-top: var(--s4);
 }
 
-.briefing h3 {
+.dialog h3 {
   margin-top: var(--s6);
-  font-size: 1.75rem;
+  font-size: 1.5rem;
 }
 
-.briefing__head {
+.dialog__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--s4);
 }
 
-.briefing__head h2 {
+.dialog__head h2 {
   font-size: clamp(1.75rem, 5vw, 2.5rem);
 }
 
-.briefing__missions {
+.dialog__list {
   display: grid;
-  gap: var(--s4);
-  counter-reset: brief;
+  gap: var(--s3);
 }
 
-.briefing__missions li {
-  counter-increment: brief;
-  padding-left: var(--s6);
-  position: relative;
+.dialog__list a {
+  display: inline-block;
+  padding-block: var(--s1);
 }
 
-.briefing__missions li::before {
-  content: '0' counter(brief);
-  position: absolute;
-  left: 0;
-  top: 0.15em;
-  font-family: var(--font-mono);
-  font-size: var(--text-hud);
-  color: var(--dim);
-}
-
-.briefing__missions p {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.dialog__list p {
   color: var(--dim);
   font-size: 0.9375rem;
 }
 
-.briefing__links {
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+.dialog__links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s3) var(--s5);
 }
 
-.briefing__links a {
+.dialog__links a {
   display: inline-block;
   padding-block: var(--s2);
+}
+
+/* A soft dark side behind the hero text, so it stays readable when a bright planet is behind it. */
+main > .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 13, 18, 0.86) 0%,
+    rgba(10, 13, 18, 0.7) 40%,
+    rgba(10, 13, 18, 0) 72%
+  );
+  pointer-events: none;
+}
+
+/* First visit only: the hero text is held back until the boot cover has gone, then revealed by
+   src/ui/motion.js. If scripts never get that far, the keyframe below shows it after four seconds
+   so the content is never lost. */
+html.first .hero__eyebrow,
+html.first .hero__row,
+html.first .hero__lede,
+html.first .hero__actions,
+html.first .hero__status {
+  opacity: 0;
+  animation: hero-fallback 1ms 4s forwards;
+}
+
+@keyframes hero-fallback {
+  to {
+    opacity: 1;
+  }
+}
+
+/* On narrow screens the role line is a little smaller, so it fits on one line. */
+@media (max-width: 480px) {
+  .hero__eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+  }
 }

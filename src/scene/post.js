@@ -26,7 +26,7 @@ export function createPost({ renderer, scene, camera }) {
   );
 
   // Threshold 1 on linear colour: only things brighter than white, like the star and the disk, glow.
-  const bloom = new UnrealBloomPass(size, 0.7, 0.55, 1.0);
+  const bloom = new UnrealBloomPass(size, 0.45, 0.5, 1.0);
   composer.addPass(bloom);
 
   const lens = new ShaderPass({
@@ -37,7 +37,7 @@ export function createPost({ renderer, scene, camera }) {
       uChroma: { value: 0 },
       uAspect: { value: 1 },
       uTime: { value: 0 },
-      uGrain: { value: 0.025 },
+      uGrain: { value: 0.03 },
       uVignette: { value: 0.3 },
     },
     vertexShader,

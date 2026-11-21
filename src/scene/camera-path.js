@@ -14,15 +14,13 @@ export function createCameraPath(curve, camera, probe) {
 
   return {
     // param runs 0 to (stops - 1). steer is -1 to 1 from the pointer. steerVelocity is its change per second.
-    // Where the route itself is, without steering or drift. Hazards use it to mark "where we should be".
-    pathPosition: position,
-    update(param, stops, steer, steerVelocity, driftUnits = 0) {
+    update(param, stops, steer, steerVelocity) {
       const t = Math.min(1, Math.max(0, stops > 1 ? param / (stops - 1) : 0));
       curve.getPoint(t, position);
       curve.getTangent(t, tangent);
       right.crossVectors(tangent, UP).normalize();
 
-      probe.position.copy(position).addScaledVector(right, steer * MAX_LATERAL + driftUnits);
+      probe.position.copy(position).addScaledVector(right, steer * MAX_LATERAL);
       target.copy(probe.position).add(tangent);
       probe.lookAt(target);
       // Banking: lean into the sideways motion, plus a little for where the pointer is.
@@ -39,8 +37,9 @@ export function createCameraPath(curve, camera, probe) {
         .addScaledVector(right, steer * MAX_LATERAL * 0.4 + shift);
       camera.position.y += 3;
       target.copy(position).addScaledVector(tangent, 14).addScaledVector(right, shift);
-      // On a phone, look a little higher so the probe sits low in the frame, under the text.
-      if (camera.aspect <= 1.2) target.y += 3;
+      // Look a little higher so the probe sits low in the frame: far enough down to stay clear of
+      // the world beside it on a wide screen, and under the text on a phone.
+      target.y += camera.aspect <= 1.2 ? 5.5 : 1.8;
       camera.lookAt(target);
     },
   };

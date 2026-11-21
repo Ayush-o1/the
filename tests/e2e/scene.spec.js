@@ -6,7 +6,8 @@ import { markVisited } from './helpers.js';
 test.skip(({ browserName }) => browserName !== 'chromium', 'scene tests run in Chromium');
 
 async function waitForScene(page) {
-  await page.waitForSelector('html.scene', { timeout: 20_000 });
+  // The software renderer in CI draws every world once before the first frame, which takes a while.
+  await page.waitForSelector('html.scene', { timeout: 90_000 });
 }
 
 async function scrollToSection(page, id) {
@@ -21,6 +22,8 @@ async function scrollToSection(page, id) {
 
 test.describe('with a returning visitor', () => {
   test.beforeEach(async ({ page }) => {
+    // Three times the usual time: the flight draws every world before it starts.
+    test.slow();
     await markVisited(page);
   });
 
@@ -33,7 +36,9 @@ test.describe('with a returning visitor', () => {
     await page.goto('/');
     await waitForScene(page);
     await expect(page.locator('canvas.scene-canvas')).toHaveAttribute('aria-hidden', 'true');
-    await expect(page.locator('.hud-sector')).toHaveText('Launch');
+    await expect(page.locator('p.visually-hidden[aria-live="polite"]')).toHaveText(
+      'Section: Launch',
+    );
     expect(errors).toEqual([]);
   });
 
@@ -43,35 +48,53 @@ test.describe('with a returning visitor', () => {
     await page.goto('/');
     await waitForScene(page);
     await scrollToSection(page, 'blackwater');
-    await expect(page.locator('.hud-sector')).toHaveText('M2 BlackWater');
     await expect(page.locator('p.visually-hidden[aria-live="polite"]')).toContainText(
       'M2 BlackWater',
     );
     await scrollToSection(page, 'contact');
-    await expect(page.locator('.hud-sector')).toHaveText('Contact');
+    await expect(page.locator('p.visually-hidden[aria-live="polite"]')).toHaveText(
+      'Section: Contact',
+    );
     await scrollToSection(page, 'launch');
-    await expect(page.locator('.hud-sector')).toHaveText('Launch');
+    await expect(page.locator('p.visually-hidden[aria-live="polite"]')).toHaveText(
+      'Section: Launch',
+    );
   });
 
-  test('flight path dots are links and moving to one focuses its heading', async ({ page }) => {
-    await page.goto('/');
-    await waitForScene(page);
-    await expect(page.locator('.hud-path__link')).toHaveCount(6);
-    await page.locator('.hud-path__link').nth(1).click();
-    await expect(page.locator('#blackwater-title')).toBeFocused();
-  });
-
-  test('the L key switches to lite and back, and removes and restores the canvas', async ({
+  test('the progress line fills as the flight goes on and the menu links reach a project', async ({
     page,
   }) => {
     await page.goto('/');
     await waitForScene(page);
-    await page.keyboard.press('l');
+    const fill = page.locator('.hud-progress__fill');
+    await expect(fill).toHaveCount(1);
+    const start = await fill.evaluate((el) => el.style.transform);
+    await scrollToSection(page, 'europa');
+    await expect
+      .poll(async () => fill.evaluate((el) => parseFloat(el.style.transform.slice(7))), {
+        timeout: 45_000,
+      })
+      .toBeGreaterThan(0.5);
+    expect(start).toContain('scaleX');
+    await page.keyboard.press('m');
+    await page.locator('#menu').getByRole('link', { name: 'BlackWater' }).click();
+    await expect(page.locator('#blackwater-title')).toBeFocused();
+  });
+
+  test('the header button switches to the plain page and back, and removes and restores the canvas', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await waitForScene(page);
+    const toggle = page.locator('[data-mode-toggle]');
+    await expect(toggle).toHaveText('Skip the flight');
+    await toggle.click();
     await expect(page.locator('html')).toHaveClass(/lite/);
+    await expect(toggle).toHaveText('Start the flight');
     await expect(page.locator('canvas.scene-canvas')).toHaveCount(0);
-    await expect(page.locator('.hud-path')).toHaveCount(0);
+    await expect(page.locator('.hud-progress')).toHaveCount(0);
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
-    await page.keyboard.press('l');
+    await toggle.click();
     await waitForScene(page);
     await expect(page.locator('canvas.scene-canvas')).toHaveCount(1);
     await expect(page.locator('html')).not.toHaveClass(/lite/);
@@ -94,9 +117,9 @@ test.describe('with a returning visitor', () => {
     page.on('pageerror', (err) => errors.push(err.message));
     await page.goto('/');
     await waitForScene(page);
-    for (const id of ['argus', 'europa', 'crew', 'belt', 'contact', 'launch']) {
+    for (const id of ['argus', 'europa', 'about', 'education', 'contact', 'launch']) {
       await scrollToSection(page, id);
-      await page.setViewportSize({ width: id === 'crew' ? 390 : 1280, height: 800 });
+      await page.setViewportSize({ width: id === 'about' ? 390 : 1280, height: 800 });
     }
     await page.waitForTimeout(300);
     expect(errors).toEqual([]);
@@ -126,14 +149,14 @@ test.describe('with a returning visitor', () => {
       };
     };
     const ids = [
-      'belt',
       'argus',
       'blackwater',
       'beetlejuice',
       'theredarmy',
       'deadletter',
       'europa',
-      'crew',
+      'about',
+      'education',
       'contact',
     ];
     const route = [...ids, ...ids.slice(0, -1).reverse(), 'launch'];
@@ -144,7 +167,7 @@ test.describe('with a returning visitor', () => {
         await page.waitForTimeout(500);
         peak = Math.max(peak, (await read()).geometries);
       }
-      await expect.poll(async () => (await read()).worlds, { timeout: 15_000 }).toBe('earth');
+      await expect.poll(async () => (await read()).worlds, { timeout: 60_000 }).toBe('earth');
     }
 
     // The first flight uploads things that are created lazily (the jump tunnel, for example). On a
@@ -177,76 +200,6 @@ test.describe('with a returning visitor', () => {
     }
     // The favicon is an SVG and is not counted as a texture.
     expect(downloaded.filter((url) => !url.endsWith('favicon.svg'))).toEqual([]);
-  });
-
-  test('hazards: hull drops along the route, alerts match the sector, the flight ends at 71%', async ({
-    page,
-  }) => {
-    // The probe eases between the far ends of the route. Slow machines need longer to arrive.
-    test.slow();
-    await page.goto('/');
-    await waitForScene(page);
-    const hull = page.locator('.hud-hull');
-    const alert = page.locator('.hud-alert');
-    await expect(hull).toHaveText('Hull 100%');
-    await scrollToSection(page, 'blackwater');
-    await expect(alert).toBeVisible();
-    await scrollToSection(page, 'europa');
-    await expect(alert).toHaveText(/close approach\. miss distance 4\.2 km\./i);
-    await scrollToSection(page, 'contact');
-    await expect(hull).toHaveText('Hull 71%');
-    await expect(alert).toHaveText('Arrived. Good enough to ship.');
-    // Scrubbing back restores the earlier state.
-    await scrollToSection(page, 'launch');
-    await expect(hull).toHaveText('Hull 100%', { timeout: 60_000 });
-    await expect(alert).toBeHidden({ timeout: 60_000 });
-  });
-
-  test('the HUD never dims faster than three times a second', async ({ page }) => {
-    test.slow();
-    await page.goto('/');
-    await waitForScene(page);
-    await page.evaluate(() => {
-      window.__glitchTimes = [];
-      new MutationObserver(() => {
-        if (document.documentElement.classList.contains('hud-glitch') !== window.__wasDim) {
-          window.__wasDim = !window.__wasDim;
-          if (window.__wasDim) window.__glitchTimes.push(performance.now());
-        }
-      }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    });
-    await scrollToSection(page, 'deadletter');
-    // Wait for the dimming to start (slow software rendering can take a while to get there).
-    await page.waitForFunction(() => window.__glitchTimes.length >= 3, null, { timeout: 60_000 });
-    const times = await page.evaluate(() => window.__glitchTimes);
-    // Gaps between one dim and the next must be at least a third of a second.
-    for (let i = 1; i < times.length; i += 1)
-      expect(times[i] - times[i - 1]).toBeGreaterThanOrEqual(333);
-  });
-
-  test('in flight the Konami code rolls the probe and the S key toggles sound', async ({
-    page,
-  }) => {
-    await page.goto('/');
-    await waitForScene(page);
-    for (const key of [
-      'ArrowUp',
-      'ArrowUp',
-      'ArrowDown',
-      'ArrowDown',
-      'ArrowLeft',
-      'ArrowRight',
-      'ArrowLeft',
-      'ArrowRight',
-      'b',
-      'a',
-    ]) {
-      await page.keyboard.press(key);
-    }
-    await expect(page.locator('#toast')).toHaveText('Barrel roll.');
-    await expect(page.locator('html')).toHaveAttribute('data-sound', 'off');
-    await page.keyboard.press('s');
-    await expect(page.locator('html')).toHaveAttribute('data-sound', 'on');
   });
 
   for (const tier of ['low', 'high']) {
@@ -282,7 +235,9 @@ test.describe('with a returning visitor', () => {
   ]) {
     test(`axe finds no violations in flight mode at ${size.width}px`, async ({ page }) => {
       await page.setViewportSize(size);
-      await page.goto('/');
+      // The low tier draws straight to the screen with no post-processing. Axe checks the page, not
+      // the picture, and the software renderer in CI takes over a minute per frame at 1920 px.
+      await page.goto('/?tier=low');
       await waitForScene(page);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations.map((v) => `${v.id}: ${v.nodes[0].html}`)).toEqual([]);
@@ -313,30 +268,22 @@ test('without WebGL 2 the page starts lite and hides the flight toggle', async (
   await expect(page.locator('[data-mode-toggle]')).toHaveCount(0);
 });
 
-test('first visit: boot lines, any key skips, role chooser, choice is remembered', async ({
+test('first visit: the boot cover shows, any key skips it, and it does not return', async ({
   page,
 }) => {
   await page.goto('/');
   await expect(page.locator('.boot')).toBeVisible();
-  await expect(page.locator('.boot__text')).toContainText('AK-01 FLIGHT COMPUTER');
   await page.keyboard.press('x');
   await expect(page.locator('.boot')).toHaveCount(0);
-  const role = page.locator('#role');
-  await expect(role).toBeVisible();
-  await role.getByRole('button', { name: /Engineer/ }).click();
-  await expect(role).toBeHidden();
-  await expect(page.locator('#argus [data-recorder]')).toHaveJSProperty('open', true);
-
   await page.reload();
   await expect(page.locator('.boot')).toHaveCount(0);
-  await expect(page.locator('#role')).toBeHidden();
-  await expect(page.locator('#argus [data-recorder]')).toHaveJSProperty('open', true);
 });
 
-test('Esc skips the role chooser', async ({ page }) => {
-  await page.goto('/?lite=1');
-  await expect(page.locator('#role')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#role')).toBeHidden();
-  await expect(page.locator('html')).toHaveAttribute('data-role', 'curious');
+test('in flight the S key toggles sound and the choice shows on the page', async ({ page }) => {
+  await markVisited(page);
+  await page.goto('/');
+  await waitForScene(page);
+  await expect(page.locator('html')).toHaveAttribute('data-sound', 'off');
+  await page.keyboard.press('s');
+  await expect(page.locator('html')).toHaveAttribute('data-sound', 'on');
 });

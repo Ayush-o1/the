@@ -1,35 +1,30 @@
-// The boot sequence. First visit only, 2.2 seconds at most, and any key or tap skips it.
-// The lines report real checks about this browser.
-const LINE_MS = 280;
-const FADE_MS = 180;
+// The boot cover. First visit only. It sits over the page while the flight compiles its shaders
+// and uploads its buffers, so nothing hitches once the visitor starts to scroll. The line fills
+// when the work is really done. It never lasts more than two seconds, and any key, tap or the
+// Skip button ends it at once. The page underneath is already readable.
+const MAX_MS = 2000;
+const MIN_MS = 500;
+const FADE_MS = 280;
 
-function buildLines(env, tier) {
-  const dpr = Math.round((window.devicePixelRatio || 1) * 10) / 10;
-  return [
-    'AK-01 FLIGHT COMPUTER',
-    `> display .... ${window.innerWidth}x${window.innerHeight} @${dpr}x`,
-    `> webgl ...... ${env.webgl2 ? 'ok' : 'missing'}  (tier: ${tier})`,
-    `> motion ..... ${env.reducedMotion ? 'reduced' : 'full'}`,
-    '> audio ...... off',
-    '> hull ....... 100%',
-    'READY',
-  ];
-}
-
-export function runBoot(env, tier) {
+export function runBoot({ ready }) {
   return new Promise((resolve) => {
-    const overlay = document.createElement('div');
-    overlay.className = 'boot';
-    // Decorative. Screen readers should go straight to the page.
-    overlay.setAttribute('aria-hidden', 'true');
-    const text = document.createElement('pre');
-    text.className = 'boot__text mono';
-    overlay.append(text);
-    document.body.append(overlay);
+    const cover = document.createElement('div');
+    cover.className = 'boot';
+    cover.innerHTML = `
+      <div class="boot__inner">
+        <p class="boot__name">Ayush Kumar</p>
+        <p class="boot__role mono">Software engineer</p>
+        <div class="boot__bar"><span class="boot__fill"></span></div>
+        <p class="boot__note mono">Preparing the flight</p>
+        <button type="button" class="btn btn--quiet boot__skip">Skip</button>
+      </div>`;
+    document.body.append(cover);
+    const fill = cover.querySelector('.boot__fill');
+    const skip = cover.querySelector('.boot__skip');
+    skip.focus({ preventScroll: true });
 
-    const lines = buildLines(env, tier);
-    let shown = 0;
     let finished = false;
+    const started = performance.now();
     const timers = [];
 
     function finish() {
@@ -37,24 +32,24 @@ export function runBoot(env, tier) {
       finished = true;
       timers.forEach(clearTimeout);
       document.removeEventListener('keydown', finish);
-      document.removeEventListener('pointerdown', finish);
-      overlay.classList.add('boot--out');
+      cover.classList.add('boot--out');
       setTimeout(() => {
-        overlay.remove();
+        cover.remove();
         resolve();
       }, FADE_MS);
     }
 
-    function showNext() {
-      if (finished) return;
-      text.textContent = lines.slice(0, shown + 1).join('\n');
-      shown += 1;
-      if (shown < lines.length) timers.push(setTimeout(showNext, LINE_MS));
-      else timers.push(setTimeout(finish, LINE_MS));
-    }
-
+    // The bar creeps to 85% while work is under way and completes when the work is done.
+    requestAnimationFrame(() => {
+      fill.style.transform = 'scaleX(0.85)';
+    });
+    ready.finally(() => {
+      fill.style.transform = 'scaleX(1)';
+      const wait = Math.max(0, MIN_MS - (performance.now() - started));
+      timers.push(setTimeout(finish, wait));
+    });
+    timers.push(setTimeout(finish, MAX_MS));
     document.addEventListener('keydown', finish);
-    document.addEventListener('pointerdown', finish);
-    showNext();
+    cover.addEventListener('pointerdown', finish);
   });
 }

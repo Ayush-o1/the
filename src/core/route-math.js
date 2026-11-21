@@ -1,45 +1,54 @@
 // Maps the page scroll position to a position along the flight route. Pure functions, no DOM.
 //
-// Each sector of the page is a "stop". A stop has a scroll position at which the sector is
-// centred in the viewport. Between two stops the probe holds still for the first part of the gap
-// (you are reading), travels in the middle, and holds again at the next stop.
+// Each section of the page is a "stop". The probe stays at a stop for as long as that section is
+// on screen, and travels to the next one in the space between them.
 
-const PLATEAU = 0.3;
-
-function smoothstep(x) {
+export function smoothstep(x) {
   const t = Math.min(1, Math.max(0, x));
   return t * t * (3 - 2 * t);
 }
 
-// Scroll positions where each rectangle is centred. Rectangles are { top, bottom } in page pixels.
-// The result is forced to be strictly increasing so the mapping below never divides by zero.
+// How far below the top of the viewport a section's title sits when the probe is "at" the stop.
+const TITLE_MARGIN = 0.12;
+
+// For each section, the range of scroll positions over which the probe stays at its stop. The
+// range starts when the title is just under the header and ends when the bottom of the section is
+// just above the bottom of the screen, so the world stays in place for the whole time the section is
+// being read. A short section gets a single point. Ranges are forced to be strictly increasing so
+// the mapping below never divides by zero. Rectangles are { top, bottom } in page pixels.
 export function stopScrolls(rects, viewportHeight) {
-  const scrolls = [];
+  const ranges = [];
+  let previousEnd = -Infinity;
   for (const rect of rects) {
-    const centred = (rect.top + rect.bottom) / 2 - viewportHeight / 2;
-    const previous = scrolls.length ? scrolls[scrolls.length - 1] : -Infinity;
-    scrolls.push(Math.max(centred, previous + 1));
+    let from = rect.top - TITLE_MARGIN * viewportHeight;
+    let to = rect.bottom - (1 - TITLE_MARGIN) * viewportHeight;
+    if (to < from) from = to = (from + to) / 2;
+    from = Math.max(from, previousEnd + 1);
+    to = Math.max(to, from);
+    ranges.push({ from, to });
+    previousEnd = to;
   }
-  return scrolls;
+  return ranges;
 }
 
-// Returns a number from 0 to stops - 1. A whole number means "at that stop".
-export function stopParam(scrolls, y) {
-  const last = scrolls.length - 1;
-  if (last < 0 || y <= scrolls[0]) return 0;
-  if (y >= scrolls[last]) return last;
+// Returns a number from 0 to stops - 1. A whole number means "at that stop". The probe travels
+// only in the gap between two sections, eased at both ends.
+export function stopParam(ranges, y) {
+  const last = ranges.length - 1;
+  if (last < 0 || y <= ranges[0].to) return 0;
+  if (y >= ranges[last].from) return last;
   let i = 0;
-  while (y >= scrolls[i + 1]) i += 1;
-  const u = (y - scrolls[i]) / (scrolls[i + 1] - scrolls[i]);
-  const travel = smoothstep((u - PLATEAU) / (1 - 2 * PLATEAU));
-  return i + travel;
+  while (y >= ranges[i + 1].from) i += 1;
+  if (y <= ranges[i].to) return i;
+  return i + smoothstep((y - ranges[i].to) / (ranges[i + 1].from - ranges[i].to));
 }
 
-// The stop whose centre is nearest to the current scroll position. Drives the sector label.
-export function nearestStop(scrolls, y) {
+// The stop whose range is nearest to the current scroll position. Drives the section label.
+export function nearestStop(ranges, y) {
+  const distance = (range) => (y < range.from ? range.from - y : y > range.to ? y - range.to : 0);
   let best = 0;
-  for (let i = 1; i < scrolls.length; i += 1) {
-    if (Math.abs(scrolls[i] - y) < Math.abs(scrolls[best] - y)) best = i;
+  for (let i = 1; i < ranges.length; i += 1) {
+    if (distance(ranges[i]) < distance(ranges[best])) best = i;
   }
   return best;
 }
@@ -54,4 +63,20 @@ export function jumpIntensity(param, jumps) {
     }
   }
   return 0;
+}
+
+// How present the probe is, 0 to 1, given its progress and the stops that are projects. It is 0
+// while a project is being read, so the probe never sits behind a dossier, and 1 in the gaps
+// between projects and at the start and end. A pure function of progress.
+export function probePresence(param, projectStops) {
+  let nearest = Infinity;
+  for (const index of projectStops) nearest = Math.min(nearest, Math.abs(param - index));
+  return smoothstep((nearest - 0.12) / 0.23);
+}
+
+// How strongly gravity bends the picture around a stop, 0 to 1. It is a pure function of progress,
+// so scrubbing back gives the same picture as flying forward. Zero beyond one stop away.
+export function wellStrength(param, index) {
+  const closeness = 1 - Math.min(1, Math.abs(param - index));
+  return smoothstep(closeness);
 }

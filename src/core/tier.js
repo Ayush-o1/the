@@ -2,9 +2,9 @@
 // deviceMemory is not used because Safari does not expose it.
 
 export const TIERS = {
-  high: { dpr: 2, stars: 7000, beltProbes: 2000, post: true },
-  mid: { dpr: 1.5, stars: 4500, beltProbes: 1200, post: true },
-  low: { dpr: 1, stars: 2000, beltProbes: 500, post: false },
+  high: { dpr: 2, stars: 7000, post: true },
+  mid: { dpr: 1.5, stars: 4500, post: true },
+  low: { dpr: 1, stars: 2000, post: false },
 };
 
 const SLOW_MS = 24;
