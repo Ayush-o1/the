@@ -18,7 +18,7 @@ import { createEuropa } from './europa.js';
 // stays. Once the probe has gone by, the world is behind the camera, so it must not hang in front
 // of the next one.
 // How far past its stop a world stays visible, in stops.
-const AFTER = 0.85;
+const AFTER = 0.3;
 // A world fades in and out over this many seconds instead of popping. Whether it should be shown
 // is a pure function of progress; only the fade toward that answer takes time.
 export const FADE_SECONDS = 0.5;

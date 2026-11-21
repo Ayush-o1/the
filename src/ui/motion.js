@@ -21,7 +21,7 @@ function inViewNow(el) {
 // How close the flight must be to a heading's section before the heading plays, in stops. The
 // headings and the camera read the same smoothed progress in the same frame, so the text arrives
 // with the world, not ahead of it.
-const ARRIVE = 0.35;
+const ARRIVE = 0.9;
 
 // stops: the flight's sections in order (scene.stops). Returns { update(param), stop() }: the
 // scene's frame loop calls update with its smoothed progress.
