@@ -40,6 +40,8 @@ export function mountHud() {
     // Called every frame.
     update({ param, stops: count }) {
       fill.style.transform = `scaleX(${param / Math.max(1, count - 1)})`;
+      // Hidden through the opening, where a few pixels of line would read as a stray mark.
+      progress.style.opacity = String(Math.min(1, Math.max(0, (param - 0.4) / 0.4)));
     },
     destroy() {
       for (const node of parts) node.remove();

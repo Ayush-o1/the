@@ -144,14 +144,15 @@ main > .hero {
   justify-content: center;
   max-width: none;
   min-height: calc(100svh - var(--header-h));
-  padding-block: clamp(40px, 7vh, 112px) clamp(48px, 11vh, 160px);
+  padding-block: clamp(40px, 8vh, 120px) clamp(32px, 5vh, 64px);
   padding-inline: var(--hero-edge);
   isolation: isolate;
   overflow: hidden;
 }
 
-/* A dark field under the words, so no star ever sits behind a letter. It fades out toward the
-   bottom of the screen, where the Earth rises into view as the flight begins. */
+/* A dark field under the words, so no star ever sits behind a letter. It is lighter on the right,
+   where there is only sky above the band, and ends softly at the foot of the hero, so the Earth
+   that rises below it as the flight begins meets no hard edge. */
 main > .hero::before {
   content: '';
   position: absolute;
@@ -160,32 +161,42 @@ main > .hero::before {
   background: linear-gradient(
     90deg,
     rgba(10, 13, 18, 0.94) 0%,
-    rgba(10, 13, 18, 0.9) 58%,
-    rgba(10, 13, 18, 0.72) 100%
+    rgba(10, 13, 18, 0.9) 50%,
+    rgba(10, 13, 18, 0.55) 100%
   );
-  mask-image: linear-gradient(to bottom, #000 0%, #000 64%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 92%, transparent 100%);
   pointer-events: none;
 }
 
+/* Two blocks: the statement, centred in the space above, and the proof as a band across the foot
+   of the screen. Both start on the same left edge and the band spans the whole column. */
 .hero__grid {
-  display: grid;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   gap: 56px;
 }
 
+.hero__text {
+  margin-block: auto;
+}
+
 .hero__proof {
+  display: flex;
+  flex-direction: column;
   margin: 0;
 }
 
 @media (min-width: 960px) {
-  .hero__grid {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    column-gap: clamp(40px, 5vw, 96px);
-    align-items: start;
+  .hero__refusals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(32px, 4vw, 72px);
   }
 
-  /* The proof's top rule lines up with the sentence under the headline. */
-  .hero__proof {
-    margin-top: calc(var(--hero-display) * 2.04 + var(--hero-gap));
+  .hero__proof .hero__refusals li {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
 }
 
@@ -225,7 +236,6 @@ main > .hero::before {
 .hero__heading .hero__lede {
   /* The sentence that names him leads the two lines under the headline. */
   color: var(--bone);
-  text-wrap: balance;
 }
 
 .hero__heading + .hero__lede {
@@ -288,7 +298,7 @@ main > .hero::before {
 
 .hero__status {
   margin-top: 20px;
-  color: var(--dim);
+  color: var(--bone-2);
   font-size: var(--hero-small);
 }
 
@@ -331,7 +341,7 @@ main > .hero::before {
 }
 
 .hero__proof figcaption {
-  padding-top: 14px;
+  padding-bottom: 12px;
   color: var(--dim);
   font-size: 0.875rem;
 }
@@ -355,6 +365,10 @@ main > .hero::before {
     gap: 40px;
   }
 
+  .hero__text {
+    margin-block: 0;
+  }
+
   .hero__actions {
     margin-top: 28px;
     gap: 8px 28px;
@@ -372,8 +386,13 @@ main > .hero::before {
 /* Short screens (a laptop at 125% zoom): everything on the first screen still fits. */
 @media (min-width: 960px) and (max-height: 700px) {
   main > .hero {
-    --hero-gap: 20px;
-    padding-block: 48px 40px;
+    --hero-gap: 16px;
+    --hero-display: clamp(3rem, 10.5vh, 4.5rem);
+    padding-block: 36px 24px;
+  }
+
+  .hero__grid {
+    gap: 28px;
   }
 
   .hero__refusals q {

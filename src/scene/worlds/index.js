@@ -59,7 +59,7 @@ const DEFINITIONS = [
     near: 2.2,
     // The opening reveals the Earth as the camera levels out (camera-path.js), so it stays a
     // little longer than the other worlds.
-    after: 0.4,
+    after: 0.6,
   },
   // Argus comes in only once the opening's Earth has gone, so one thing arrives at a time.
   {
@@ -67,8 +67,8 @@ const DEFINITIONS = [
     stop: 'argus',
     create: createArgus,
     offset: [-19, 1, 46],
-    near: 0.6,
-    nearPortrait: 0.35,
+    near: 0.4,
+    nearPortrait: 0.3,
   },
   {
     id: 'blackwater',

@@ -195,7 +195,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     // probe stays out of the flight there.
     if (portrait) presence = 0;
     // The opening shows the Earth alone; the probe joins the flight on the way to the first project.
-    presence *= smoothstep(Math.max(0, (param - 0.35) / 0.35));
+    presence *= smoothstep(Math.max(0, (param - 0.55) / 0.3));
     const opening = 0.6 + 0.4 * smoothstep(Math.min(1, param / 0.9));
     probe.object.visible = presence > 0.01;
     probe.object.scale.setScalar(probeScale * opening * Math.max(presence, 0.01));

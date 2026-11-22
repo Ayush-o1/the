@@ -68,7 +68,7 @@ test.describe('menu', () => {
       'About',
       'Education',
       'Contact',
-      'In 60 seconds',
+      '60-second summary',
     ]) {
       expect([...reached].some((text) => text?.includes(name))).toBe(true);
     }
