@@ -11,8 +11,7 @@ import { initA11y } from './core/a11y.js';
 import { createAudio } from './core/audio.js';
 import { detectEnvironment, decideMode } from './core/capabilities.js';
 import { createModeController } from './core/mode.js';
-import { readSetting, writeSetting } from './core/store.js';
-import { runBoot } from './ui/boot.js';
+import { readSetting } from './core/store.js';
 import { mountDebug } from './ui/debug.js';
 import { mountSimulations } from './sims/index.js';
 import { setModeToggleLabel } from './ui/hud.js';
@@ -78,12 +77,12 @@ if (env.webgl2) {
   toggleButton?.remove();
 }
 
-let flight = Promise.resolve();
 if (decision.mode === 'lite') {
   modes.enterLite(decision.reason);
 } else {
   setModeToggleLabel('scene');
-  flight = new Promise((resolve) => afterFirstPaint(() => modes.enterScene().then(resolve)));
+  // The page is readable at once; the flight warms up behind it and fades in when it is ready.
+  afterFirstPaint(() => modes.enterScene());
 }
 
 // Switching to lite when the reduced-motion setting turns on mid-visit.
@@ -95,26 +94,4 @@ if (env.debug) {
   mountDebug(modes.getStats, () => modes.current);
   // A hook for the measurement scripts: they read the flight's progress every frame.
   window.__ak = { stats: modes.getStats, tune: modes.getTune, trace };
-}
-
-// First visit: the boot cover runs while the flight warms up, then the hero is revealed.
-function showHeroAtOnce() {
-  document.documentElement.classList.remove('first');
-}
-
-if (readSetting('visited') !== '1') {
-  const first = decision.mode === 'scene' ? runBoot({ ready: flight }) : Promise.resolve();
-  first.then(async () => {
-    writeSetting('visited', '1');
-    if (decision.mode !== 'scene' || env.reducedMotion) return showHeroAtOnce();
-    try {
-      const motion = await import('./ui/motion.js');
-      motion.revealHero();
-    } catch (error) {
-      console.warn('Hero reveal failed to load:', error);
-      showHeroAtOnce();
-    }
-  });
-} else {
-  showHeroAtOnce();
 }

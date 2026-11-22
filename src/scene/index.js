@@ -11,6 +11,7 @@ import {
   wellStrength,
   probePresence,
   smoothstep,
+  smootherstep,
 } from '../core/route-math.js';
 import { damp } from '../core/damp.js';
 import { createFollower } from '../core/motion.js';
@@ -187,15 +188,21 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
     // The probe steps out of frame while a section is being read.
-    // On a phone the text fills the screen, so the probe only shows in the opening frame.
     const portrait = camera.aspect <= 1.2;
     let presence = probePresence(param, projectStops);
     if (lastProject >= 0) presence *= 1 - smoothstep((param - lastProject) / 0.15);
-    if (portrait) presence *= 1 - smoothstep((param - 0.08) / 0.22);
+    // On a phone the text fills the screen, and the opening shows the Earth's edge only, so the
+    // probe stays out of the flight there.
+    if (portrait) presence = 0;
+    // The opening shows the Earth alone; the probe joins the flight on the way to the first project.
+    presence *= smoothstep(Math.max(0, (param - 0.55) / 0.3));
+    const opening = 0.6 + 0.4 * smoothstep(Math.min(1, param / 0.9));
     probe.object.visible = presence > 0.01;
-    probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
+    probe.object.scale.setScalar(probeScale * opening * Math.max(presence, 0.01));
     worlds.update(param, time, camera, dt);
-    nebula.update(time, camera.position);
+    // Off in the opening (the first screen is text over black and stars), full strength by the time
+    // the first project is reached.
+    nebula.update(time, camera.position, smootherstep(Math.min(1, param / 0.8)));
     jump.update(jumpAmount, time, camera);
 
     // The black hole bends the picture around it. Its screen position is where the lens is aimed.
@@ -248,8 +255,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     if (post) post.render();
     else renderer.render(scene, camera);
   }
-  // ready resolves when the warm-up is done, so the boot cover lifts and the hero text shows
-  // without waiting for the planet maps. The flight's first frame waits for them (below).
+  // ready resolves when the warm-up is done, without waiting for the planet maps. The flight's first frame waits for them (below).
   let markReady;
   const ready = new Promise((resolve) => {
     markReady = resolve;
@@ -266,8 +272,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     markReady();
     if (stopped) return;
     // The planet maps. Uploading one to the GPU takes a frame or more, so the flight waits up to
-    // MAP_WAIT_MS for them before its first frame (behind the boot cover on a first visit; the
-    // page itself is already readable). Maps that arrive in time show at once; a map that arrives
+    // MAP_WAIT_MS for them before its first frame (the page itself is already readable, and the
+    // canvas fades in only when that frame is drawn). Maps that arrive in time show at once; a map that arrives
     // later, on a slow connection, uploads then and its world cross-fades to it.
     if (mapsAllowed(tier)) {
       let flying = false;

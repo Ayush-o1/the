@@ -1,10 +1,16 @@
 // Puts the probe and the camera on the route. The probe sits on the curve. The camera trails
 // behind it and a little above, looking ahead along the curve.
 import { Vector3 } from 'three';
+import { smootherstep } from '../core/route-math.js';
 
 const UP = new Vector3(0, 1, 0);
 const MAX_LATERAL = 1.4;
 const MAX_ROLL = 0.12;
+// The opening. The camera starts tilted up into the stars, with the Earth and the probe just below
+// the frame, and levels out as the flight begins, so they rise into view. Nothing appears from
+// nowhere: they were there all along. A pure function of progress, so scrolling back tilts it up.
+const OPENING_TILT = 0.5; // radians: the Earth and the probe are just below the frame
+const OPENING_END = 0.15; // progress at which the camera is level
 
 export function createCameraPath(curve, camera, probe) {
   const position = new Vector3();
@@ -41,6 +47,8 @@ export function createCameraPath(curve, camera, probe) {
       // the world beside it on a wide screen, and under the text on a phone.
       target.y += camera.aspect <= 1.2 ? 6.8 : 1.8;
       camera.lookAt(target);
+      const tilt = OPENING_TILT * (1 - smootherstep(Math.min(1, Math.max(0, param / OPENING_END))));
+      if (tilt > 0) camera.rotateX(tilt);
     },
   };
 }

@@ -1,0 +1,437 @@
+/* The header and the first screen. Values that differ from the shared tokens are hero-scoped
+   (--hero-*), so nothing below the hero changes. Three text sizes (display, lede, small), three
+   text colours (bone, bone-2, dim), no accent colour, and mono only for the quoted strings, which
+   are real output from the code. */
+
+:root {
+  --hero-display: clamp(3.5rem, 0.5rem + 6.4vw, 9rem);
+  --hero-lede: clamp(1.0625rem, 0.9rem + 0.45vw, 1.5rem);
+  /* The gap between the headline and the sentence under it. The proof column starts at the same
+     height as that sentence (two headline lines plus this gap). */
+  --hero-gap: 28px;
+  --hero-small: 0.9375rem;
+  --hero-rule: rgba(236, 230, 216, 0.2);
+  --hero-bone-hi: #faf7f0;
+  /* The left edge of the content column, the same as every section below. */
+  --hero-edge: max(var(--gutter), calc((100% - 82.5rem) / 2 + var(--gutter)));
+}
+
+/* Tablets get their own headline size, not the phone's. */
+@media (min-width: 600px) and (max-width: 959px) {
+  :root {
+    --hero-display: 5.5rem;
+  }
+}
+
+/* Header: the name, four links, the summary (Menu on narrow screens) and the 3D switch. Plain
+   words, no boxes. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-chrome);
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: var(--header-h);
+  padding-inline: var(--hero-edge);
+  background: var(--ink);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--hero-small);
+  line-height: 1.2;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--bone);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header__nav-wrap {
+  margin-left: auto;
+}
+
+.site-header__nav {
+  display: flex;
+  gap: 28px;
+}
+
+.site-header__nav a,
+.site-header__control {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bone-2);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--t-fast) var(--ease-settle),
+    text-decoration-color var(--t-fast) var(--ease-settle);
+}
+
+.site-header__nav a:hover,
+.site-header__control:hover {
+  color: var(--bone);
+  text-decoration-color: var(--line-strong);
+}
+
+.site-header__control:active {
+  color: var(--dim);
+}
+
+.site-header__tools {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* A hairline between the places and the switch. The switch is a preference, not a place, so it
+   is quieter than the links. */
+.site-header__control[data-mode-toggle] {
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--dim);
+}
+
+.site-header__control--narrow {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .site-header {
+    gap: 20px;
+  }
+
+  .site-header__nav-wrap {
+    display: none;
+  }
+
+  .site-header__tools {
+    margin-left: auto;
+    gap: 20px;
+  }
+
+  .site-header__control[data-mode-toggle] {
+    padding-left: 20px;
+  }
+
+  .site-header__control--wide {
+    display: none;
+  }
+
+  .site-header__control--narrow {
+    display: inline-flex;
+  }
+}
+
+/* The first screen. Full width, so the dark field behind the text is not held to the column. */
+main > .hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: none;
+  min-height: calc(100svh - var(--header-h));
+  padding-block: clamp(40px, 8vh, 120px) clamp(32px, 5vh, 64px);
+  padding-inline: var(--hero-edge);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* A dark field under the words, so no star ever sits behind a letter. It is lighter on the right,
+   where there is only sky above the band, and ends softly at the foot of the hero, so the Earth
+   that rises below it as the flight begins meets no hard edge. */
+main > .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 13, 18, 0.94) 0%,
+    rgba(10, 13, 18, 0.9) 50%,
+    rgba(10, 13, 18, 0.55) 100%
+  );
+  mask-image: linear-gradient(to bottom, #000 0%, #000 84%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Over the 3D canvas the field is pure black, the colour of the space below the hero, so the foot
+   of the hero has no seam. */
+html.scene main > .hero::before {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.94) 0%,
+    rgba(0, 0, 0, 0.9) 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* Without 3D the stars are a repeating CSS pattern; on the first screen it stays almost hidden,
+   so it never reads as a grid. */
+html:not(.scene) main > .hero::before {
+  background: rgba(10, 13, 18, 0.9);
+  mask-image: none;
+}
+
+/* Over the canvas the header is the same black as the space under it. */
+html.scene .site-header {
+  background: #000;
+}
+
+/* Two blocks: the statement, centred in the space above, and the proof as a band across the foot
+   of the screen. Both start on the same left edge and the band spans the whole column. */
+.hero__grid {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.hero__text {
+  margin-block: auto;
+}
+
+.hero__proof {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+@media (min-width: 960px) {
+  .hero__refusals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(32px, 4vw, 72px);
+  }
+
+  /* Two rows across the three columns, so the captions sit on one line whatever the quotes do. */
+  .hero__refusals {
+    grid-template-rows: auto auto;
+  }
+
+  .hero__proof .hero__refusals li {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+.hero__heading {
+  /* Reset the shared h1 face: the two lines inside carry their own type. */
+  font: inherit;
+  letter-spacing: normal;
+}
+
+.hero__title {
+  display: block;
+  max-width: 6.4em;
+  color: var(--bone);
+  font-family: var(--font-display);
+  font-size: var(--hero-display);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  /* Optical alignment: the I's left side bearing would push the line right of the text below. */
+  margin-left: -0.045em;
+}
+
+.hero__lede {
+  display: block;
+  max-width: 31em;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: normal;
+  margin-top: var(--hero-gap);
+  color: var(--bone-2);
+  font-size: var(--hero-lede);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.hero__heading .hero__lede {
+  /* The sentence that names him leads the two lines under the headline. */
+  color: var(--bone);
+  font-weight: 500;
+}
+
+.hero__heading + .hero__lede {
+  margin-top: 6px;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 28px;
+  margin-top: 36px;
+  font-size: var(--hero-small);
+}
+
+.hero__actions a:not(.hero__button) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.hero__actions a:not(.hero__button):hover {
+  color: var(--bone);
+  text-decoration-color: var(--bone);
+}
+
+/* The one button on the screen. */
+.hero__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--radius);
+  background: var(--bone);
+  color: var(--ink);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  transition: background-color var(--t-fast) var(--ease-settle);
+}
+
+.hero__button span {
+  display: inline-block;
+  transition: transform var(--t-ui) var(--ease-settle);
+}
+
+.hero__button:hover {
+  background: var(--hero-bone-hi);
+  color: var(--ink);
+}
+
+.hero__button:hover span {
+  transform: translateY(2px);
+}
+
+.hero__button:active {
+  background: var(--bone-2);
+}
+
+.hero__status {
+  margin-top: 20px;
+  color: var(--bone-2);
+  font-size: var(--hero-small);
+}
+
+/* The proof: three refusals quoted from the code, each with the project it comes from. */
+
+.hero__refusals {
+  border-top: 1px solid var(--hero-rule);
+}
+
+.hero__refusals li {
+  display: block;
+  padding: 18px 0 16px;
+  border-bottom: 1px solid var(--hero-rule);
+  color: var(--dim);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.hero__refusals q {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  quotes: none;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.hero__refusals a {
+  color: var(--bone-2);
+}
+
+.hero__refusals a:hover {
+  color: var(--bone);
+  text-decoration-color: currentcolor;
+}
+
+.hero__proof figcaption {
+  padding-bottom: 12px;
+  color: var(--dim);
+  font-size: 0.875rem;
+}
+
+/* Phones: the screen is designed on its own. The text starts high, the button and GitHub share a
+   row, and the proof follows straight on, so there is no empty band before the fold. The dark
+   field is even across the width, because the text is. */
+@media (max-width: 599px) {
+  main > .hero {
+    --hero-gap: 20px;
+    justify-content: flex-start;
+    padding-block: 40px 48px;
+  }
+
+  main > .hero::before {
+    background: rgba(10, 13, 18, 0.93);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
+  }
+
+  .hero__grid {
+    gap: 40px;
+  }
+
+  .hero__text {
+    margin-block: 0;
+  }
+
+  .hero__actions {
+    margin-top: 28px;
+    gap: 8px 28px;
+  }
+
+  .hero__status {
+    margin-top: 12px;
+  }
+
+  .hero__refusals q {
+    font-size: 0.875rem;
+  }
+}
+
+/* Short screens (a laptop at 125% zoom): everything on the first screen still fits. */
+@media (min-width: 960px) and (max-height: 700px) {
+  main > .hero {
+    --hero-gap: 16px;
+    --hero-display: clamp(3rem, 10.5vh, 4.5rem);
+    padding-block: 36px 24px;
+  }
+
+  .hero__grid {
+    gap: 28px;
+  }
+
+  .hero__refusals q {
+    font-size: 0.8125rem;
+  }
+
+  .hero__actions {
+    margin-top: 28px;
+  }
+}

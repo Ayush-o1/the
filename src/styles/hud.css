@@ -1,4 +1,4 @@
-/* Canvas, flight path, boot cover and debug overlay. Only used when scripts run. */
+/* Canvas, flight progress and debug overlay. Only used when scripts run. */
 
 .scene-canvas {
   position: fixed;
@@ -21,84 +21,25 @@ main,
   z-index: var(--z-content);
 }
 
-/* Flight progress: a thin line along the bottom edge of the header. It never covers content. */
+/* Flight progress: a hairline drawn over the header's own bottom rule, so the header keeps one
+   line, not two. It never covers content. */
 .hud-progress {
   position: fixed;
-  top: var(--header-h);
+  top: calc(var(--header-h) - 1px);
   left: 0;
   right: 0;
   z-index: var(--z-chrome);
-  height: 2px;
-  background: var(--line);
+  height: 1px;
   pointer-events: none;
 }
 
 .hud-progress__fill {
   display: block;
   height: 100%;
-  background: var(--signal);
+  /* Neutral, so a short line at the start of the flight reads as progress, not as a stray mark. */
+  background: rgba(236, 230, 216, 0.6);
   transform: scaleX(0);
   transform-origin: left;
-}
-
-/* Boot cover */
-.boot {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-boot);
-  display: grid;
-  place-items: center;
-  padding: var(--gutter);
-  background: var(--ink);
-  transition: opacity var(--t-ui) var(--ease-settle);
-}
-
-.boot--out {
-  opacity: 0;
-}
-
-.boot__inner {
-  display: grid;
-  justify-items: center;
-  gap: var(--s3);
-  width: min(22rem, 100%);
-  text-align: center;
-}
-
-.boot__name {
-  color: var(--bone);
-  font-family: var(--font-display);
-  font-size: 3.25rem;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.boot__role,
-.boot__note {
-  color: var(--dim);
-}
-
-.boot__bar {
-  width: 100%;
-  height: 1px;
-  margin-top: var(--s4);
-  background: var(--line-strong);
-  overflow: hidden;
-}
-
-.boot__fill {
-  display: block;
-  height: 100%;
-  background: var(--bone);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--t-scene) var(--ease-settle);
-}
-
-.boot__skip {
-  justify-self: center;
-  margin-top: var(--s4);
 }
 
 /* ?debug overlay */
