@@ -1,19 +1,32 @@
 // Helpers shared by the world modules.
 import { ShaderMaterial, Vector3 } from 'three';
 import noise from '../../shaders/noise.glsl?raw';
+import light from '../../shaders/light.glsl?raw';
 import planetVertex from '../../shaders/planet.vert.glsl?raw';
 
-// The direction the light comes from. One sun for the whole route: from the upper left, in front
-// of the camera, so every world has its lit side toward the text and its shadow away from it.
-// The scene's directional light and every world shader use this same vector.
-export const SUN_DIRECTION = new Vector3(-30, 36, 26).normalize();
+// The direction the light comes from. One sun for the whole route: from the left, above and a
+// little behind the camera, about side-on. Most worlds sit on the left of the screen with their
+// project card on the right, so this lights the half that shows and leaves a dark limb toward the
+// card; Earth in the opening has a lit limb and the terminator crossing its far side. The scene's
+// key light, the reflections and every world shader use this same vector.
+export const SUN_DIRECTION = new Vector3(-0.75, 0.45, 0.45).normalize();
 
-// Builds a ShaderMaterial. The fragment source gets the shared noise functions in front of it.
+// Where the cold fill comes from: Earth, below the route.
+export const FILL_DIRECTION = new Vector3(-0.2, -1, 0.25).normalize();
+
+// Builds a ShaderMaterial. The fragment source gets the shared noise and light code in front of
+// it. Every material gets the shared sun direction and a fade uniform; the world manager swaps in
+// one fade value per world.
 export function shaderMaterial({ vertex = planetVertex, fragment, uniforms = {}, ...options }) {
   return new ShaderMaterial({
     vertexShader: vertex,
-    fragmentShader: `${noise}\n${fragment}`,
-    uniforms: { uTime: { value: 0 }, ...uniforms },
+    fragmentShader: `${noise}\n${light}\n${fragment}`,
+    uniforms: {
+      uTime: { value: 0 },
+      uSunDir: { value: SUN_DIRECTION },
+      uFade: { value: 1 },
+      ...uniforms,
+    },
     ...options,
   });
 }

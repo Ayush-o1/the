@@ -36,11 +36,20 @@ const decision = decideMode(env);
 
 // Sound follows the flight: the thrust hiss follows scroll speed.
 const audio = createAudio();
+const trace = env.debug ? [] : null;
 const modes = createModeController({
   env,
   startTier: START_TIER,
   pinTier: TIER_PINNED,
-  onFrame: ({ thrust }) => audio.setThrust(thrust),
+  onFrame: (state) => {
+    audio.setThrust(state.thrust);
+    // ?debug only: the flight's own clock, scroll target and smoothed progress, every frame, for
+    // the motion measurements. A ring of the last 4000 frames.
+    if (trace) {
+      trace.push([state.time, state.target, state.param]);
+      if (trace.length > 4000) trace.shift();
+    }
+  },
 });
 const sound = initSound(audio);
 
@@ -85,7 +94,7 @@ window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',
 if (env.debug) {
   mountDebug(modes.getStats, () => modes.current);
   // A hook for the measurement scripts: they read the flight's progress every frame.
-  window.__ak = { stats: modes.getStats };
+  window.__ak = { stats: modes.getStats, tune: modes.getTune, trace };
 }
 
 // First visit: the boot cover runs while the flight warms up, then the hero is revealed.

@@ -12,10 +12,12 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
   let loading = false;
   let pending = Promise.resolve();
   let stopMotion = null;
+  let reveals = null;
 
   function teardown() {
     stopMotion?.();
     stopMotion = null;
+    reveals = null;
     hud?.destroy();
     scene?.dispose();
     hud = null;
@@ -50,8 +52,11 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         pinTier,
         onContextLost: () => enterLite('graphics context lost'),
         onSector: (stop) => hud?.setSector(stop),
+        // The page's moving parts update in the flight's own frame, before it is drawn: the
+        // progress line reads the same smoothed progress as the camera.
         onFrame: (state) => {
           hud?.update(state);
+          reveals?.update();
           onFrame?.(state);
         },
       });
@@ -71,7 +76,8 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
         import('../ui/motion.js')
           .then((motion) => {
             if (current !== 'scene') return;
-            stopMotion = motion.initReveals();
+            reveals = motion.initReveals();
+            stopMotion = () => reveals.stop();
           })
           .catch((error) => console.warn('Motion polish failed to load:', error));
       }
@@ -101,5 +107,7 @@ export function createModeController({ env, startTier, pinTier, onFrame }) {
       return current;
     },
     getStats: () => scene?.getStats() ?? null,
+    // Scene internals, for the ?debug measurement and framing scripts only.
+    getTune: () => scene?.tune ?? null,
   };
 }

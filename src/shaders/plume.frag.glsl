@@ -7,4 +7,6 @@ void main() {
   float core = pow(1.0 - vAlong, 1.6);
   vec3 hot = mix(vec3(1.0, 0.45, 0.15), vec3(1.0, 0.86, 0.6), core);
   gl_FragColor = vec4(hot, core * flicker * uPower);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

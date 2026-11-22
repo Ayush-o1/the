@@ -18,9 +18,13 @@ function inViewNow(el) {
   return rect.top < window.innerHeight && rect.bottom > 0;
 }
 
+// Returns { update(), stop() }. The scene's frame loop calls update in the same frame as the
+// camera, before drawing, so a heading starts on the frame it is first seen. It plays once.
+// (Holding headings until the camera arrived left cards on screen without their titles.)
 export function initReveals() {
   const observers = [];
   const splits = [];
+  const waiting = [];
 
   // Headings are split after fonts load, so the line breaks match what the visitor will see.
   document.fonts.ready.then(() => {
@@ -43,13 +47,13 @@ export function initReveals() {
         play();
         continue;
       }
-      // Below the fold: hold the lines out of sight until the heading scrolls in, then play once.
+      // Below the fold: hold the lines out of sight until the heading is on screen, then play once.
       gsap.set(split.lines, { yPercent: 110 });
+      const item = { play, seen: false, done: false };
+      waiting.push(item);
       const observer = new IntersectionObserver(
         (entries) => {
-          if (!entries.some((entry) => entry.isIntersecting)) return;
-          observer.disconnect();
-          play();
+          item.seen = entries.some((entry) => entry.isIntersecting);
         },
         { rootMargin: '0px 0px -10% 0px' },
       );
@@ -58,9 +62,18 @@ export function initReveals() {
     }
   });
 
-  return () => {
-    for (const observer of observers) observer.disconnect();
-    for (const split of splits) split.revert();
+  return {
+    update() {
+      for (const item of waiting) {
+        if (item.done || !item.seen) continue;
+        item.done = true;
+        item.play();
+      }
+    },
+    stop() {
+      for (const observer of observers) observer.disconnect();
+      for (const split of splits) split.revert();
+    },
   };
 }
 

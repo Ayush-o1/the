@@ -91,3 +91,19 @@ test('contact form falls back to a mailto link', async ({ page }) => {
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.locator('#contact-note')).toContainText('mail app');
 });
+
+test.describe('with a software renderer and no saved choice', () => {
+  // Chromium here renders WebGL with SwiftShader, on the CPU. Without the saved choice the
+  // Chromium project starts with, the page must start plain and say why.
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('the page starts lite with the reason "software graphics"', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName !== 'chromium', 'only the Chromium project renders in software');
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-lite-reason', 'software graphics');
+    await expect(page.locator('canvas.scene-canvas')).toHaveCount(0);
+  });
+});

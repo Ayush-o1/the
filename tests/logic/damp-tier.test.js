@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { damp } from '../../src/core/damp.js';
 import { createTierMonitor } from '../../src/core/tier.js';
-import { decideMode } from '../../src/core/capabilities.js';
+import { decideMode, isSoftwareRenderer } from '../../src/core/capabilities.js';
 
 test('damp covers the same distance in the same time at 30 and 120 fps', () => {
   function run(fps) {
@@ -71,4 +71,32 @@ test('decideMode: lite for reduced motion, data saver, no WebGL 2, saved choice,
 test('decideMode: ?lite=0 forces the scene except without WebGL 2', () => {
   assert.equal(decideMode({ ...base, reducedMotion: true, queryLite: '0' }).mode, 'scene');
   assert.equal(decideMode({ ...base, webgl2: false, queryLite: '0' }).mode, 'lite');
+});
+
+test('decideMode: a software renderer starts lite unless the visitor chose the flight', () => {
+  assert.deepEqual(decideMode({ ...base, softwareGL: true }), {
+    mode: 'lite',
+    reason: 'software graphics',
+  });
+  assert.equal(decideMode({ ...base, softwareGL: true, savedLite: '0' }).mode, 'scene');
+  assert.equal(decideMode({ ...base, softwareGL: true, queryLite: '0' }).mode, 'scene');
+});
+
+test('isSoftwareRenderer recognises CPU renderers and not real GPUs', () => {
+  for (const name of [
+    'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)), SwiftShader driver)',
+    'llvmpipe (LLVM 15.0.7, 256 bits)',
+    'Microsoft Basic Render Driver',
+  ]) {
+    assert.equal(isSoftwareRenderer(name), true, name);
+  }
+  for (const name of [
+    'ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)',
+    'Apple GPU',
+    'Adreno (TM) 740',
+    'Mali-G78',
+    '',
+  ]) {
+    assert.equal(isSoftwareRenderer(name), false, name);
+  }
 });

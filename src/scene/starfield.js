@@ -29,7 +29,7 @@ export function createStarfield() {
     // Three classes: many faint pinpricks, some medium, very few bright.
     const roll = rng();
     if (roll > 0.985) {
-      sizes[i] = 3 + rng() * 1.6;
+      sizes[i] = 2.2 + rng() * 1.0;
       mags[i] = 0.9;
     } else if (roll > 0.85) {
       sizes[i] = 1.6 + rng() * 0.7;

@@ -14,18 +14,23 @@ import {
   LineBasicMaterial,
   Color,
   AdditiveBlending,
+  Vector3,
+  Quaternion,
 } from 'three';
-import { shaderMaterial, SUN_DIRECTION, disposeTree } from './util.js';
+import { shaderMaterial, disposeTree } from './util.js';
 import { createRng } from '../../lib/rng.js';
 import ringVertex from '../../shaders/ring.vert.glsl?raw';
 import ringFragment from '../../shaders/ring.frag.glsl?raw';
 import gasFragment from '../../shaders/gasgiant.frag.glsl?raw';
+import rings from '../../shaders/rings.glsl?raw';
+import { EMPTY_MAP } from '../maps.js';
 import satelliteVertex from '../../shaders/satellite.vert.glsl?raw';
 import satelliteFragment from '../../shaders/satellite.frag.glsl?raw';
 
 const RADIUS = 11;
 const SATELLITES = { high: 36, mid: 26, low: 14 };
 const RED_NODE = 7;
+const Y_AXIS = new Vector3(0, 1, 0);
 
 function buildSatellites(count) {
   const rng = createRng(1111);
@@ -51,35 +56,57 @@ export function createArgus({ tier }) {
   const count = SATELLITES[tier];
   const sats = buildSatellites(count);
 
+  // The planet and its ring share these, so each can shade the other.
+  const center = new Vector3();
+  const ringNormal = new Vector3(0, 0, 1);
+  const inner = RADIUS * 1.32;
+  const outer = RADIUS * 2.25;
+
   const planetMaterial = shaderMaterial({
-    fragment: gasFragment,
+    fragment: `${rings}\n${gasFragment}`,
     uniforms: {
-      uSunDir: { value: SUN_DIRECTION },
-      uColA: { value: new Color(0x6b5a3c) },
-      uColB: { value: new Color(0xb39a68) },
-      uColC: { value: new Color(0x4a3d2a) },
+      uColA: { value: new Color(0xbfa577) },
+      uColB: { value: new Color(0xe6d8b6) },
+      uColC: { value: new Color(0x8a7048) },
       uSeed: { value: 3.0 },
+      uMaps: { value: 0 },
+      uMap: { value: EMPTY_MAP },
+      uRingNormal: { value: ringNormal },
+      uRingInner: { value: inner },
+      uRingOuter: { value: outer },
+      uCenter: { value: center },
     },
   });
-  const planet = new Mesh(new SphereGeometry(RADIUS, 64, 48), planetMaterial);
+  const planet = new Mesh(new SphereGeometry(RADIUS, 96, 64), planetMaterial);
   group.add(planet);
 
   const ringMaterial = shaderMaterial({
     vertex: ringVertex,
-    fragment: ringFragment,
+    fragment: `${rings}\n${ringFragment}`,
     uniforms: {
-      uInner: { value: RADIUS * 1.35 },
-      uOuter: { value: RADIUS * 2.1 },
-      uColor: { value: new Color(0xd8c7a0) },
+      uInner: { value: inner },
+      uOuter: { value: outer },
+      uColor: { value: new Color(0xd9caa4) },
+      uCenter: { value: center },
+      uPlanetRadius: { value: RADIUS },
+      uRingNormal: { value: ringNormal },
     },
     transparent: true,
     side: DoubleSide,
     depthWrite: false,
   });
-  const ring = new Mesh(new RingGeometry(RADIUS * 1.35, RADIUS * 2.1, 128, 1), ringMaterial);
+  const ring = new Mesh(new RingGeometry(inner, outer, 256, 1), ringMaterial);
   ring.rotation.x = Math.PI / 2 - 0.28;
   ring.rotation.z = -0.25;
+  // Drawn after the planet: the planet writes depth, so the far arc is hidden behind it and the
+  // near arc shows in front.
+  ring.renderOrder = 1;
   group.add(ring);
+  // The planet spins about the ring's axis, so its bands run parallel to the ring.
+  ring.updateMatrix();
+  const axis = new Vector3(0, 0, 1).applyQuaternion(ring.quaternion);
+  const tilt = new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), axis);
+  const spin = new Quaternion();
 
   // Satellites are points. Their positions are computed on the CPU because the lines need them too.
   const positions = new Float32Array(count * 3);
@@ -136,7 +163,10 @@ export function createArgus({ tier }) {
     group,
     update(time) {
       planetMaterial.uniforms.uTime.value = time;
-      planet.rotation.y = time * 0.01;
+      planet.quaternion.copy(tilt).multiply(spin.setFromAxisAngle(Y_AXIS, time * 0.01));
+      group.updateMatrixWorld();
+      planet.getWorldPosition(center);
+      ringNormal.set(0, 0, 1).transformDirection(ring.matrixWorld);
       sats.forEach((sat, i) => satellitePosition(sat, time, positions, i * 3));
       pairs.forEach(([a, b], i) => {
         linePositions.set(positions.subarray(a * 3, a * 3 + 3), i * 6);

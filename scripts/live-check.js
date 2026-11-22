@@ -60,13 +60,20 @@ const browser = await chromium.launch({
 // 2. Flight: starts, HUD present, still no errors.
 {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  // This browser draws WebGL in software, which the site sends to the plain page; the saved choice
+  // asks for the flight, as a visitor would with the toggle.
   await context.addInitScript(() => {
     localStorage.setItem('ak-visited', '1');
+    localStorage.setItem('ak-lite', '0');
   });
   const page = await context.newPage();
   const errors = [];
+  const maps = new Set();
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => message.type() === 'error' && errors.push(message.text()));
+  page.on('response', (response) => {
+    if (/\.webp$/.test(response.url()) && response.ok()) maps.add(response.url());
+  });
   await page.goto(base);
   const started = await page.waitForSelector('html.scene', { timeout: 20000 }).then(
     () => true,
@@ -80,6 +87,7 @@ const browser = await chromium.launch({
     'section is announced',
     (await page.locator('p.visually-hidden[aria-live]').textContent())?.includes('Europa'),
   );
+  check('the six planet maps are served', maps.size === 6, String(maps.size));
   check('no console errors in flight', errors.length === 0, errors.join(' | '));
   await context.close();
 }

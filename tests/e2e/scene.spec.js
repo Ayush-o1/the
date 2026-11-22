@@ -129,9 +129,14 @@ test.describe('with a returning visitor', () => {
     await page.goto('/?debug');
     await waitForScene(page);
     await expect(page.locator('.debug')).toContainText('draw calls', { timeout: 5000 });
-    const text = await page.locator('.debug').textContent();
-    expect(Number(text.match(/draw calls (\d+)/)[1])).toBeLessThanOrEqual(200);
-    expect(Number(text.match(/triangles (\d+)/)[1])).toBeLessThanOrEqual(300_000);
+    // The overlay refreshes every 250 ms; on a slow machine its first text can still show the
+    // warm-up renders. Read it until it shows a flight frame.
+    const read = async (name) => {
+      const text = await page.locator('.debug').textContent();
+      return Number(text.match(new RegExp(`${name} (\\d+)`))[1]);
+    };
+    await expect.poll(() => read('draw calls'), { timeout: 10_000 }).toBeLessThanOrEqual(200);
+    expect(await read('triangles')).toBeLessThanOrEqual(300_000);
   });
 
   test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
@@ -184,22 +189,49 @@ test.describe('with a returning visitor', () => {
     expect(peak).toBeLessThan(60);
   });
 
-  test('the flight downloads no images, textures or model files', async ({ page }) => {
+  // The only image files the flight fetches are the six planet maps (NASA and USGS imagery), and
+  // only on tiers that use them. No models, no HDR environments, nothing else.
+  const MAPS = ['earth-day', 'earth-night', 'earth-clouds', 'mars', 'europa', 'jupiter'];
+  function watchDownloads(page) {
     const downloaded = [];
     page.on('request', (request) => {
-      if (['image', 'media'].includes(request.resourceType())) downloaded.push(request.url());
-      if (/\.(png|jpe?g|webp|gif|ktx2?|glb|gltf|hdr|exr)(\?|$)/i.test(request.url())) {
-        downloaded.push(request.url());
+      const url = request.url();
+      if (url.endsWith('favicon.svg')) return;
+      if (
+        ['image', 'media'].includes(request.resourceType()) ||
+        /\.(png|jpe?g|webp|gif|ktx2?|glb|gltf|hdr|exr)(\?|$)/i.test(url)
+      ) {
+        downloaded.push(url);
       }
     });
-    await page.goto('/');
+    return downloaded;
+  }
+
+  test('the flight downloads only the six planet maps, and no model files', async ({ page }) => {
+    const downloaded = watchDownloads(page);
+    await page.goto('/?tier=high');
     await waitForScene(page);
     for (const id of ['argus', 'blackwater', 'europa', 'contact']) {
       await scrollToSection(page, id);
       await page.waitForTimeout(300);
     }
-    // The favicon is an SVG and is not counted as a texture.
-    expect(downloaded.filter((url) => !url.endsWith('favicon.svg'))).toEqual([]);
+    const names = downloaded.map((url) =>
+      url
+        .split('/')
+        .pop()
+        .replace(/-[\w-]{8}\.webp$/, ''),
+    );
+    expect(downloaded.every((url) => /\.webp(\?|$)/.test(url))).toBe(true);
+    expect([...new Set(names)].sort()).toEqual([...MAPS].sort());
+  });
+
+  test('the low tier downloads no images at all', async ({ page }) => {
+    const downloaded = watchDownloads(page);
+    await page.goto('/?tier=low');
+    await waitForScene(page);
+    await scrollToSection(page, 'europa');
+    await page.waitForTimeout(500);
+    expect(downloaded).toEqual([]);
   });
 
   for (const tier of ['low', 'high']) {

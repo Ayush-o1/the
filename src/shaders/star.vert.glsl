@@ -18,6 +18,6 @@ void main() {
   vec3 neutral = vec3(1.0, 0.97, 0.92);
   vec3 warm = vec3(1.0, 0.76, 0.5);
   vColor = aTemp < 0.5 ? mix(cool, neutral, aTemp * 2.0) : mix(neutral, warm, (aTemp - 0.5) * 2.0);
-  vBig = step(2.4, aSize);
+  vBig = step(2.15, aSize);
   vAlpha = aMag * (1.0 - vBig * 0.14 * (0.5 + 0.5 * sin(uTime * 0.9 + aPhase)));
 }
