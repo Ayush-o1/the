@@ -202,7 +202,7 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     worlds.update(param, time, camera, dt);
     // Faint in the opening (the first screen is text over near-black), full strength by the time
     // the first project is reached.
-    nebula.update(time, camera.position, 0.25 + 0.75 * smootherstep(Math.min(1, param / 0.8)));
+    nebula.update(time, camera.position, 0.1 + 0.9 * smootherstep(Math.min(1, param / 0.8)));
     jump.update(jumpAmount, time, camera);
 
     // The black hole bends the picture around it. Its screen position is where the lens is aimed.

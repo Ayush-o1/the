@@ -4,7 +4,7 @@
    are real output from the code. */
 
 :root {
-  --hero-display: clamp(3.5rem, 0.5rem + 6vw, 8rem);
+  --hero-display: clamp(3.5rem, 0.5rem + 6.4vw, 9rem);
   --hero-lede: clamp(1.0625rem, 0.9rem + 0.45vw, 1.5rem);
   /* The gap between the headline and the sentence under it. The proof column starts at the same
      height as that sentence (two headline lines plus this gap). */
@@ -164,8 +164,25 @@ main > .hero::before {
     rgba(10, 13, 18, 0.9) 50%,
     rgba(10, 13, 18, 0.55) 100%
   );
-  mask-image: linear-gradient(to bottom, #000 0%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 84%, transparent 100%);
   pointer-events: none;
+}
+
+/* Over the 3D canvas the field is pure black, the colour of the space below the hero, so the foot
+   of the hero has no seam. */
+html.scene main > .hero::before {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.94) 0%,
+    rgba(0, 0, 0, 0.9) 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* Without 3D the stars are a repeating CSS pattern; on the first screen it stays almost hidden,
+   so it never reads as a grid. */
+html:not(.scene) main > .hero::before {
+  background: rgba(10, 13, 18, 0.9);
 }
 
 /* Two blocks: the statement, centred in the space above, and the proof as a band across the foot
@@ -194,7 +211,15 @@ main > .hero::before {
     column-gap: clamp(32px, 4vw, 72px);
   }
 
+  /* Two rows across the three columns, so the captions sit on one line whatever the quotes do. */
+  .hero__refusals {
+    grid-template-rows: auto auto;
+  }
+
   .hero__proof .hero__refusals li {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
     padding-bottom: 0;
     border-bottom: 0;
   }
@@ -236,6 +261,7 @@ main > .hero::before {
 .hero__heading .hero__lede {
   /* The sentence that names him leads the two lines under the headline. */
   color: var(--bone);
+  font-weight: 500;
 }
 
 .hero__heading + .hero__lede {

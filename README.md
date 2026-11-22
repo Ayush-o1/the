@@ -25,14 +25,14 @@ three runs):
 
 | Measure                            | Desktop | Phone profile |
 | ---------------------------------- | ------- | ------------- |
-| Performance                        | 96      | 93            |
+| Performance                        | 100     | 95            |
 | Accessibility, best practices, SEO | 100     | 100           |
-| Total blocking time                | 67 ms   | 170 ms        |
+| Total blocking time                | 40 ms   | 98 ms         |
 
-On a first visit a short cover stays up while every shader is compiled, so the largest text
-appears after about 1.3 s on desktop; later visits have no cover. Browsers that draw WebGL on the
-CPU get the plain page. The first load is 23 KB, all JavaScript is 217 KB gzipped, the three font
-files are 52 KB, and the planet maps (loaded after the flight starts) are 694 KB.
+The headline is the largest paint and appears at once; nothing covers the page while the 3D warms
+up, and it fades in behind the text when it is ready. Browsers that draw WebGL on the CPU get the
+plain page. The first load is 23 KB, all JavaScript is 217 KB gzipped, the three font files are
+52 KB, and the planet maps (loaded after the flight starts) are 694 KB.
 
 ## Planet imagery
 
