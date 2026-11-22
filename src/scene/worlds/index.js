@@ -57,6 +57,9 @@ const DEFINITIONS = [
     at: [33.16, -49.48, -96.07],
     atPortrait: [6.5, -44.2, -17.07],
     near: 2.2,
+    // The opening reveals the Earth as the camera levels out (camera-path.js), so it stays a
+    // little longer than the other worlds.
+    after: 0.75,
   },
   { id: 'argus', stop: 'argus', create: createArgus, offset: [-19, 1, 46], near: 0.85 },
   {
@@ -144,7 +147,7 @@ export function createWorldManager({ scene, stops, tier }) {
       for (const entry of entries) {
         const offset = param - entry.index; // negative before the stop, positive after
         // A pure function of progress, so flying forward and scrubbing back show the same worlds.
-        const wanted = offset > -entry.near && offset < AFTER ? 1 : 0;
+        const wanted = offset > -entry.near && offset < (entry.after ?? AFTER) ? 1 : 0;
         // The first frame starts where the page is (a deep link does not fade in from nothing).
         entry.fade.value = first ? wanted : stepFade(entry.fade.value, wanted, dt);
         applyFade(entry);

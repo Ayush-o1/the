@@ -10,11 +10,10 @@ function element(tag, className) {
   return el;
 }
 
-// The Skip the flight / Start the flight toggle lives in the header in both modes. Its label says
-// what a click does.
+// The 3D switch lives in the header in both modes. Its label says what a click does.
 export function setModeToggleLabel(mode) {
   const label = $('[data-mode-label]');
-  if (label) label.textContent = mode === 'scene' ? 'Skip the flight' : 'Start the flight';
+  if (label) label.textContent = mode === 'scene' ? 'Turn off 3D' : 'Turn on 3D';
 }
 
 export function mountHud() {

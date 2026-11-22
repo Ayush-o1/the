@@ -24,30 +24,3 @@ body::before {
 html.scene body::before {
   display: none;
 }
-
-/* The plain page's hero: the same planet as the flight, drawn in CSS. Lit from the upper left, with
-   a thin blue limb. Hidden when the 3D flight is running, which draws the real one. */
-html:not(.scene) main > .hero::after {
-  content: '';
-  position: absolute;
-  z-index: -2;
-  right: -12vw;
-  top: 50%;
-  width: min(100vw, 1400px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 26% 12%, rgba(255, 236, 200, 0.35) 0, transparent 26%),
-    radial-gradient(circle at 30% 16%, #3f7fc0 0, #1b4a7c 30%, #0a1f3a 60%, #050a14 100%);
-  box-shadow:
-    inset 3px 3px 10px rgba(160, 205, 255, 0.55),
-    0 -2px 40px 2px rgba(100, 160, 240, 0.2);
-}
-
-@media (max-width: 899px) {
-  html:not(.scene) main > .hero::after {
-    right: -45vw;
-    top: 62%;
-    width: 150vw;
-  }
-}

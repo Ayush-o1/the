@@ -22,7 +22,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="I build software for the day something breaks. Ayush Kumar, software engineer, over the Earth with a probe in orbit."
+      content="I write the code that says no. Ayush Kumar, software engineer in Bengaluru."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Ayush Kumar | Software engineer" />
@@ -51,12 +51,6 @@
     <!-- Adds .js before first paint so controls that need JavaScript do not flash in and out. -->
     <script>
       document.documentElement.classList.add('js');
-      // First visit: the hero text waits for the boot cover. main.js clears this class.
-      try {
-        if (!localStorage.getItem('ak-visited')) document.documentElement.classList.add('first');
-      } catch {
-        // Storage can be blocked. The hero is then simply shown at once.
-      }
     </script>
     <link rel="stylesheet" href="/src/styles/main.css" />
   </head>
@@ -65,7 +59,7 @@
 
     <header class="site-header">
       <a class="site-header__brand" href="#launch">Ayush Kumar</a>
-      <nav aria-label="Main">
+      <nav class="site-header__nav-wrap" aria-label="Main">
         <ul class="site-header__nav">
           <li><a href="#projects">Projects</a></li>
           <li><a href="#about">About</a></li>
@@ -74,9 +68,11 @@
         </ul>
       </nav>
       <div class="site-header__tools">
-        <button type="button" class="btn btn--quiet needs-js" data-open-dialog="menu">Menu</button>
-        <button type="button" class="btn btn--quiet needs-js" data-mode-toggle>
-          <span data-mode-label>Skip the flight</span>
+        <button type="button" class="site-header__control needs-js" data-open-dialog="menu">
+          Menu
+        </button>
+        <button type="button" class="site-header__control needs-js" data-mode-toggle>
+          <span data-mode-label>Turn off 3D</span>
         </button>
       </div>
     </header>
@@ -84,29 +80,43 @@
     <main id="main">
       <!-- Launch -->
       <section id="launch" class="hero" aria-labelledby="hero-title" data-sector="Launch">
-        <h1 id="hero-title" class="hero__title">
-          <span class="hero__eyebrow mono">Ayush Kumar · Software engineer · Bengaluru</span>
-          <span class="hero__line">
-            <span class="hero__row">I build software</span>
-            <span class="hero__row">for the day</span>
-            <span class="hero__row"><em>something breaks.</em></span>
-          </span>
-        </h1>
-        <p class="hero__lede">
-          Six projects, each built around a failure: an outage, a mismatch, a bad input. Read the
-          decisions, or fly past them.
-        </p>
-        <div class="hero__actions">
-          <a class="btn btn--primary" href="#projects">Start the flight</a>
-          <a class="btn" href="https://github.com/Ayush-o1">GitHub</a>
-          <a class="btn" href="https://blackwater-app.onrender.com">Live demo</a>
-          <!--resume:start-->
-          <a class="btn" href="./resume.pdf">Resume</a>
-          <!--resume:end-->
+        <div class="hero__grid">
+          <div class="hero__text">
+            <h1 id="hero-title" class="hero__title">I write the code that says no.</h1>
+            <p class="hero__lede">
+              I'm Ayush Kumar, a software engineer in Bengaluru. Most of a system is the happy path.
+              I work on the rest: the lock, the audit entry, the refusal.
+            </p>
+            <div class="hero__actions">
+              <a class="hero__button" href="#projects"
+                >See the projects <span aria-hidden="true">&darr;</span></a
+              >
+              <a href="https://github.com/Ayush-o1">GitHub</a>
+              <!--resume:start-->
+              <a href="./resume.pdf">Resume</a>
+              <!--resume:end-->
+            </div>
+            <p class="hero__status">Open to software engineer roles</p>
+          </div>
+          <figure class="hero__proof">
+            <ul class="hero__refusals">
+              <li>
+                <q lang="en">You cannot approve or reject a resolution you proposed.</q>
+                <a href="#beetlejuice">BeetleJuice</a>, payment reconciliation
+              </li>
+              <li>
+                <q lang="en">Incident is closed and cannot be modified.</q>
+                <a href="#blackwater">BlackWater</a>, incident management
+              </li>
+              <li>
+                <q lang="en">untrusted_destination_private_data</q>
+                <a href="#deadletter">deadLetter</a>, the rule that denies an AI agent&rsquo;s tool
+                call
+              </li>
+            </ul>
+            <figcaption>Three refusals, quoted from the code.</figcaption>
+          </figure>
         </div>
-        <p class="hero__status">
-          <span class="status-dot" aria-hidden="true"></span>Open to software engineer roles
-        </p>
       </section>
 
       <!-- Missions M1 to M3 -->

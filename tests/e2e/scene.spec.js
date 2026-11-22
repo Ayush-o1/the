@@ -87,10 +87,10 @@ test.describe('with a returning visitor', () => {
     await page.goto('/');
     await waitForScene(page);
     const toggle = page.locator('[data-mode-toggle]');
-    await expect(toggle).toHaveText('Skip the flight');
+    await expect(toggle).toHaveText('Turn off 3D');
     await toggle.click();
     await expect(page.locator('html')).toHaveClass(/lite/);
-    await expect(toggle).toHaveText('Start the flight');
+    await expect(toggle).toHaveText('Turn on 3D');
     await expect(page.locator('canvas.scene-canvas')).toHaveCount(0);
     await expect(page.locator('.hud-progress')).toHaveCount(0);
     await expect(page.locator('#argus .dossier__objective')).toBeVisible();
@@ -300,15 +300,15 @@ test('without WebGL 2 the page starts lite and hides the flight toggle', async (
   await expect(page.locator('[data-mode-toggle]')).toHaveCount(0);
 });
 
-test('first visit: the boot cover shows, any key skips it, and it does not return', async ({
+test('first visit: no cover; the headline is readable at once and the flight fades in behind it', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.boot')).toBeVisible();
-  await page.keyboard.press('x');
+  await expect(page.locator('#hero-title')).toBeVisible();
+  await expect(page.locator('#hero-title')).toHaveCSS('opacity', '1');
   await expect(page.locator('.boot')).toHaveCount(0);
-  await page.reload();
-  await expect(page.locator('.boot')).toHaveCount(0);
+  await waitForScene(page);
+  await expect(page.locator('#hero-title')).toBeVisible();
 });
 
 test('in flight the S key toggles sound and the choice shows on the page', async ({ page }) => {
