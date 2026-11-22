@@ -155,7 +155,14 @@ main > .hero::before {
   }
 }
 
+.hero__heading {
+  /* Reset the shared h1 face: the two lines inside carry their own type. */
+  font: inherit;
+  letter-spacing: normal;
+}
+
 .hero__title {
+  display: block;
   max-width: 6.4em;
   color: var(--bone);
   font-family: var(--font-display);
@@ -169,7 +176,11 @@ main > .hero::before {
 }
 
 .hero__lede {
+  display: block;
   max-width: 31em;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: normal;
   margin-top: 28px;
   color: var(--bone-2);
   font-size: var(--hero-lede);
@@ -177,7 +188,7 @@ main > .hero::before {
   text-wrap: pretty;
 }
 
-.hero__lede + .hero__lede {
+.hero__heading + .hero__lede {
   margin-top: 4px;
 }
 

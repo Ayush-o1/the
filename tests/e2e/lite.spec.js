@@ -21,7 +21,7 @@ test('every section renders and the console is clean', async ({ page }) => {
   page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()));
   page.on('pageerror', (err) => errors.push(err.message));
   await page.goto('/?lite=1');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Software engineer');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(/software engineer/i);
   for (const id of ['launch', 'projects', 'fleet', 'more', 'about', 'education', 'contact']) {
     await expect(page.locator(`#${id}`)).toBeAttached();
   }
