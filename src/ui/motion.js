@@ -76,19 +76,3 @@ export function initReveals() {
     },
   };
 }
-
-// The hero sequence: eyebrow, the three title rows, the lede, the buttons, the status line. One
-// settle ease, one stagger. It runs once, after the boot cover, and ends in under 1.2 seconds.
-export function revealHero() {
-  const parts = $$('.hero__eyebrow, .hero__row, .hero__lede, .hero__actions, .hero__status');
-  gsap.set(parts, { opacity: 0, y: 28 });
-  document.documentElement.classList.remove('first');
-  gsap.to(parts, {
-    opacity: 1,
-    y: 0,
-    duration: REVEAL_SECONDS,
-    ease: 'expo.out',
-    stagger: STAGGER_SECONDS,
-    clearProps: 'all',
-  });
-}

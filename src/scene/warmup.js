@@ -1,7 +1,7 @@
 // Compiles every shader and uploads every buffer before the first visible frame. Without this the
 // browser compiles each world's shaders the first time it comes into view, in the middle of a
-// scroll, and the frame takes tens of milliseconds. Behind the boot cover it costs nothing, but
-// it must not freeze the page either, so the work is cut into short tasks: one world is built,
+// scroll, and the frame takes tens of milliseconds. It runs while the visitor reads the first
+// screen, so it must not freeze the page: so the work is cut into short tasks: one world is built,
 // then one world is rendered, with the thread handed back in between.
 // compileAsync alone does not upload geometry, and meshes outside the camera are skipped by
 // frustum culling, so each world is rendered with culling switched off, then restored.

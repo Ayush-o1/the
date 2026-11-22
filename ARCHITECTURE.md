@@ -13,7 +13,7 @@ index.html            all content, semantic, readable without scripts or WebGL
 src/styles/           tokens, base, layout, components, dossier, art (CSS pictures), sims, hud, lite
 src/main.js           decides lite or scene, wires the shared UI
 src/core/             pure logic and small services (no DOM unless stated)
-src/ui/               DOM behaviour: dialogs, flight path, boot cover, reveals, sound, contact form
+src/ui/               DOM behaviour: dialogs, flight progress, reveals, sound, contact form
 src/sims/             six simulations: one pure logic file and one DOM file each
 src/scene/            the 3D flight, loaded lazily with import()
 src/shaders/          GLSL files, imported with ?raw
@@ -33,8 +33,9 @@ Scroll is native: the wheel, touch, keys and the scrollbar all move the page as 
 ### The scene
 
 - `route.js` has one waypoint per section id. `core/route-math.js` turns the scroll position into a position along that route. The probe stays at a stop while its section is on screen and travels in the space between sections.
-- Every world is built once, before the first frame. `warmup.js` compiles all shaders and uploads all buffers behind the boot cover, so no shader is compiled while the visitor scrolls. A world is shown when the probe is near it and hidden once it has gone by, a pure function of progress.
+- Every world is built once, before the first frame. `warmup.js` compiles all shaders and uploads all buffers in short tasks while the visitor reads the first screen; the canvas fades in only when its first frame is drawn, so no shader is compiled while the visitor scrolls. A world is shown when the probe is near it and hidden once it has gone by, a pure function of progress.
 - The camera never snaps. Progress follows the scroll through the spring above.
+- The opening (`camera-path.js`): the camera starts tilted up into the stars, with the Earth and the probe just below the frame, and levels out by progress 0.15, so they rise into view as the flight begins. The nebula is faint in the opening and full strength by the first project.
 - Worlds fade in and out over 0.5 s; whether one should show is a pure function of progress.
 - `post.js` runs a sanitise pass, bloom on highlights only, a lens pass (gravitational lensing and a colour fringe near the black hole, one colour grade, vignette, grain), then ACES tone mapping with a dither so dark gradients do not band. The scene renders into a 4x multisampled target. The low tier skips all of it.
 - `lighting.js`: one sun direction (`worlds/util.js`) for the key light, the reflections and every world shader, a weak cold fill from Earth, and a reflection map made with PMREM from a small procedural sky.

@@ -10,6 +10,8 @@ test.describe('menu', () => {
   test('the Menu button opens the list of places, a link goes there, and Esc returns focus', async ({
     page,
   }) => {
+    // The Menu button is the narrow-screen header control; wide screens show every link instead.
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/?lite=1');
     const button = page.locator('header [data-open-dialog="menu"]');
     await button.click();
@@ -60,7 +62,14 @@ test.describe('menu', () => {
       const label = await page.evaluate(() => document.activeElement?.textContent?.trim());
       reached.add(label);
     }
-    for (const name of ['Ayush Kumar', 'Projects', 'About', 'Education', 'Contact', 'Menu']) {
+    for (const name of [
+      'Ayush Kumar',
+      'Projects',
+      'About',
+      'Education',
+      'Contact',
+      '60-second summary',
+    ]) {
       expect([...reached].some((text) => text?.includes(name))).toBe(true);
     }
   });

@@ -7,14 +7,17 @@ import fragment from '../shaders/nebula.frag.glsl?raw';
 
 export function createNebula() {
   const material = shaderMaterial({ vertex, fragment, side: BackSide, depthWrite: false });
+  material.uniforms.uStrength = { value: 1 };
   const geometry = new SphereGeometry(1500, 32, 16);
   const mesh = new Mesh(geometry, material);
   mesh.renderOrder = -10;
   mesh.frustumCulled = false;
   return {
     object: mesh,
-    update(time, cameraPosition) {
+    // strength scales the haze: the opening keeps it faint so the first screen stays near black.
+    update(time, cameraPosition, strength = 1) {
       material.uniforms.uTime.value = time;
+      material.uniforms.uStrength.value = strength;
       mesh.position.copy(cameraPosition);
     },
     dispose() {
