@@ -48,7 +48,7 @@ void main() {
   color = mix(color, hot, smoothstep(0.65, 1.0, heat));
   // Toward the limb the light comes from higher, cooler gas: redder as well as dimmer.
   color = mix(color * vec3(1.0, 0.55, 0.4), color, mu);
-  gl_FragColor = vec4(color * limb * 0.85, uFade);
+  gl_FragColor = vec4(color * limb * 1.6, uFade);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }

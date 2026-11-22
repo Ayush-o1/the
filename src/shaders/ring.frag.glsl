@@ -25,7 +25,9 @@ void main() {
   float c = dot(oc, oc) - uPlanetRadius * uPlanetRadius;
   float shadow = (b < 0.0 && b * b - c > 0.0) ? 1.0 : 0.0;
   vec3 color = uColor * (0.75 + 0.35 * density) * (SUN_COLOR * lit * (1.0 - shadow) + FILL_COLOR);
-  gl_FragColor = vec4(color, density * 0.92 * uFade);
+  // Close to the camera the ring would cross the frame as huge flat slabs: fade it there.
+  float near = smoothstep(10.0, 40.0, length(cameraPosition - vWorldPos));
+  gl_FragColor = vec4(color, density * 0.92 * uFade * near);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }

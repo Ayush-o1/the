@@ -77,7 +77,7 @@ const DEFINITIONS = [
     id: 'theredarmy',
     stop: 'theredarmy',
     create: createMars,
-    offset: [-21, 0, 48],
+    offset: [-27, 1, 50],
     near: 0.85,
   },
   {

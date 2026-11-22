@@ -34,7 +34,7 @@ vec3 diskColor(float r, float angle, out float density) {
   vec3 hot = vec3(1.0, 0.93, 0.8);
   vec3 color = mix(cool, warm, smoothstep(0.15, 0.55, heat));
   color = mix(color, hot, smoothstep(0.6, 1.0, heat));
-  return color * (0.4 + 2.6 * heat);
+  return color * (0.35 + 1.7 * heat);
 }
 
 void main() {
@@ -55,6 +55,7 @@ void main() {
   vec3 light = vec3(0.0);
   float alpha = 0.0;
   bool escaped = false;
+  vec3 ring = vec3(0.0);
   vec3 h = cross(pos, dir);
   float h2 = dot(h, h);
   for (int i = 0; i < STEPS; i++) {
@@ -70,6 +71,9 @@ void main() {
     float dt = clamp(0.09 * r * r / (1.0 + r), 0.03, 1.2);
     // The photon orbit equation in Cartesian form: acceleration -1.5 h^2 x / r^5.
     vec3 accel = -1.5 * h2 * pos / pow(r, 5.0);
+    // Light that skims the photon sphere (r = 1.5) piles up into a thin bright ring.
+    // Kept apart and added only if the ray escapes: rays that fall in never reach the camera.
+    ring += (1.0 - alpha) * vec3(1.0, 0.82, 0.62) * exp(-pow((r - 1.52) * 14.0, 2.0)) * dt * 0.9;
     vec3 next = pos + dir * dt;
     vec3 nextDir = normalize(dir + accel * dt);
     if (pos.y * next.y < 0.0) {
@@ -85,7 +89,8 @@ void main() {
         float cosine = dot(orbit, -dir);
         float doppler = 1.0 / (inversesqrt(1.0 - speed * speed) * (1.0 - speed * cosine));
         float redshift = sqrt(max(1.0 - 1.0 / rh, 0.0));
-        float boost = pow(doppler * redshift, 3.0);
+        // Capped, so the bright side blooms without flooding the shadow next to it.
+        float boost = min(pow(doppler * redshift, 3.0), 2.5);
         emitted *= boost;
         // Approaching gas looks hotter and whiter, receding gas redder.
         emitted = mix(emitted, emitted * vec3(1.0, 0.75, 0.55), smoothstep(1.0, 0.6, doppler));
@@ -101,6 +106,7 @@ void main() {
   // A ray still close to the hole when the steps run out is spiralling in: it is part of the
   // shadow, so it is opaque black (whatever disk light it picked up stays in front).
   if (!escaped && alpha < 0.98 && length(pos) < start) alpha = 1.0;
+  if (escaped) light += ring;
   // Premultiplied output: the shadow is opaque black, open sky is clear.
   gl_FragColor = vec4(light, alpha) * uFade;
   #include <tonemapping_fragment>
