@@ -283,6 +283,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
       flying = true;
       if (stopped) return;
     }
+    // The warm-up renders counted into the renderer's stats; start the ?debug numbers clean.
+    renderer.info.reset();
     gsap.ticker.add(tick);
     // GSAP skips time after a slow frame by default, which would make the camera jump.
     gsap.ticker.lagSmoothing(0);
