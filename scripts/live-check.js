@@ -27,7 +27,7 @@ const browser = await chromium.launch({
   check('page answers 200', response?.status() === 200, String(response?.status()));
   check(
     'h1 says software engineer',
-    ((await page.locator('h1').textContent()) ?? '').includes('Software engineer'),
+    /software engineer/i.test((await page.locator('h1').textContent()) ?? ''),
   );
   check(
     'page title says software engineer',

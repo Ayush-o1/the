@@ -183,6 +183,12 @@ html.scene main > .hero::before {
    so it never reads as a grid. */
 html:not(.scene) main > .hero::before {
   background: rgba(10, 13, 18, 0.9);
+  mask-image: none;
+}
+
+/* Over the canvas the header is the same black as the space under it. */
+html.scene .site-header {
+  background: #000;
 }
 
 /* Two blocks: the statement, centred in the space above, and the proof as a band across the foot
