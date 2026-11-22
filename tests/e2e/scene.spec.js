@@ -129,9 +129,14 @@ test.describe('with a returning visitor', () => {
     await page.goto('/?debug');
     await waitForScene(page);
     await expect(page.locator('.debug')).toContainText('draw calls', { timeout: 5000 });
-    const text = await page.locator('.debug').textContent();
-    expect(Number(text.match(/draw calls (\d+)/)[1])).toBeLessThanOrEqual(200);
-    expect(Number(text.match(/triangles (\d+)/)[1])).toBeLessThanOrEqual(300_000);
+    // The overlay refreshes every 250 ms; on a slow machine its first text can still show the
+    // warm-up renders. Read it until it shows a flight frame.
+    const read = async (name) => {
+      const text = await page.locator('.debug').textContent();
+      return Number(text.match(new RegExp(`${name} (\\d+)`))[1]);
+    };
+    await expect.poll(() => read('draw calls'), { timeout: 10_000 }).toBeLessThanOrEqual(200);
+    expect(await read('triangles')).toBeLessThanOrEqual(300_000);
   });
 
   test('a full flight forwards and back leaves no extra GPU memory behind', async ({ page }) => {
