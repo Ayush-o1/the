@@ -4,8 +4,11 @@
    are real output from the code. */
 
 :root {
-  --hero-display: clamp(3.5rem, 0.9rem + 4.2vw, 5.25rem);
-  --hero-lede: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
+  --hero-display: clamp(3.5rem, 0.5rem + 6vw, 6.75rem);
+  --hero-lede: clamp(1.0625rem, 0.9rem + 0.45vw, 1.5rem);
+  /* The gap between the headline and the sentence under it. The proof column starts at the same
+     height as that sentence (two headline lines plus this gap). */
+  --hero-gap: 28px;
   --hero-small: 0.9375rem;
   --hero-rule: rgba(236, 230, 216, 0.2);
   --hero-bone-hi: #faf7f0;
@@ -13,7 +16,15 @@
   --hero-edge: max(var(--gutter), calc((100% - 82.5rem) / 2 + var(--gutter)));
 }
 
-/* Header: the name, four links, Menu and the 3D switch. Plain words, no boxes. */
+/* Tablets get their own headline size, not the phone's. */
+@media (min-width: 600px) and (max-width: 959px) {
+  :root {
+    --hero-display: 4.75rem;
+  }
+}
+
+/* Header: the name, four links, the summary (Menu on narrow screens) and the 3D switch. Plain
+   words, no boxes. */
 .site-header {
   position: sticky;
   top: 0;
@@ -86,11 +97,17 @@
   gap: 24px;
 }
 
-/* A hairline between the places and the switch. */
+/* A hairline between the places and the switch. The switch is a preference, not a place, so it
+   is quieter than the links. */
 .site-header__control[data-mode-toggle] {
   padding-left: 24px;
   border-left: 1px solid var(--line);
   border-radius: 0;
+  color: var(--dim);
+}
+
+.site-header__control--narrow {
+  display: none;
 }
 
 @media (max-width: 899px) {
@@ -109,6 +126,14 @@
 
   .site-header__control[data-mode-toggle] {
     padding-left: 20px;
+  }
+
+  .site-header__control--wide {
+    display: none;
+  }
+
+  .site-header__control--narrow {
+    display: inline-flex;
   }
 }
 
@@ -147,11 +172,20 @@ main > .hero::before {
   gap: 56px;
 }
 
+.hero__proof {
+  margin: 0;
+}
+
 @media (min-width: 960px) {
   .hero__grid {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     column-gap: clamp(40px, 5vw, 96px);
-    align-items: end;
+    align-items: start;
+  }
+
+  /* The proof's top rule lines up with the sentence under the headline. */
+  .hero__proof {
+    margin-top: calc(var(--hero-display) * 2.04 + var(--hero-gap));
   }
 }
 
@@ -181,7 +215,7 @@ main > .hero::before {
   font-family: var(--font-body);
   font-weight: 400;
   letter-spacing: normal;
-  margin-top: 28px;
+  margin-top: var(--hero-gap);
   color: var(--bone-2);
   font-size: var(--hero-lede);
   line-height: 1.55;
@@ -253,9 +287,6 @@ main > .hero::before {
 }
 
 /* The proof: three refusals quoted from the code, each with the project it comes from. */
-.hero__proof {
-  margin: 0;
-}
 
 .hero__refusals {
   border-top: 1px solid var(--hero-rule);
@@ -275,13 +306,13 @@ main > .hero::before {
   margin-bottom: 6px;
   color: var(--bone);
   font-family: var(--font-mono);
-  font-size: var(--hero-small);
+  font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.01em;
   quotes: none;
   overflow-wrap: anywhere;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .hero__refusals a {
@@ -299,20 +330,23 @@ main > .hero::before {
   font-size: 0.875rem;
 }
 
-/* Phones: the screen is designed on its own. The text starts high, the button spans the width,
-   and the proof follows straight on, so there is no empty band before the fold. */
+/* Phones: the screen is designed on its own. The text starts high, the button and GitHub share a
+   row, and the proof follows straight on, so there is no empty band before the fold. The dark
+   field is even across the width, because the text is. */
 @media (max-width: 599px) {
   main > .hero {
+    --hero-gap: 20px;
     justify-content: flex-start;
-    padding-block: 40px 56px;
+    padding-block: 40px 48px;
+  }
+
+  main > .hero::before {
+    background: rgba(10, 13, 18, 0.93);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%);
   }
 
   .hero__grid {
-    gap: 44px;
-  }
-
-  .hero__lede {
-    margin-top: 20px;
+    gap: 40px;
   }
 
   .hero__actions {
@@ -320,9 +354,8 @@ main > .hero::before {
     gap: 8px 28px;
   }
 
-  .hero__button {
-    justify-content: center;
-    width: 100%;
+  .hero__status {
+    margin-top: 12px;
   }
 
   .hero__refusals q {
@@ -333,11 +366,8 @@ main > .hero::before {
 /* Short screens (a laptop at 125% zoom): everything on the first screen still fits. */
 @media (min-width: 960px) and (max-height: 700px) {
   main > .hero {
+    --hero-gap: 20px;
     padding-block: 32px 40px;
-  }
-
-  .hero__lede {
-    margin-top: 20px;
   }
 
   .hero__actions {

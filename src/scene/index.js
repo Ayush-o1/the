@@ -188,13 +188,16 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
 
     rig.update(param, stops.length, steer, (steer - previousSteer) / dt);
     // The probe steps out of frame while a section is being read.
-    // On a phone the text fills the screen, so the probe only shows in the opening frame.
     const portrait = camera.aspect <= 1.2;
     let presence = probePresence(param, projectStops);
     if (lastProject >= 0) presence *= 1 - smoothstep((param - lastProject) / 0.15);
-    if (portrait) presence *= 1 - smoothstep((param - 0.08) / 0.22);
+    // On a phone the text fills the screen, and the opening shows the Earth's edge only, so the
+    // probe stays out of the flight there.
+    if (portrait) presence = 0;
+    // On the way out of the opening the probe is smaller, so it does not dwarf the Earth beside it.
+    const opening = 0.6 + 0.4 * smoothstep(Math.min(1, param / 0.9));
     probe.object.visible = presence > 0.01;
-    probe.object.scale.setScalar(probeScale * Math.max(presence, 0.01));
+    probe.object.scale.setScalar(probeScale * opening * Math.max(presence, 0.01));
     worlds.update(param, time, camera, dt);
     // Faint in the opening (the first screen is text over near-black), full strength by the time
     // the first project is reached.

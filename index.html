@@ -84,7 +84,20 @@
         </ul>
       </nav>
       <div class="site-header__tools">
-        <button type="button" class="site-header__control needs-js" data-open-dialog="menu">
+        <!-- On wide screens the links are all visible, so the header offers the 60-second summary
+             instead of a menu that would repeat them. On narrow screens the Menu lists them. -->
+        <button
+          type="button"
+          class="site-header__control site-header__control--wide needs-js"
+          data-open-dialog="summary"
+        >
+          Summary
+        </button>
+        <button
+          type="button"
+          class="site-header__control site-header__control--narrow needs-js"
+          data-open-dialog="menu"
+        >
           Menu
         </button>
         <button type="button" class="site-header__control needs-js" data-mode-toggle>
@@ -121,12 +134,12 @@
           <figure class="hero__proof">
             <ul class="hero__refusals">
               <li>
-                <q lang="en">You cannot approve or reject a resolution you proposed.</q>
-                <a href="#beetlejuice">BeetleJuice</a>, payment reconciliation
-              </li>
-              <li>
                 <q lang="en">Incident is closed and cannot be modified.</q>
                 <a href="#blackwater">BlackWater</a>, incident management
+              </li>
+              <li>
+                <q lang="en">You cannot approve or reject a resolution you proposed.</q>
+                <a href="#beetlejuice">BeetleJuice</a>, payment reconciliation
               </li>
               <li>
                 <q lang="en">untrusted_destination_private_data</q>
@@ -134,7 +147,7 @@
                 call
               </li>
             </ul>
-            <figcaption>Three refusals, quoted from the code.</figcaption>
+            <figcaption>Quoted from the code.</figcaption>
           </figure>
         </div>
       </section>

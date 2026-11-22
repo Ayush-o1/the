@@ -9,7 +9,7 @@ const MAX_ROLL = 0.12;
 // The opening. The camera starts tilted up into the stars, with the Earth and the probe just below
 // the frame, and levels out as the flight begins, so they rise into view. Nothing appears from
 // nowhere: they were there all along. A pure function of progress, so scrolling back tilts it up.
-const OPENING_TILT = 0.5; // radians
+const OPENING_TILT = 0.4; // radians: the Earth's lit edge rests in the lower corner
 const OPENING_END = 0.15; // progress at which the camera is level
 
 export function createCameraPath(curve, camera, probe) {

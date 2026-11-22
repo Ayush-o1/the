@@ -59,7 +59,7 @@ const DEFINITIONS = [
     near: 2.2,
     // The opening reveals the Earth as the camera levels out (camera-path.js), so it stays a
     // little longer than the other worlds.
-    after: 0.75,
+    after: 0.45,
   },
   { id: 'argus', stop: 'argus', create: createArgus, offset: [-19, 1, 46], near: 0.85 },
   {
