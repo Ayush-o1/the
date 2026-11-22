@@ -4,7 +4,7 @@
    are real output from the code. */
 
 :root {
-  --hero-display: clamp(3.5rem, 0.5rem + 6vw, 6.75rem);
+  --hero-display: clamp(3.5rem, 0.5rem + 6vw, 8rem);
   --hero-lede: clamp(1.0625rem, 0.9rem + 0.45vw, 1.5rem);
   /* The gap between the headline and the sentence under it. The proof column starts at the same
      height as that sentence (two headline lines plus this gap). */
@@ -19,7 +19,7 @@
 /* Tablets get their own headline size, not the phone's. */
 @media (min-width: 600px) and (max-width: 959px) {
   :root {
-    --hero-display: 4.75rem;
+    --hero-display: 5.5rem;
   }
 }
 
@@ -222,8 +222,14 @@ main > .hero::before {
   text-wrap: pretty;
 }
 
+.hero__heading .hero__lede {
+  /* The sentence that names him leads the two lines under the headline. */
+  color: var(--bone);
+  text-wrap: balance;
+}
+
 .hero__heading + .hero__lede {
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .hero__actions {
@@ -367,7 +373,11 @@ main > .hero::before {
 @media (min-width: 960px) and (max-height: 700px) {
   main > .hero {
     --hero-gap: 20px;
-    padding-block: 32px 40px;
+    padding-block: 48px 40px;
+  }
+
+  .hero__refusals q {
+    font-size: 0.8125rem;
   }
 
   .hero__actions {

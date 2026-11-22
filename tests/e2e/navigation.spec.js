@@ -62,7 +62,14 @@ test.describe('menu', () => {
       const label = await page.evaluate(() => document.activeElement?.textContent?.trim());
       reached.add(label);
     }
-    for (const name of ['Ayush Kumar', 'Projects', 'About', 'Education', 'Contact', 'Summary']) {
+    for (const name of [
+      'Ayush Kumar',
+      'Projects',
+      'About',
+      'Education',
+      'Contact',
+      'In 60 seconds',
+    ]) {
       expect([...reached].some((text) => text?.includes(name))).toBe(true);
     }
   });

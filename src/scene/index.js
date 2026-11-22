@@ -194,7 +194,8 @@ export function startScene({ env, startTier, pinTier, onContextLost, onSector, o
     // On a phone the text fills the screen, and the opening shows the Earth's edge only, so the
     // probe stays out of the flight there.
     if (portrait) presence = 0;
-    // On the way out of the opening the probe is smaller, so it does not dwarf the Earth beside it.
+    // The opening shows the Earth alone; the probe joins the flight on the way to the first project.
+    presence *= smoothstep(Math.max(0, (param - 0.35) / 0.35));
     const opening = 0.6 + 0.4 * smoothstep(Math.min(1, param / 0.9));
     probe.object.visible = presence > 0.01;
     probe.object.scale.setScalar(probeScale * opening * Math.max(presence, 0.01));
