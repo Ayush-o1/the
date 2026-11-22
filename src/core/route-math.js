@@ -8,6 +8,22 @@ export function smoothstep(x) {
   return t * t * (3 - 2 * t);
 }
 
+// Like smoothstep, but its second derivative is also zero at both ends, so a motion that starts
+// or stops with it has no jump in acceleration.
+export function smootherstep(x) {
+  const t = Math.min(1, Math.max(0, x));
+  return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+// The exposure at this progress: each stop has its own, blended smoothly between neighbours.
+export function exposureAt(param, exposures) {
+  if (exposures.length === 0) return 1;
+  const last = exposures.length - 1;
+  const i = Math.min(last, Math.max(0, Math.floor(param)));
+  const next = Math.min(last, i + 1);
+  return exposures[i] + (exposures[next] - exposures[i]) * smootherstep(param - i);
+}
+
 // How far below the top of the viewport a section's title sits when the probe is "at" the stop.
 const TITLE_MARGIN = 0.12;
 
@@ -40,7 +56,9 @@ export function stopParam(ranges, y) {
   let i = 0;
   while (y >= ranges[i + 1].from) i += 1;
   if (y <= ranges[i].to) return i;
-  return i + smoothstep((y - ranges[i].to) / (ranges[i + 1].from - ranges[i].to));
+  // smootherstep, not smoothstep: its acceleration is also zero where a section starts and ends,
+  // so crossing a section boundary has no jump in acceleration (a jerk spike).
+  return i + smootherstep((y - ranges[i].to) / (ranges[i + 1].from - ranges[i].to));
 }
 
 // The stop whose range is nearest to the current scroll position. Drives the section label.

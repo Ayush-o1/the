@@ -9,7 +9,7 @@ import {
   Points,
   ShaderMaterial,
   AdditiveBlending,
-  BackSide,
+  PlaneGeometry,
   Color,
 } from 'three';
 import { shaderMaterial, disposeTree } from './util.js';
@@ -18,8 +18,8 @@ import { createRng } from '../../lib/rng.js';
 import sunFragment from '../../shaders/sun.frag.glsl?raw';
 import streamVertex from '../../shaders/stream.vert.glsl?raw';
 import streamFragment from '../../shaders/stream.frag.glsl?raw';
-import shellVertex from '../../shaders/shell.vert.glsl?raw';
-import shellFragment from '../../shaders/shell.frag.glsl?raw';
+import glowVertex from '../../shaders/glow.vert.glsl?raw';
+import coronaFragment from '../../shaders/corona.frag.glsl?raw';
 
 const RADIUS = 16;
 const DOTS = { high: 160, mid: 110, low: 60 };
@@ -50,17 +50,23 @@ export function createBeetleJuice({ tier }) {
   const starMaterial = shaderMaterial({ fragment: sunFragment });
   group.add(new Mesh(new SphereGeometry(RADIUS, 96, 64), starMaterial));
 
-  // A fresnel shell: bright at the edge, so the star looks like it is burning into the dark.
-  const shellMaterial = new ShaderMaterial({
-    vertexShader: shellVertex,
-    fragmentShader: shellFragment,
-    uniforms: { uColor: { value: new Color(0xff5a2a) } },
+  // The envelope: ragged plumes beyond the edge, on a quad that faces the camera.
+  const coronaSize = RADIUS * 4.4;
+  const coronaMaterial = shaderMaterial({
+    vertex: glowVertex,
+    fragment: coronaFragment,
+    uniforms: {
+      uRadius: { value: RADIUS },
+      uSize: { value: coronaSize },
+      uColor: { value: new Color(0xff5a24) },
+    },
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
-    side: BackSide,
   });
-  group.add(new Mesh(new SphereGeometry(RADIUS * 1.18, 48, 32), shellMaterial));
+  const corona = new Mesh(new PlaneGeometry(coronaSize, coronaSize), coronaMaterial);
+  corona.frustumCulled = false;
+  group.add(corona);
 
   const streams = buildStreams(DOTS[tier]);
   const geometry = new BufferGeometry();
@@ -84,13 +90,16 @@ export function createBeetleJuice({ tier }) {
   dots.frustumCulled = false;
   group.add(dots);
 
-  const flare = createGlow({ color: 0xff7a3c, size: RADIUS * 7, intensity: 0.55, streaks: 0.5 });
+  // A broad, faint glow into space. No cross streaks: those are a camera artefact, not the star.
+  const flare = createGlow({ color: 0xff6a30, size: RADIUS * 8, intensity: 0.22 });
   group.add(flare.mesh);
 
   return {
     group,
     update(time, camera) {
       starMaterial.uniforms.uTime.value = time;
+      coronaMaterial.uniforms.uTime.value = time;
+      corona.quaternion.copy(camera.quaternion);
       streamMaterial.uniforms.uTime.value = time;
       flare.face(camera);
     },

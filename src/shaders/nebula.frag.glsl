@@ -10,4 +10,6 @@ void main() {
   float amount = smoothstep(0.45, 0.85, clouds) * (0.4 + 0.6 * dust);
   vec3 color = mix(vec3(0.03, 0.07, 0.11), vec3(0.08, 0.15, 0.19), dust);
   gl_FragColor = vec4(color * amount * 0.6, 1.0);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }

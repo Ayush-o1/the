@@ -3,7 +3,6 @@ import {
   Group,
   Mesh,
   SphereGeometry,
-  OctahedronGeometry,
   Color,
   Line,
   LineDashedMaterial,
@@ -13,9 +12,12 @@ import {
   Float32BufferAttribute,
   Vector3,
 } from 'three';
-import { shaderMaterial, SUN_DIRECTION, disposeTree } from './util.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { shaderMaterial, disposeTree } from './util.js';
 import iceFragment from '../../shaders/ice.frag.glsl?raw';
 import gasFragment from '../../shaders/gasgiant.frag.glsl?raw';
+import rings from '../../shaders/rings.glsl?raw';
+import { EMPTY_MAP } from '../maps.js';
 
 const MOON_RADIUS = 7;
 const JUPITER_RADIUS = 60;
@@ -43,20 +45,27 @@ export function createEuropa({ tier }) {
   const group = new Group();
   const segments = tier === 'low' ? [48, 32] : [96, 64];
 
-  const moon = new Mesh(
-    new SphereGeometry(MOON_RADIUS, ...segments),
-    shaderMaterial({ fragment: iceFragment, uniforms: { uSunDir: { value: SUN_DIRECTION } } }),
-  );
+  const moonMaterial = shaderMaterial({
+    fragment: iceFragment,
+    uniforms: { uMaps: { value: 0 }, uMap: { value: EMPTY_MAP } },
+  });
+  const moon = new Mesh(new SphereGeometry(MOON_RADIUS, ...segments), moonMaterial);
   group.add(moon);
 
+  // Jupiter has no ring worth drawing at this distance: the ring inputs are switched off.
   const jupiterMaterial = shaderMaterial({
-    fragment: gasFragment,
+    fragment: `${rings}\n${gasFragment}`,
     uniforms: {
-      uSunDir: { value: SUN_DIRECTION },
-      uColA: { value: new Color(0x7a5a38) },
-      uColB: { value: new Color(0xc9a878) },
-      uColC: { value: new Color(0x5a3a28) },
+      uColA: { value: new Color(0x9c7a55) },
+      uColB: { value: new Color(0xe3d3b8) },
+      uColC: { value: new Color(0x6a4630) },
       uSeed: { value: 9.0 },
+      uMaps: { value: 0 },
+      uMap: { value: EMPTY_MAP },
+      uRingNormal: { value: new Vector3(0, 1, 0) },
+      uRingInner: { value: 0 },
+      uRingOuter: { value: 0 },
+      uCenter: { value: new Vector3() },
     },
   });
   const jupiter = new Mesh(new SphereGeometry(JUPITER_RADIUS, 96, 64), jupiterMaterial);
@@ -70,7 +79,7 @@ export function createEuropa({ tier }) {
     'position',
     new Float32BufferAttribute(orbitArc([0, 0, 0], JUPITER_POSITION), 3),
   );
-  const arcMaterial = new LineBasicMaterial({ color: 0xede7da, transparent: true, opacity: 0.35 });
+  const arcMaterial = new LineBasicMaterial({ color: 0xede7da, transparent: true, opacity: 0.22 });
   group.add(new Line(arcGeometry, arcMaterial));
 
   const [px, py, pz] = DEBRIS.position;
@@ -84,25 +93,44 @@ export function createEuropa({ tier }) {
     dashSize: 1.2,
     gapSize: 0.9,
     transparent: true,
-    opacity: 0.8,
+    opacity: 0.5,
   });
   const track = new Line(trackGeometry, trackMaterial);
   track.computeLineDistances();
   group.add(track);
 
-  const debrisGeometry = new OctahedronGeometry(0.7, 0);
+  // The debris: a small tumbling fragment of a craft, foil on one face, bare metal on the rest.
+  const debrisGeometry = new RoundedBoxGeometry(1.1, 0.45, 0.7, 2, 0.08);
   const debrisMaterial = new MeshStandardMaterial({
-    color: 0xc9c4b8,
-    metalness: 0.6,
-    roughness: 0.5,
-    emissive: 0x331108,
+    color: 0xc79a4c,
+    metalness: 0.9,
+    roughness: 0.32,
   });
   const debris = new Mesh(debrisGeometry, debrisMaterial);
   group.add(debris);
 
+  const arrived = new Set();
+  let fadeStart = null;
+
   return {
     group,
+    maps: tier === 'low' ? [] : ['europa', 'jupiter'],
+    setMap(name, texture, instant = false) {
+      if (name === 'europa') moonMaterial.uniforms.uMap.value = texture;
+      if (name === 'jupiter') jupiterMaterial.uniforms.uMap.value = texture;
+      arrived.add(name);
+      if (arrived.size < 2) return;
+      if (instant) moonMaterial.uniforms.uMaps.value = jupiterMaterial.uniforms.uMaps.value = 1;
+      else fadeStart = -1;
+    },
     update(time, camera, local) {
+      if (fadeStart === -1) fadeStart = time;
+      if (fadeStart !== null) {
+        const k = Math.min(1, (time - fadeStart) / 0.9);
+        moonMaterial.uniforms.uMaps.value = jupiterMaterial.uniforms.uMaps.value =
+          k * k * (3 - 2 * k);
+        if (k >= 1) fadeStart = null;
+      }
       // The debris slides along its track as the probe passes: local progress -0.5 to 0.5 maps to the whole track.
       const along = Math.min(1, Math.max(0, local + 0.5));
       debris.position.set(px + along * TRACK_LENGTH, py, pz);

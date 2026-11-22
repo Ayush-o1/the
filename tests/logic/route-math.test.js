@@ -123,3 +123,20 @@ test('the probe is absent at a project, present in the gaps, and the same going 
   assert.ok(Math.abs(probePresence(2.3, projects) - probePresence(1.7, projects)) < 1e-9);
   assert.ok(probePresence(2.2, projects) > 0 && probePresence(2.2, projects) < 1);
 });
+
+test('crossing a section boundary has no jump in acceleration (smootherstep travel)', () => {
+  // Two sections with a 1000 px gap between them; scrolling at a steady speed through the gap.
+  const ranges = [
+    { from: 0, to: 500 },
+    { from: 1500, to: 2000 },
+  ];
+  const h = 1;
+  const accel = (y) =>
+    stopParam(ranges, y + h) - 2 * stopParam(ranges, y) + stopParam(ranges, y - h);
+  // Just inside the gap at both ends the curvature is tiny, as it is just outside (zero).
+  const scale = 1 / (1000 * 1000);
+  assert.ok(Math.abs(accel(501)) < 0.01 * scale * 6);
+  assert.ok(Math.abs(accel(1499)) < 0.01 * scale * 6);
+  // And in the middle of the gap it is not zero: the curve really does ease.
+  assert.ok(Math.abs(accel(800)) > 0.1 * scale);
+});

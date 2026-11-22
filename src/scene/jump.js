@@ -7,7 +7,7 @@ import vertex from '../shaders/tunnel.vert.glsl?raw';
 import fragment from '../shaders/tunnel.frag.glsl?raw';
 
 export const BASE_FOV = 55;
-const EXTRA_FOV = 20;
+const EXTRA_FOV = 10;
 
 export function createJump() {
   const geometry = new CylinderGeometry(7, 7, 120, 96, 1, true);
