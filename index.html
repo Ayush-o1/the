@@ -52,6 +52,22 @@
     <script>
       document.documentElement.classList.add('js');
     </script>
+    <!-- The two faces on the first screen load with the page, so the headline does not shift when a
+         fallback font is swapped out. -->
+    <link
+      rel="preload"
+      href="/src/fonts/fraunces-roman.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/src/fonts/hanken-grotesk.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="stylesheet" href="/src/styles/main.css" />
   </head>
   <body>
@@ -83,9 +99,10 @@
         <div class="hero__grid">
           <div class="hero__text">
             <h1 id="hero-title" class="hero__title">I write the code that says no.</h1>
+            <p class="hero__lede">I'm Ayush Kumar, a software engineer in Bengaluru.</p>
             <p class="hero__lede">
-              I'm Ayush Kumar, a software engineer in Bengaluru. Most of a system is the happy path.
-              I work on the rest: the lock, the audit entry, the refusal.
+              Most of a system is the happy path. I work on the rest: the lock, the audit entry, the
+              refusal.
             </p>
             <div class="hero__actions">
               <a class="hero__button" href="#projects"

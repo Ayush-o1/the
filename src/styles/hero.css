@@ -4,7 +4,7 @@
    are real output from the code. */
 
 :root {
-  --hero-display: clamp(3rem, 0.9rem + 4.2vw, 5.25rem);
+  --hero-display: clamp(3.5rem, 0.9rem + 4.2vw, 5.25rem);
   --hero-lede: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
   --hero-small: 0.9375rem;
   --hero-rule: rgba(236, 230, 216, 0.2);
@@ -156,7 +156,7 @@ main > .hero::before {
 }
 
 .hero__title {
-  max-width: 10em;
+  max-width: 6.4em;
   color: var(--bone);
   font-family: var(--font-display);
   font-size: var(--hero-display);
@@ -175,6 +175,10 @@ main > .hero::before {
   font-size: var(--hero-lede);
   line-height: 1.55;
   text-wrap: pretty;
+}
+
+.hero__lede + .hero__lede {
+  margin-top: 4px;
 }
 
 .hero__actions {
