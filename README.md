@@ -20,16 +20,19 @@ Plain HTML, CSS and JavaScript with Vite. Three.js draws the flight. There is no
 text is in `index.html`; scripts only add behaviour. The flight is loaded after the page is
 readable and the page works without it.
 
-The numbers below were measured on a local build, with Lighthouse 12 on a Mac GPU:
+The numbers below were measured on a local build, with Lighthouse 12 on a Mac GPU (median of
+three runs):
 
 | Measure                            | Desktop | Phone profile |
 | ---------------------------------- | ------- | ------------- |
-| Performance                        | 100     | 96            |
+| Performance                        | 96      | 93            |
 | Accessibility, best practices, SEO | 100     | 100           |
-| Total blocking time                | 0 ms    | 0 ms          |
+| Total blocking time                | 67 ms   | 170 ms        |
 
-First contentful paint is 0.4 s on a simulated fast mobile network. The first load is 23 KB, all
-JavaScript is 203 KB gzipped and the three font files are 52 KB.
+On a first visit a short cover stays up while every shader is compiled, so the largest text
+appears after about 1.3 s on desktop; later visits have no cover. Browsers that draw WebGL on the
+CPU get the plain page. The first load is 23 KB, all JavaScript is 217 KB gzipped, the three font
+files are 52 KB, and the planet maps (loaded after the flight starts) are 694 KB.
 
 ## Planet imagery
 
